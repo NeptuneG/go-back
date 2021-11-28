@@ -1,4 +1,4 @@
-package api
+package controller
 
 import (
 	"database/sql"
@@ -8,32 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Server struct {
-	store  *db.Store
-	router *gin.Engine
-}
-
-func NewServer(store *db.Store) *Server {
-	server := &Server{store: store}
-	router := gin.Default()
-
-	router.GET("/live_houses", server.getAllLiveHouses)
-	router.POST("/live_houses", server.createLivehouse)
-
-	server.router = router
-	return server
-}
-
-func (server *Server) Start(address string) error {
-	return server.router.Run(address)
-}
-
 type getAllLiveHousesRequest struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	Limit  int32 `form:"limit"`
+	Offset int32 `form:"offset"`
 }
 
-func (server *Server) getAllLiveHouses(ctx *gin.Context) {
+func (controller *Controller) GetAllLiveHouses(ctx *gin.Context) {
 	var req getAllLiveHousesRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -44,13 +24,14 @@ func (server *Server) getAllLiveHouses(ctx *gin.Context) {
 		Limit:  req.Limit,
 		Offset: req.Offset,
 	}
-	liveHouses, err := server.store.GetAllLiveHouses(ctx, arg)
+
+	liveHouses, err := controller.store.GetAllLiveHouses(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, liveHouses)
+	ctx.JSON(http.StatusOK, map[string][]db.LiveHouse{"liveHouses": liveHouses})
 }
 
 type createLiveHouseRequest struct {
@@ -59,7 +40,7 @@ type createLiveHouseRequest struct {
 	Slug    string `json:"slug"`
 }
 
-func (server *Server) createLivehouse(ctx *gin.Context) {
+func (controller *Controller) CreateLivehouse(ctx *gin.Context) {
 	var req createLiveHouseRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -71,15 +52,11 @@ func (server *Server) createLivehouse(ctx *gin.Context) {
 		Address: sql.NullString{Valid: true, String: req.Address},
 		Slug:    sql.NullString{Valid: true, String: req.Slug},
 	}
-	liveHouse, err := server.store.CreateLiveHouse(ctx, arg)
+	liveHouse, err := controller.store.CreateLiveHouse(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, liveHouse)
-}
-
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
 }

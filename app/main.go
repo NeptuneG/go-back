@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/NeptuneG/go-back/api"
 	db "github.com/NeptuneG/go-back/db/sqlc"
+	"github.com/NeptuneG/go-back/server"
 	_ "github.com/lib/pq"
 )
 
@@ -17,12 +17,18 @@ const (
 
 func main() {
 	conn, err := sql.Open(dbDriver, dbSource)
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	if err != nil {
 		log.Fatal("Connecting database failed:", err)
 	}
 
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
+	server := server.NewServer(store)
 
 	err = server.Start(serverAddress)
 	if err != nil {
