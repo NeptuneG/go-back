@@ -1,4 +1,4 @@
 :concurrency: 10
 :queues:
   - default
-  - live_events
+  - scraping_live_events

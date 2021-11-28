@@ -2,7 +2,7 @@
 
 require 'sidekiq'
 
-Dir["#{File.dirname(__FILE__)}/workers/*.rb"].each { |file| require file }
+Dir[File.join(".", "**/*.rb")].each { |file| require file }
 
 redis_url = "redis://#{ENV.fetch('REDIS_HOST', 'redis')}:#{ENV.fetch('REDIS_PORT', 6379)}"
 
