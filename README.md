@@ -29,11 +29,18 @@
 - `docker-compose run --rm app go mod init github.com/NeptuneG/go-back`
 - `docker-compose run --rm app air init`
 - `sqlc init`
+    - sqlc installed on localhost
+    - [Installing sqlc — sqlc 1.11.0 documentation](https://docs.sqlc.dev/en/latest/overview/install.html)
     - [Configuration file (version 1) — sqlc 1.10.0 documentation](https://docs.sqlc.dev/en/stable/reference/config.html)
 
 ## DB Diagram
 
 - [go-back - dbdiagram.io](https://dbdiagram.io/d/619f9ec18c901501c0d2b534)
+
+## Todo
+
+- [ ] auto `updated_at`
+- [ ] slug
 
 ## References
 

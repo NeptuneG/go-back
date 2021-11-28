@@ -1,0 +1,84 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    connection_pool (2.2.5)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
+    faraday (1.8.0)
+      faraday-em_http (~> 1.0)
+      faraday-em_synchrony (~> 1.0)
+      faraday-excon (~> 1.1)
+      faraday-httpclient (~> 1.0.1)
+      faraday-net_http (~> 1.0)
+      faraday-net_http_persistent (~> 1.1)
+      faraday-patron (~> 1.0)
+      faraday-rack (~> 1.0)
+      multipart-post (>= 1.2, < 3)
+      ruby2_keywords (>= 0.0.4)
+    faraday-cookie_jar (0.0.7)
+      faraday (>= 0.8.0)
+      http-cookie (~> 1.0.0)
+    faraday-em_http (1.0.0)
+    faraday-em_synchrony (1.0.0)
+    faraday-encoding (0.0.5)
+      faraday
+    faraday-excon (1.1.0)
+    faraday-http-cache (2.2.0)
+      faraday (>= 0.8)
+    faraday-httpclient (1.0.1)
+    faraday-net_http (1.0.1)
+    faraday-net_http_persistent (1.2.0)
+    faraday-patron (1.0.0)
+    faraday-rack (1.0.0)
+    faraday_middleware (1.2.0)
+      faraday (~> 1.0)
+    fastimage (2.2.5)
+    http-cookie (1.0.4)
+      domain_name (~> 0.5)
+    metainspector (5.11.2)
+      addressable (~> 2.7)
+      faraday (~> 1.4)
+      faraday-cookie_jar (~> 0.0)
+      faraday-encoding (~> 0.0)
+      faraday-http-cache (~> 2.2)
+      faraday_middleware (~> 1.0)
+      fastimage (~> 2.2)
+      nesty (~> 1.0)
+      nokogiri (~> 1.11)
+    multipart-post (2.1.1)
+    nesty (1.0.2)
+    nokogiri (1.12.5-x86_64-linux)
+      racc (~> 1.4)
+    parallel (1.21.0)
+    public_suffix (4.0.6)
+    racc (1.6.0)
+    rack (2.2.3)
+    redis (4.5.1)
+    redis-namespace (1.8.1)
+      redis (>= 3.0.4)
+    ruby2_keywords (0.0.5)
+    sidekiq (6.3.1)
+      connection_pool (>= 2.2.2)
+      rack (~> 2.0)
+      redis (>= 4.2.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.8)
+
+PLATFORMS
+  x86_64-linux-musl
+
+DEPENDENCIES
+  metainspector (~> 5.11)
+  parallel (~> 1.20)
+  redis (~> 4.0)
+  redis-namespace (~> 1.8)
+  sidekiq (~> 6.1)
+
+RUBY VERSION
+   ruby 3.0.3p157
+
+BUNDLED WITH
+   2.2.32
