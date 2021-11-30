@@ -1,4 +1,4 @@
-package util
+package types
 
 import (
 	"database/sql"
@@ -21,4 +21,13 @@ func (s *NullString) UnmarshalJSON(data []byte) error {
 	s.String = str
 	s.Valid = str != ""
 	return nil
+}
+
+func NewNullString(s string) NullString {
+	return NullString{
+		sql.NullString{
+			String: s,
+			Valid:  s != "",
+		},
+	}
 }

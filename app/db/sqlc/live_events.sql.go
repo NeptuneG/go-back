@@ -5,9 +5,9 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
+	"github.com/NeptuneG/go-back/db/types"
 	"github.com/google/uuid"
 )
 
@@ -23,15 +23,15 @@ INSERT INTO live_events (
 `
 
 type CreateLiveEventParams struct {
-	LiveHouseID     uuid.UUID      `json:"liveHouseID"`
-	Title           string         `json:"title"`
-	Url             string         `json:"url"`
-	Description     sql.NullString `json:"description"`
-	PriceInfo       sql.NullString `json:"priceInfo"`
-	StageOneOpenAt  sql.NullTime   `json:"stageOneOpenAt"`
-	StageOneStartAt time.Time      `json:"stageOneStartAt"`
-	StageTwoOpenAt  sql.NullTime   `json:"stageTwoOpenAt"`
-	StageTwoStartAt sql.NullTime   `json:"stageTwoStartAt"`
+	LiveHouseID     uuid.UUID        `json:"liveHouseID"`
+	Title           string           `json:"title"`
+	Url             string           `json:"url"`
+	Description     types.NullString `json:"description"`
+	PriceInfo       types.NullString `json:"priceInfo"`
+	StageOneOpenAt  types.NullTime   `json:"stageOneOpenAt"`
+	StageOneStartAt time.Time        `json:"stageOneStartAt"`
+	StageTwoOpenAt  types.NullTime   `json:"stageTwoOpenAt"`
+	StageTwoStartAt types.NullTime   `json:"stageTwoStartAt"`
 }
 
 func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams) (LiveEvent, error) {

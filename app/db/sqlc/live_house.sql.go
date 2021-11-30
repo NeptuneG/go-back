@@ -5,8 +5,8 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/NeptuneG/go-back/db/types"
 	"github.com/google/uuid"
 )
 
@@ -15,25 +15,30 @@ INSERT INTO live_houses (
   name, address, slug
 ) VALUES (
   $1, $2, $3
-) RETURNING id, name, address, slug, created_at, updated_at
+) RETURNING id, name, address, slug
 `
 
 type CreateLiveHouseParams struct {
-	Name    string         `json:"name"`
-	Address sql.NullString `json:"address"`
-	Slug    sql.NullString `json:"slug"`
+	Name    string           `json:"name"`
+	Address types.NullString `json:"address"`
+	Slug    types.NullString `json:"slug"`
 }
 
-func (q *Queries) CreateLiveHouse(ctx context.Context, arg CreateLiveHouseParams) (LiveHouse, error) {
+type CreateLiveHouseRow struct {
+	ID      uuid.UUID        `json:"id"`
+	Name    string           `json:"name"`
+	Address types.NullString `json:"address"`
+	Slug    types.NullString `json:"slug"`
+}
+
+func (q *Queries) CreateLiveHouse(ctx context.Context, arg CreateLiveHouseParams) (CreateLiveHouseRow, error) {
 	row := q.queryRow(ctx, q.createLiveHouseStmt, createLiveHouse, arg.Name, arg.Address, arg.Slug)
-	var i LiveHouse
+	var i CreateLiveHouseRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Address,
 		&i.Slug,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -66,6 +71,46 @@ func (q *Queries) GetAllLiveHouses(ctx context.Context, arg GetAllLiveHousesPara
 			&i.Slug,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllLiveHousesDefault = `-- name: GetAllLiveHousesDefault :many
+SELECT id, name, address, slug FROM live_houses
+ORDER BY id
+`
+
+type GetAllLiveHousesDefaultRow struct {
+	ID      uuid.UUID        `json:"id"`
+	Name    string           `json:"name"`
+	Address types.NullString `json:"address"`
+	Slug    types.NullString `json:"slug"`
+}
+
+func (q *Queries) GetAllLiveHousesDefault(ctx context.Context) ([]GetAllLiveHousesDefaultRow, error) {
+	rows, err := q.query(ctx, q.getAllLiveHousesDefaultStmt, getAllLiveHousesDefault)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllLiveHousesDefaultRow
+	for rows.Next() {
+		var i GetAllLiveHousesDefaultRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Address,
+			&i.Slug,
 		); err != nil {
 			return nil, err
 		}

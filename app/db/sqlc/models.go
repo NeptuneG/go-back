@@ -3,53 +3,53 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 
+	"github.com/NeptuneG/go-back/db/types"
 	"github.com/google/uuid"
 )
 
 type Artist struct {
-	ID          uuid.UUID      `json:"id"`
-	Name        string         `json:"name"`
-	Description sql.NullString `json:"description"`
-	Slug        sql.NullString `json:"slug"`
-	CreatedAt   time.Time      `json:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt"`
+	ID          uuid.UUID        `json:"id"`
+	Name        string           `json:"name"`
+	Description types.NullString `json:"description"`
+	Slug        types.NullString `json:"slug"`
+	CreatedAt   time.Time        `json:"createdAt"`
+	UpdatedAt   time.Time        `json:"updatedAt"`
 }
 
 type LiveEvent struct {
-	ID              uuid.UUID      `json:"id"`
-	LiveHouseID     uuid.UUID      `json:"liveHouseID"`
-	Title           string         `json:"title"`
-	Url             string         `json:"url"`
-	Description     sql.NullString `json:"description"`
-	PriceInfo       sql.NullString `json:"priceInfo"`
-	StageOneOpenAt  sql.NullTime   `json:"stageOneOpenAt"`
-	StageOneStartAt time.Time      `json:"stageOneStartAt"`
-	StageTwoOpenAt  sql.NullTime   `json:"stageTwoOpenAt"`
-	StageTwoStartAt sql.NullTime   `json:"stageTwoStartAt"`
-	Slug            sql.NullString `json:"slug"`
-	CreatedAt       time.Time      `json:"createdAt"`
-	UpdatedAt       time.Time      `json:"updatedAt"`
+	ID              uuid.UUID        `json:"id"`
+	LiveHouseID     uuid.UUID        `json:"liveHouseID"`
+	Title           string           `json:"title"`
+	Url             string           `json:"url"`
+	Description     types.NullString `json:"description"`
+	PriceInfo       types.NullString `json:"priceInfo"`
+	StageOneOpenAt  types.NullTime   `json:"stageOneOpenAt"`
+	StageOneStartAt time.Time        `json:"stageOneStartAt"`
+	StageTwoOpenAt  types.NullTime   `json:"stageTwoOpenAt"`
+	StageTwoStartAt types.NullTime   `json:"stageTwoStartAt"`
+	Slug            types.NullString `json:"slug"`
+	CreatedAt       time.Time        `json:"createdAt"`
+	UpdatedAt       time.Time        `json:"updatedAt"`
 }
 
 type LiveHouse struct {
-	ID        uuid.UUID      `json:"id"`
-	Name      string         `json:"name"`
-	Address   sql.NullString `json:"address"`
-	Slug      sql.NullString `json:"slug"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
+	ID        uuid.UUID        `json:"id"`
+	Name      string           `json:"name"`
+	Address   types.NullString `json:"address"`
+	Slug      types.NullString `json:"slug"`
+	CreatedAt time.Time        `json:"createdAt"`
+	UpdatedAt time.Time        `json:"updatedAt"`
 }
 
 type User struct {
-	ID                 uuid.UUID      `json:"id"`
-	Email              string         `json:"email"`
-	EncryptedPassword  string         `json:"encryptedPassword"`
-	ResetPasswordToken sql.NullString `json:"resetPasswordToken"`
-	CreatedAt          time.Time      `json:"createdAt"`
-	UpdatedAt          time.Time      `json:"updatedAt"`
+	ID                 uuid.UUID        `json:"id"`
+	Email              string           `json:"email"`
+	EncryptedPassword  string           `json:"encryptedPassword"`
+	ResetPasswordToken types.NullString `json:"resetPasswordToken"`
+	CreatedAt          time.Time        `json:"createdAt"`
+	UpdatedAt          time.Time        `json:"updatedAt"`
 }
 
 type UserOrder struct {

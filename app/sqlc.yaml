@@ -18,3 +18,14 @@ packages:
     output_db_file_name: "db.go"
     output_models_file_name: "models.go"
     output_querier_file_name: "querier.go"
+overrides:
+  - go_type: "github.com/NeptuneG/go-back/db/types.NullString"
+    db_type: "text"
+    nullable: true
+  - go_type: "github.com/NeptuneG/go-back/db/types.NullString"
+    db_type: "pg_catalog.varchar"
+    nullable: true
+  - go_type: "github.com/NeptuneG/go-back/db/types.NullTime"
+    db_type: "timestamptz"
+    nullable: true
+

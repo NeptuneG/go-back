@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"database/sql"
 	"net/http"
 
 	db "github.com/NeptuneG/go-back/db/sqlc"
+	"github.com/NeptuneG/go-back/db/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,18 +20,13 @@ func (controller *Controller) GetAllLiveHouses(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.GetAllLiveHousesParams{
-		Limit:  req.Limit,
-		Offset: req.Offset,
-	}
-
-	liveHouses, err := controller.store.GetAllLiveHouses(ctx, arg)
+	liveHouses, err := controller.store.GetAllLiveHousesDefault(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, map[string][]db.LiveHouse{"liveHouses": liveHouses})
+	ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveHousesDefaultRow{"liveHouses": liveHouses})
 }
 
 type createLiveHouseRequest struct {
@@ -49,8 +44,8 @@ func (controller *Controller) CreateLivehouse(ctx *gin.Context) {
 
 	arg := db.CreateLiveHouseParams{
 		Name:    req.Name,
-		Address: sql.NullString{Valid: true, String: req.Address},
-		Slug:    sql.NullString{Valid: true, String: req.Slug},
+		Address: types.NewNullString(req.Address),
+		Slug:    types.NewNullString(req.Slug),
 	}
 	liveHouse, err := controller.store.CreateLiveHouse(ctx, arg)
 	if err != nil {
