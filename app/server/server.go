@@ -17,6 +17,7 @@ func NewServer(store *db.Store) *Server {
 
 	router.GET("/live_houses", controller.GetAllLiveHouses)
 	router.POST("/live_houses", controller.CreateLivehouse)
+	router.POST("/live_houses/:id/scrape_events", controller.ScrapeLivehouseEvents)
 
 	return &Server{
 		router:     router,
