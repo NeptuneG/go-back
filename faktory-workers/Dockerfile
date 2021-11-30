@@ -11,7 +11,6 @@ RUN set -x && \
     cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
     gem install bundler --no-document
 
-
 WORKDIR $APP_HOME
 
 COPY Gemfile ./Gemfile
@@ -22,5 +21,5 @@ RUN bundle config set --local path $BUNDLE_PATH && \
 
 COPY . ./
 
-ENTRYPOINT [ "bundle", "exec", "sidekiq" ]
-CMD [ "-r", "./boot.rb", "-C", "./config/sidekiq.yml" ]
+ENTRYPOINT [ "bundle", "exec", "faktory-worker" ]
+CMD [ "-r", "./boot.rb" ]

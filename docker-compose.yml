@@ -30,15 +30,22 @@ services:
       - "6379:6379"
     volumes:
       - redis:/data
-  sidekiq:
-    container_name: go-back-sidekiq
-    build:
-      context: ./sidekiq
-    depends_on:
-      - redis
+  faktory:
+    container_name: go-back-faktory
+    image: contribsys/faktory:latest
     volumes:
-      - ./sidekiq:/app
+      - faktory:/var/lib/faktory
+    ports:
+      - "7419:7419"
+      - "7420:7420"
+  faktory-workers:
+    container_name: go-back-faktory-workers
+    build:
+      context: ./faktory-workers
+    depends_on:
+      - faktory
 
 volumes:
   data:
   redis:
+  faktory:

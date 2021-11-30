@@ -7,6 +7,4 @@ ruby '3.0.3'
 
 gem 'metainspector', '~> 5.11'
 gem 'parallel', '~> 1.20'
-gem 'redis', '~> 4.0'
-gem 'redis-namespace', '~> 1.8'
-gem 'sidekiq', '~> 6.1'
+gem 'faktory_worker_ruby'

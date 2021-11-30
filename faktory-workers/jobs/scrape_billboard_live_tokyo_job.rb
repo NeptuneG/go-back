@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-class ScrapingLiveEventsWorker
-  include Sidekiq::Worker
-
-  sidekiq_options queue: :scraping_live_events, retry: false
+class ScrapeBillboardLiveTokyoJob
+  include Faktory::Job
 
   def perform(year_month)
     ScrapeBillboardLiveTokyo.new(year_month).call
