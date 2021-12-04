@@ -14,7 +14,7 @@ packages:
     emit_result_struct_pointers: false
     emit_params_struct_pointers: false
     emit_methods_with_db_argument: false
-    json_tags_case_style: "camel"
+    json_tags_case_style: "snake"
     output_db_file_name: "db.go"
     output_models_file_name: "models.go"
     output_querier_file_name: "querier.go"

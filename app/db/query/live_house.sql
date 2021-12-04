@@ -18,3 +18,6 @@ OFFSET $2;
 -- name: GetAllLiveHousesDefault :many
 SELECT id, name, address, slug FROM live_houses
 ORDER BY id;
+
+-- name: GetAllLiveHousesIdAndSlugs :many
+SELECT id, slug FROM live_houses;

@@ -36,4 +36,4 @@ sqlc-generate:
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
-	docker exec go-back-app go mod tidy
+	docker exec go-back-app go mod tidy -compat=1.17

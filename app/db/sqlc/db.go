@@ -28,11 +28,20 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createLiveHouseStmt, err = db.PrepareContext(ctx, createLiveHouse); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateLiveHouse: %w", err)
 	}
+	if q.getAllLiveEventsStmt, err = db.PrepareContext(ctx, getAllLiveEvents); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllLiveEvents: %w", err)
+	}
+	if q.getAllLiveEventsByLiveHouseSlugStmt, err = db.PrepareContext(ctx, getAllLiveEventsByLiveHouseSlug); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllLiveEventsByLiveHouseSlug: %w", err)
+	}
 	if q.getAllLiveHousesStmt, err = db.PrepareContext(ctx, getAllLiveHouses); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllLiveHouses: %w", err)
 	}
 	if q.getAllLiveHousesDefaultStmt, err = db.PrepareContext(ctx, getAllLiveHousesDefault); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllLiveHousesDefault: %w", err)
+	}
+	if q.getAllLiveHousesIdAndSlugsStmt, err = db.PrepareContext(ctx, getAllLiveHousesIdAndSlugs); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllLiveHousesIdAndSlugs: %w", err)
 	}
 	if q.getLiveEventByIdStmt, err = db.PrepareContext(ctx, getLiveEventById); err != nil {
 		return nil, fmt.Errorf("error preparing query GetLiveEventById: %w", err)
@@ -58,6 +67,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createLiveHouseStmt: %w", cerr)
 		}
 	}
+	if q.getAllLiveEventsStmt != nil {
+		if cerr := q.getAllLiveEventsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllLiveEventsStmt: %w", cerr)
+		}
+	}
+	if q.getAllLiveEventsByLiveHouseSlugStmt != nil {
+		if cerr := q.getAllLiveEventsByLiveHouseSlugStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllLiveEventsByLiveHouseSlugStmt: %w", cerr)
+		}
+	}
 	if q.getAllLiveHousesStmt != nil {
 		if cerr := q.getAllLiveHousesStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAllLiveHousesStmt: %w", cerr)
@@ -66,6 +85,11 @@ func (q *Queries) Close() error {
 	if q.getAllLiveHousesDefaultStmt != nil {
 		if cerr := q.getAllLiveHousesDefaultStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAllLiveHousesDefaultStmt: %w", cerr)
+		}
+	}
+	if q.getAllLiveHousesIdAndSlugsStmt != nil {
+		if cerr := q.getAllLiveHousesIdAndSlugsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllLiveHousesIdAndSlugsStmt: %w", cerr)
 		}
 	}
 	if q.getLiveEventByIdStmt != nil {
@@ -120,27 +144,33 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                           DBTX
-	tx                           *sql.Tx
-	createLiveEventStmt          *sql.Stmt
-	createLiveHouseStmt          *sql.Stmt
-	getAllLiveHousesStmt         *sql.Stmt
-	getAllLiveHousesDefaultStmt  *sql.Stmt
-	getLiveEventByIdStmt         *sql.Stmt
-	getLiveEventsByLiveHouseStmt *sql.Stmt
-	getLiveHouseByIdStmt         *sql.Stmt
+	db                                  DBTX
+	tx                                  *sql.Tx
+	createLiveEventStmt                 *sql.Stmt
+	createLiveHouseStmt                 *sql.Stmt
+	getAllLiveEventsStmt                *sql.Stmt
+	getAllLiveEventsByLiveHouseSlugStmt *sql.Stmt
+	getAllLiveHousesStmt                *sql.Stmt
+	getAllLiveHousesDefaultStmt         *sql.Stmt
+	getAllLiveHousesIdAndSlugsStmt      *sql.Stmt
+	getLiveEventByIdStmt                *sql.Stmt
+	getLiveEventsByLiveHouseStmt        *sql.Stmt
+	getLiveHouseByIdStmt                *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                           tx,
-		tx:                           tx,
-		createLiveEventStmt:          q.createLiveEventStmt,
-		createLiveHouseStmt:          q.createLiveHouseStmt,
-		getAllLiveHousesStmt:         q.getAllLiveHousesStmt,
-		getAllLiveHousesDefaultStmt:  q.getAllLiveHousesDefaultStmt,
-		getLiveEventByIdStmt:         q.getLiveEventByIdStmt,
-		getLiveEventsByLiveHouseStmt: q.getLiveEventsByLiveHouseStmt,
-		getLiveHouseByIdStmt:         q.getLiveHouseByIdStmt,
+		db:                                  tx,
+		tx:                                  tx,
+		createLiveEventStmt:                 q.createLiveEventStmt,
+		createLiveHouseStmt:                 q.createLiveHouseStmt,
+		getAllLiveEventsStmt:                q.getAllLiveEventsStmt,
+		getAllLiveEventsByLiveHouseSlugStmt: q.getAllLiveEventsByLiveHouseSlugStmt,
+		getAllLiveHousesStmt:                q.getAllLiveHousesStmt,
+		getAllLiveHousesDefaultStmt:         q.getAllLiveHousesDefaultStmt,
+		getAllLiveHousesIdAndSlugsStmt:      q.getAllLiveHousesIdAndSlugsStmt,
+		getLiveEventByIdStmt:                q.getLiveEventByIdStmt,
+		getLiveEventsByLiveHouseStmt:        q.getLiveEventsByLiveHouseStmt,
+		getLiveHouseByIdStmt:                q.getLiveHouseByIdStmt,
 	}
 }

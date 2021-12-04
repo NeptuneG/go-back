@@ -26,7 +26,7 @@ func (controller *Controller) GetAllLiveHouses(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveHousesDefaultRow{"liveHouses": liveHouses})
+	ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveHousesDefaultRow{"live_houses": liveHouses})
 }
 
 type createLiveHouseRequest struct {

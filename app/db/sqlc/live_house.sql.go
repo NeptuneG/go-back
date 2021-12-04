@@ -125,6 +125,38 @@ func (q *Queries) GetAllLiveHousesDefault(ctx context.Context) ([]GetAllLiveHous
 	return items, nil
 }
 
+const getAllLiveHousesIdAndSlugs = `-- name: GetAllLiveHousesIdAndSlugs :many
+SELECT id, slug FROM live_houses
+`
+
+type GetAllLiveHousesIdAndSlugsRow struct {
+	ID   uuid.UUID        `json:"id"`
+	Slug types.NullString `json:"slug"`
+}
+
+func (q *Queries) GetAllLiveHousesIdAndSlugs(ctx context.Context) ([]GetAllLiveHousesIdAndSlugsRow, error) {
+	rows, err := q.query(ctx, q.getAllLiveHousesIdAndSlugsStmt, getAllLiveHousesIdAndSlugs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllLiveHousesIdAndSlugsRow
+	for rows.Next() {
+		var i GetAllLiveHousesIdAndSlugsRow
+		if err := rows.Scan(&i.ID, &i.Slug); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getLiveHouseById = `-- name: GetLiveHouseById :one
 SELECT id, name, address, slug, created_at, updated_at FROM live_houses
 WHERE id = $1 LIMIT 1

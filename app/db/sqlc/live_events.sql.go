@@ -23,15 +23,15 @@ INSERT INTO live_events (
 `
 
 type CreateLiveEventParams struct {
-	LiveHouseID     uuid.UUID        `json:"liveHouseID"`
+	LiveHouseID     uuid.UUID        `json:"live_house_id"`
 	Title           string           `json:"title"`
 	Url             string           `json:"url"`
 	Description     types.NullString `json:"description"`
-	PriceInfo       types.NullString `json:"priceInfo"`
-	StageOneOpenAt  types.NullTime   `json:"stageOneOpenAt"`
-	StageOneStartAt time.Time        `json:"stageOneStartAt"`
-	StageTwoOpenAt  types.NullTime   `json:"stageTwoOpenAt"`
-	StageTwoStartAt types.NullTime   `json:"stageTwoStartAt"`
+	PriceInfo       types.NullString `json:"price_info"`
+	StageOneOpenAt  types.NullTime   `json:"stage_one_open_at"`
+	StageOneStartAt time.Time        `json:"stage_one_start_at"`
+	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
+	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
 }
 
 func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams) (LiveEvent, error) {
@@ -63,6 +63,131 @@ func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getAllLiveEvents = `-- name: GetAllLiveEvents :many
+SELECT
+  live_houses.slug as live_house_slug,
+  live_events.id,
+  live_events.title, live_events.url,
+  live_events.description, live_events.price_info,
+  live_events.stage_one_open_at, live_events.stage_one_start_at,
+  live_events.stage_two_open_at, live_events.stage_two_start_at,
+  live_events.slug
+FROM live_events
+INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
+`
+
+type GetAllLiveEventsRow struct {
+	LiveHouseSlug   types.NullString `json:"live_house_slug"`
+	ID              uuid.UUID        `json:"id"`
+	Title           string           `json:"title"`
+	Url             string           `json:"url"`
+	Description     types.NullString `json:"description"`
+	PriceInfo       types.NullString `json:"price_info"`
+	StageOneOpenAt  types.NullTime   `json:"stage_one_open_at"`
+	StageOneStartAt time.Time        `json:"stage_one_start_at"`
+	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
+	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	Slug            types.NullString `json:"slug"`
+}
+
+func (q *Queries) GetAllLiveEvents(ctx context.Context) ([]GetAllLiveEventsRow, error) {
+	rows, err := q.query(ctx, q.getAllLiveEventsStmt, getAllLiveEvents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllLiveEventsRow
+	for rows.Next() {
+		var i GetAllLiveEventsRow
+		if err := rows.Scan(
+			&i.LiveHouseSlug,
+			&i.ID,
+			&i.Title,
+			&i.Url,
+			&i.Description,
+			&i.PriceInfo,
+			&i.StageOneOpenAt,
+			&i.StageOneStartAt,
+			&i.StageTwoOpenAt,
+			&i.StageTwoStartAt,
+			&i.Slug,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllLiveEventsByLiveHouseSlug = `-- name: GetAllLiveEventsByLiveHouseSlug :many
+SELECT
+  live_houses.slug as live_house_slug,
+  live_events.id,
+  live_events.title, live_events.url,
+  live_events.description, live_events.price_info,
+  live_events.stage_one_open_at, live_events.stage_one_start_at,
+  live_events.stage_two_open_at, live_events.stage_two_start_at,
+  live_events.slug
+FROM live_events
+INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
+WHERE live_houses.slug = $1
+`
+
+type GetAllLiveEventsByLiveHouseSlugRow struct {
+	LiveHouseSlug   types.NullString `json:"live_house_slug"`
+	ID              uuid.UUID        `json:"id"`
+	Title           string           `json:"title"`
+	Url             string           `json:"url"`
+	Description     types.NullString `json:"description"`
+	PriceInfo       types.NullString `json:"price_info"`
+	StageOneOpenAt  types.NullTime   `json:"stage_one_open_at"`
+	StageOneStartAt time.Time        `json:"stage_one_start_at"`
+	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
+	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	Slug            types.NullString `json:"slug"`
+}
+
+func (q *Queries) GetAllLiveEventsByLiveHouseSlug(ctx context.Context, slug types.NullString) ([]GetAllLiveEventsByLiveHouseSlugRow, error) {
+	rows, err := q.query(ctx, q.getAllLiveEventsByLiveHouseSlugStmt, getAllLiveEventsByLiveHouseSlug, slug)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllLiveEventsByLiveHouseSlugRow
+	for rows.Next() {
+		var i GetAllLiveEventsByLiveHouseSlugRow
+		if err := rows.Scan(
+			&i.LiveHouseSlug,
+			&i.ID,
+			&i.Title,
+			&i.Url,
+			&i.Description,
+			&i.PriceInfo,
+			&i.StageOneOpenAt,
+			&i.StageOneStartAt,
+			&i.StageTwoOpenAt,
+			&i.StageTwoStartAt,
+			&i.Slug,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getLiveEventById = `-- name: GetLiveEventById :one
@@ -99,7 +224,7 @@ OFFSET $3
 `
 
 type GetLiveEventsByLiveHouseParams struct {
-	LiveHouseID uuid.UUID `json:"liveHouseID"`
+	LiveHouseID uuid.UUID `json:"live_house_id"`
 	Limit       int32     `json:"limit"`
 	Offset      int32     `json:"offset"`
 }

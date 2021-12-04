@@ -17,3 +17,28 @@ SELECT * FROM live_events
 WHERE live_house_id = $1
 LIMIT $2
 OFFSET $3;
+
+-- name: GetAllLiveEvents :many
+SELECT
+  live_houses.slug as live_house_slug,
+  live_events.id,
+  live_events.title, live_events.url,
+  live_events.description, live_events.price_info,
+  live_events.stage_one_open_at, live_events.stage_one_start_at,
+  live_events.stage_two_open_at, live_events.stage_two_start_at,
+  live_events.slug
+FROM live_events
+INNER JOIN live_houses ON live_events.live_house_id = live_houses.id;
+
+-- name: GetAllLiveEventsByLiveHouseSlug :many
+SELECT
+  live_houses.slug as live_house_slug,
+  live_events.id,
+  live_events.title, live_events.url,
+  live_events.description, live_events.price_info,
+  live_events.stage_one_open_at, live_events.stage_one_start_at,
+  live_events.stage_two_open_at, live_events.stage_two_start_at,
+  live_events.slug
+FROM live_events
+INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
+WHERE live_houses.slug = $1;

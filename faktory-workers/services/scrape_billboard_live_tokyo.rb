@@ -10,7 +10,7 @@ class ScrapeBillboardLiveTokyo
   end
 
   def call
-    scraped_live_events.each { |live_events| puts(live_events.to_json) }
+    scraped_live_events
   end
 
   private
@@ -41,16 +41,18 @@ class ScrapeBillboardLiveTokyo
     parsed_live_event_page = MetaInspector.new(live_event_url).parsed
     scrape_date = scrape_date(parsed_live_event_page)
     scrape_open_starts = scrape_open_starts(parsed_live_event_page)
-    {
+    hash = {
       live_house_slug: 'billboard-live-tokyo', url: live_event_url,
       title: scrape_title(parsed_live_event_page),
       description: scrape_description(parsed_live_event_page),
       price_info: scrape_price_info(parsed_live_event_page),
-      stage_one_open_at: "#{scrape_date} #{scrape_open_starts[0]}",
-      stage_one_start_at: "#{scrape_date} #{scrape_open_starts[1]}",
-      stage_two_open_at: "#{scrape_date} #{scrape_open_starts[2]}",
-      stage_two_start_at: "#{scrape_date} #{scrape_open_starts[3]}"
+      stage_one_open_at: parse_datetime_in_rfc3339("#{scrape_date} #{scrape_open_starts[0]}"),
+      stage_one_start_at:  parse_datetime_in_rfc3339("#{scrape_date} #{scrape_open_starts[1]}"),
+      stage_two_open_at: parse_datetime_in_rfc3339("#{scrape_date} #{scrape_open_starts[2]}"),
+      stage_two_start_at: parse_datetime_in_rfc3339("#{scrape_date} #{scrape_open_starts[3]}")
     }
+    @logger.info("Scraped #{hash.to_json}")
+    hash
   rescue StandardError => e
     @logger.error("Scraping #{live_event_url} failed: #{e.message}")
     {}
@@ -84,5 +86,10 @@ class ScrapeBillboardLiveTokyo
   def match_hour_format?(timestamp)
     # HH:MM 24-hour with leading 0
     /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.match?(timestamp)
+  end
+
+  def parse_datetime_in_rfc3339(datetime)
+    # Timezone handle by ENV['TZ']
+    Time.parse(datetime).to_datetime.rfc3339
   end
 end

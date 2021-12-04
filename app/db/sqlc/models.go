@@ -14,24 +14,24 @@ type Artist struct {
 	Name        string           `json:"name"`
 	Description types.NullString `json:"description"`
 	Slug        types.NullString `json:"slug"`
-	CreatedAt   time.Time        `json:"createdAt"`
-	UpdatedAt   time.Time        `json:"updatedAt"`
+	CreatedAt   time.Time        `json:"created_at"`
+	UpdatedAt   time.Time        `json:"updated_at"`
 }
 
 type LiveEvent struct {
 	ID              uuid.UUID        `json:"id"`
-	LiveHouseID     uuid.UUID        `json:"liveHouseID"`
+	LiveHouseID     uuid.UUID        `json:"live_house_id"`
 	Title           string           `json:"title"`
 	Url             string           `json:"url"`
 	Description     types.NullString `json:"description"`
-	PriceInfo       types.NullString `json:"priceInfo"`
-	StageOneOpenAt  types.NullTime   `json:"stageOneOpenAt"`
-	StageOneStartAt time.Time        `json:"stageOneStartAt"`
-	StageTwoOpenAt  types.NullTime   `json:"stageTwoOpenAt"`
-	StageTwoStartAt types.NullTime   `json:"stageTwoStartAt"`
+	PriceInfo       types.NullString `json:"price_info"`
+	StageOneOpenAt  types.NullTime   `json:"stage_one_open_at"`
+	StageOneStartAt time.Time        `json:"stage_one_start_at"`
+	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
+	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
 	Slug            types.NullString `json:"slug"`
-	CreatedAt       time.Time        `json:"createdAt"`
-	UpdatedAt       time.Time        `json:"updatedAt"`
+	CreatedAt       time.Time        `json:"created_at"`
+	UpdatedAt       time.Time        `json:"updated_at"`
 }
 
 type LiveHouse struct {
@@ -39,23 +39,23 @@ type LiveHouse struct {
 	Name      string           `json:"name"`
 	Address   types.NullString `json:"address"`
 	Slug      types.NullString `json:"slug"`
-	CreatedAt time.Time        `json:"createdAt"`
-	UpdatedAt time.Time        `json:"updatedAt"`
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"updated_at"`
 }
 
 type User struct {
 	ID                 uuid.UUID        `json:"id"`
 	Email              string           `json:"email"`
-	EncryptedPassword  string           `json:"encryptedPassword"`
-	ResetPasswordToken types.NullString `json:"resetPasswordToken"`
-	CreatedAt          time.Time        `json:"createdAt"`
-	UpdatedAt          time.Time        `json:"updatedAt"`
+	EncryptedPassword  string           `json:"encrypted_password"`
+	ResetPasswordToken types.NullString `json:"reset_password_token"`
+	CreatedAt          time.Time        `json:"created_at"`
+	UpdatedAt          time.Time        `json:"updated_at"`
 }
 
 type UserOrder struct {
 	ID          uuid.UUID `json:"id"`
-	LiveEventID uuid.UUID `json:"liveEventID"`
-	UserID      uuid.UUID `json:"userID"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	LiveEventID uuid.UUID `json:"live_event_id"`
+	UserID      uuid.UUID `json:"user_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
