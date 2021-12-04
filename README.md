@@ -40,7 +40,11 @@
 ## Todo
 
 - [ ] auto `updated_at`
+    - [PostgreSQL アップデート時のタイムスタンプ自動更新 - IT技術で仕事を減らしたい！](https://timesaving.hatenablog.com/entry/2020/08/29/210000)
 - [ ] slug
+- [ ] test
+- [ ] logging
+- [ ] k8s
 
 ## References
 

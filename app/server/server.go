@@ -1,28 +1,20 @@
 package server
 
 import (
-	"github.com/NeptuneG/go-back/controller"
 	db "github.com/NeptuneG/go-back/db/sqlc"
+	"github.com/NeptuneG/go-back/server/controller"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	router     *gin.Engine
-	controller *controller.Controller
+	router *gin.Engine
 }
 
 func NewServer(store *db.Store) *Server {
-	router := gin.Default()
 	controller := controller.NewController(store)
+	router := newRouter(controller)
 
-	router.GET("/live_houses", controller.GetAllLiveHouses)
-	router.POST("/live_houses", controller.CreateLivehouse)
-	router.POST("/live_houses/:id/scrape_events", controller.ScrapeLivehouseEvents)
-
-	return &Server{
-		router:     router,
-		controller: controller,
-	}
+	return &Server{router: router}
 }
 
 func (server *Server) Start(address string) error {

@@ -5,7 +5,6 @@ import (
 
 	db "github.com/NeptuneG/go-back/db/sqlc"
 	"github.com/NeptuneG/go-back/db/types"
-	faktory "github.com/contribsys/faktory/client"
 	"github.com/gin-gonic/gin"
 )
 
@@ -55,20 +54,4 @@ func (controller *Controller) CreateLivehouse(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, liveHouse)
-}
-
-func (controller *Controller) ScrapeLivehouseEvents(ctx *gin.Context) {
-	client, err := faktory.Open()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-	job := faktory.NewJob("ScrapeBillboardLiveTokyoJob", 202109)
-	err = client.Push(job)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	ctx.JSON(http.StatusOK, map[string]string{"jobId": job.Jid})
 }
