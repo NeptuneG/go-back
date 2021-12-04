@@ -42,7 +42,7 @@ class ScrapeBillboardLiveTokyo
     scrape_date = scrape_date(parsed_live_event_page)
     scrape_open_starts = scrape_open_starts(parsed_live_event_page)
     {
-      live_house_name: 'Billboard Live TOKYO', url: live_event_url,
+      live_house_slug: 'billboard-live-tokyo', url: live_event_url,
       title: scrape_title(parsed_live_event_page),
       description: scrape_description(parsed_live_event_page),
       price_info: scrape_price_info(parsed_live_event_page),
