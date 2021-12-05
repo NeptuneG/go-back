@@ -46,6 +46,17 @@
 - [ ] logging
 - [ ] k8s
 
+## Notes
+
+- redis pubsub
+    - subcriber will not consume payload automatically after restart
+    - multiple subcriber will consume payload repeatedly
+    - cannot persist data
+    - no ack
+- redis list LPUSH & BRPop
+    - able to persist data
+    - no ack?
+
 ## References
 
 ### Fundamentals
