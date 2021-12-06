@@ -28,6 +28,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createLiveHouseStmt, err = db.PrepareContext(ctx, createLiveHouse); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateLiveHouse: %w", err)
 	}
+	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
+	}
 	if q.getAllLiveEventsStmt, err = db.PrepareContext(ctx, getAllLiveEvents); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllLiveEvents: %w", err)
 	}
@@ -52,6 +55,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getLiveHouseByIdStmt, err = db.PrepareContext(ctx, getLiveHouseById); err != nil {
 		return nil, fmt.Errorf("error preparing query GetLiveHouseById: %w", err)
 	}
+	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	}
 	return &q, nil
 }
 
@@ -65,6 +71,11 @@ func (q *Queries) Close() error {
 	if q.createLiveHouseStmt != nil {
 		if cerr := q.createLiveHouseStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createLiveHouseStmt: %w", cerr)
+		}
+	}
+	if q.createUserStmt != nil {
+		if cerr := q.createUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
 	if q.getAllLiveEventsStmt != nil {
@@ -105,6 +116,11 @@ func (q *Queries) Close() error {
 	if q.getLiveHouseByIdStmt != nil {
 		if cerr := q.getLiveHouseByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getLiveHouseByIdStmt: %w", cerr)
+		}
+	}
+	if q.getUserStmt != nil {
+		if cerr := q.getUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
 		}
 	}
 	return err
@@ -148,6 +164,7 @@ type Queries struct {
 	tx                                  *sql.Tx
 	createLiveEventStmt                 *sql.Stmt
 	createLiveHouseStmt                 *sql.Stmt
+	createUserStmt                      *sql.Stmt
 	getAllLiveEventsStmt                *sql.Stmt
 	getAllLiveEventsByLiveHouseSlugStmt *sql.Stmt
 	getAllLiveHousesStmt                *sql.Stmt
@@ -156,6 +173,7 @@ type Queries struct {
 	getLiveEventByIdStmt                *sql.Stmt
 	getLiveEventsByLiveHouseStmt        *sql.Stmt
 	getLiveHouseByIdStmt                *sql.Stmt
+	getUserStmt                         *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -164,6 +182,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                                  tx,
 		createLiveEventStmt:                 q.createLiveEventStmt,
 		createLiveHouseStmt:                 q.createLiveHouseStmt,
+		createUserStmt:                      q.createUserStmt,
 		getAllLiveEventsStmt:                q.getAllLiveEventsStmt,
 		getAllLiveEventsByLiveHouseSlugStmt: q.getAllLiveEventsByLiveHouseSlugStmt,
 		getAllLiveHousesStmt:                q.getAllLiveHousesStmt,
@@ -172,5 +191,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getLiveEventByIdStmt:                q.getLiveEventByIdStmt,
 		getLiveEventsByLiveHouseStmt:        q.getLiveEventsByLiveHouseStmt,
 		getLiveHouseByIdStmt:                q.getLiveHouseByIdStmt,
+		getUserStmt:                         q.getUserStmt,
 	}
 }

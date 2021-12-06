@@ -14,6 +14,7 @@ func newRouter(controller *controller.Controller) *gin.Engine {
 		v1.POST("/live_houses", controller.CreateLivehouse)
 		v1.POST("/live_events/scrape_jobs", controller.CreateScrapeLiveEventsJob)
 		v1.GET("/live_events", controller.GetLiveEvents)
+		v1.POST("/users", controller.CreateUser)
 	}
 
 	return router
