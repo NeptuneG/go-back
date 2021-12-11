@@ -32,7 +32,7 @@ type LiveEvent struct {
 	Slug            types.NullString `json:"slug"`
 	CreatedAt       time.Time        `json:"created_at"`
 	UpdatedAt       time.Time        `json:"updated_at"`
-	AvailableSeats  types.NullInt32  `json:"available_seats"`
+	AvailableSeats  int32            `json:"available_seats"`
 }
 
 type LiveHouse struct {

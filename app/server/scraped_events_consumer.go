@@ -28,7 +28,26 @@ type createLiveEventRequest struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at" binding:"required"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
-	AvaiableSeats   types.NullInt32  `json:"avaiable_seats"`
+	AvaiableSeats   *int32           `json:"avaiable_seats"`
+}
+
+func (request *createLiveEventRequest) toCreateLiveEventParams(live_house_id uuid.UUID) db.CreateLiveEventParams {
+	availableSeats := int32(100)
+	if request.AvaiableSeats != nil {
+		availableSeats = *request.AvaiableSeats
+	}
+	return db.CreateLiveEventParams{
+		LiveHouseID:     live_house_id,
+		Title:           request.Title,
+		Url:             request.Url,
+		Description:     request.Description,
+		PriceInfo:       request.PriceInfo,
+		StageOneOpenAt:  request.StageOneOpenAt,
+		StageOneStartAt: request.StageOneStartAt,
+		StageTwoOpenAt:  request.StageTwoOpenAt,
+		StageTwoStartAt: request.StageTwoStartAt,
+		AvailableSeats:  availableSeats,
+	}
 }
 
 func (scraped_events_consumer *ScrapedEventsConsumer) Start() {
@@ -65,18 +84,7 @@ func (scraped_events_consumer *ScrapedEventsConsumer) createLiveEvent(ctx contex
 	if err != nil {
 		return err
 	}
-	create_params := db.CreateLiveEventParams{
-		LiveHouseID:     live_house_id,
-		Title:           req.Title,
-		Url:             req.Url,
-		Description:     req.Description,
-		PriceInfo:       req.PriceInfo,
-		StageOneOpenAt:  req.StageOneOpenAt,
-		StageOneStartAt: req.StageOneStartAt,
-		StageTwoOpenAt:  req.StageTwoOpenAt,
-		StageTwoStartAt: req.StageTwoStartAt,
-		AvailableSeats:  req.AvaiableSeats,
-	}
+	create_params := req.toCreateLiveEventParams(live_house_id)
 	if _, err := scraped_events_consumer.store.CreateLiveEvent(ctx, create_params); err != nil {
 		return err
 	}

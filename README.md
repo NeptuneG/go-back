@@ -4,6 +4,9 @@
 
 - go: 1.17.3
 - postgres: 14.1
+- requires sqlc
+    - [Installing sqlc — sqlc 1.11.0 documentation](https://docs.sqlc.dev/en/latest/overview/install.html)
+    - [Configuration file (version 1) — sqlc 1.10.0 documentation](https://docs.sqlc.dev/en/stable/reference/config.html)
 - setup
     ```bash
     docker-compose build
@@ -13,7 +16,7 @@
     ```
 - generate db migration
     ```bash
-    make generate-migrate NAME=#{migration_name}
+    make generate-migrate NAME=#{snake_case_migration_name}
     ```
 - db migrate
     ```bash
@@ -23,15 +26,6 @@
     ```bash
     make db-rollback STEP=n # default STEP is 1
     ```
-
-## Steup steps
-
-- `docker-compose run --rm app go mod init github.com/NeptuneG/go-back`
-- `docker-compose run --rm app air init`
-- `sqlc init`
-    - sqlc installed on localhost
-    - [Installing sqlc — sqlc 1.11.0 documentation](https://docs.sqlc.dev/en/latest/overview/install.html)
-    - [Configuration file (version 1) — sqlc 1.10.0 documentation](https://docs.sqlc.dev/en/stable/reference/config.html)
 
 ## DB Diagram
 
@@ -45,9 +39,12 @@
 - [ ] test
 - [ ] logging
 - [ ] k8s
+- [ ] pagination
 
 ## Notes
 
+- `docker-compose run --rm app go mod init github.com/NeptuneG/go-back`
+- `docker-compose run --rm app air init`
 - redis pubsub
     - subcriber will not consume payload automatically after restart
     - multiple subcriber will consume payload repeatedly
@@ -56,6 +53,10 @@
 - redis list LPUSH & BRPop
     - able to persist data
     - no ack?
+
+## 🤯🤯🤯
+
+- create order elegantly against available seats
 
 ## References
 

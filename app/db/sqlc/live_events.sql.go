@@ -33,7 +33,7 @@ type CreateLiveEventParams struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
-	AvailableSeats  types.NullInt32  `json:"available_seats"`
+	AvailableSeats  int32            `json:"available_seats"`
 }
 
 func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams) (LiveEvent, error) {
@@ -94,7 +94,7 @@ type GetAllLiveEventsRow struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
-	AvailableSeats  types.NullInt32  `json:"available_seats"`
+	AvailableSeats  int32            `json:"available_seats"`
 	Slug            types.NullString `json:"slug"`
 }
 
@@ -160,7 +160,7 @@ type GetAllLiveEventsByLiveHouseSlugRow struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
-	AvailableSeats  types.NullInt32  `json:"available_seats"`
+	AvailableSeats  int32            `json:"available_seats"`
 	Slug            types.NullString `json:"slug"`
 }
 
@@ -198,6 +198,18 @@ func (q *Queries) GetAllLiveEventsByLiveHouseSlug(ctx context.Context, slug type
 		return nil, err
 	}
 	return items, nil
+}
+
+const getLiveEventAvailableSeatsById = `-- name: GetLiveEventAvailableSeatsById :one
+SELECT available_seats FROM live_events
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetLiveEventAvailableSeatsById(ctx context.Context, id uuid.UUID) (int32, error) {
+	row := q.queryRow(ctx, q.getLiveEventAvailableSeatsByIdStmt, getLiveEventAvailableSeatsById, id)
+	var available_seats int32
+	err := row.Scan(&available_seats)
+	return available_seats, err
 }
 
 const getLiveEventById = `-- name: GetLiveEventById :one
@@ -276,4 +288,19 @@ func (q *Queries) GetLiveEventsByLiveHouse(ctx context.Context, arg GetLiveEvent
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateLiveEventAvailableSeatsById = `-- name: UpdateLiveEventAvailableSeatsById :exec
+UPDATE live_events SET available_seats = $1
+WHERE id = $2
+`
+
+type UpdateLiveEventAvailableSeatsByIdParams struct {
+	AvailableSeats int32     `json:"available_seats"`
+	ID             uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateLiveEventAvailableSeatsById(ctx context.Context, arg UpdateLiveEventAvailableSeatsByIdParams) error {
+	_, err := q.exec(ctx, q.updateLiveEventAvailableSeatsByIdStmt, updateLiveEventAvailableSeatsById, arg.AvailableSeats, arg.ID)
+	return err
 }
