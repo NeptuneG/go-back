@@ -67,3 +67,6 @@
 
 ### gin
 - [ginを最速でマスターしよう - Qiita](https://qiita.com/Syoitu/items/8e7e3215fb7ac9dabc3a)
+
+### Debug
+- [Setup Go with VSCode in Docker and Air for debugging - DEV Community 👩‍💻👨‍💻](https://dev.to/andreidascalu/setup-go-with-vscode-in-docker-for-debugging-24ch)

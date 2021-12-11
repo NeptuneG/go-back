@@ -28,7 +28,7 @@ db-rollback:
 
 .PHONY: db-seed
 db-seed:
-	cat app/db/seeds.sql | xargs -0 docker exec -it go-back-db psql -U dev -d back_development -c
+	cat app/db/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d back_development -c
 
 .PHONY: sqlc-generate
 sqlc-generate:
