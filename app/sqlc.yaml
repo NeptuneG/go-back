@@ -19,6 +19,8 @@ packages:
     output_models_file_name: "models.go"
     output_querier_file_name: "querier.go"
 overrides:
+  # https://docs.sqlc.dev/en/stable/reference/config.html
+  # https://github.com/kyleconroy/sqlc/blob/main/internal/codegen/golang/postgresql_type.go#L12
   - go_type: "github.com/NeptuneG/go-back/db/types.NullString"
     db_type: "text"
     nullable: true
@@ -27,5 +29,14 @@ overrides:
     nullable: true
   - go_type: "github.com/NeptuneG/go-back/db/types.NullTime"
     db_type: "timestamptz"
+    nullable: true
+  - go_type: "github.com/NeptuneG/go-back/db/types.NullInt32"
+    db_type: "int4"
+    nullable: true
+  - go_type: "github.com/NeptuneG/go-back/db/types.NullInt32"
+    db_type: "pg_catalog.int4"
+    nullable: true
+  - go_type: "github.com/NeptuneG/go-back/db/types.NullInt32"
+    db_type: "integer"
     nullable: true
 

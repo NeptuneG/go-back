@@ -28,6 +28,7 @@ type createLiveEventRequest struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at" binding:"required"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	AvaiableSeats   types.NullInt32  `json:"avaiable_seats"`
 }
 
 func (scraped_events_consumer *ScrapedEventsConsumer) Start() {
@@ -74,6 +75,7 @@ func (scraped_events_consumer *ScrapedEventsConsumer) createLiveEvent(ctx contex
 		StageOneStartAt: req.StageOneStartAt,
 		StageTwoOpenAt:  req.StageTwoOpenAt,
 		StageTwoStartAt: req.StageTwoStartAt,
+		AvailableSeats:  req.AvaiableSeats,
 	}
 	if _, err := scraped_events_consumer.store.CreateLiveEvent(ctx, create_params); err != nil {
 		return err

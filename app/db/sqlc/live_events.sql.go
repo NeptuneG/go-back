@@ -16,10 +16,11 @@ INSERT INTO live_events (
   live_house_id, title, url,
   description, price_info,
   stage_one_open_at, stage_one_start_at,
-  stage_two_open_at, stage_two_start_at
+  stage_two_open_at, stage_two_start_at,
+  available_seats
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9
-) RETURNING id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+) RETURNING id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at, available_seats
 `
 
 type CreateLiveEventParams struct {
@@ -32,6 +33,7 @@ type CreateLiveEventParams struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	AvailableSeats  types.NullInt32  `json:"available_seats"`
 }
 
 func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams) (LiveEvent, error) {
@@ -45,6 +47,7 @@ func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams
 		arg.StageOneStartAt,
 		arg.StageTwoOpenAt,
 		arg.StageTwoStartAt,
+		arg.AvailableSeats,
 	)
 	var i LiveEvent
 	err := row.Scan(
@@ -61,6 +64,7 @@ func (q *Queries) CreateLiveEvent(ctx context.Context, arg CreateLiveEventParams
 		&i.Slug,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AvailableSeats,
 	)
 	return i, err
 }
@@ -73,6 +77,7 @@ SELECT
   live_events.description, live_events.price_info,
   live_events.stage_one_open_at, live_events.stage_one_start_at,
   live_events.stage_two_open_at, live_events.stage_two_start_at,
+  live_events.available_seats,
   live_events.slug
 FROM live_events
 INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
@@ -89,6 +94,7 @@ type GetAllLiveEventsRow struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	AvailableSeats  types.NullInt32  `json:"available_seats"`
 	Slug            types.NullString `json:"slug"`
 }
 
@@ -112,6 +118,7 @@ func (q *Queries) GetAllLiveEvents(ctx context.Context) ([]GetAllLiveEventsRow, 
 			&i.StageOneStartAt,
 			&i.StageTwoOpenAt,
 			&i.StageTwoStartAt,
+			&i.AvailableSeats,
 			&i.Slug,
 		); err != nil {
 			return nil, err
@@ -135,6 +142,7 @@ SELECT
   live_events.description, live_events.price_info,
   live_events.stage_one_open_at, live_events.stage_one_start_at,
   live_events.stage_two_open_at, live_events.stage_two_start_at,
+  live_events.available_seats,
   live_events.slug
 FROM live_events
 INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
@@ -152,6 +160,7 @@ type GetAllLiveEventsByLiveHouseSlugRow struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	AvailableSeats  types.NullInt32  `json:"available_seats"`
 	Slug            types.NullString `json:"slug"`
 }
 
@@ -175,6 +184,7 @@ func (q *Queries) GetAllLiveEventsByLiveHouseSlug(ctx context.Context, slug type
 			&i.StageOneStartAt,
 			&i.StageTwoOpenAt,
 			&i.StageTwoStartAt,
+			&i.AvailableSeats,
 			&i.Slug,
 		); err != nil {
 			return nil, err
@@ -191,7 +201,7 @@ func (q *Queries) GetAllLiveEventsByLiveHouseSlug(ctx context.Context, slug type
 }
 
 const getLiveEventById = `-- name: GetLiveEventById :one
-SELECT id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at FROM live_events
+SELECT id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at, available_seats FROM live_events
 WHERE id = $1 LIMIT 1
 `
 
@@ -212,12 +222,13 @@ func (q *Queries) GetLiveEventById(ctx context.Context, id uuid.UUID) (LiveEvent
 		&i.Slug,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AvailableSeats,
 	)
 	return i, err
 }
 
 const getLiveEventsByLiveHouse = `-- name: GetLiveEventsByLiveHouse :many
-SELECT id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at FROM live_events
+SELECT id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at, available_seats FROM live_events
 WHERE live_house_id = $1
 LIMIT $2
 OFFSET $3
@@ -252,6 +263,7 @@ func (q *Queries) GetLiveEventsByLiveHouse(ctx context.Context, arg GetLiveEvent
 			&i.Slug,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AvailableSeats,
 		); err != nil {
 			return nil, err
 		}
