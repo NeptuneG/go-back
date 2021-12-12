@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	db "github.com/NeptuneG/go-back/db/sqlc"
-	"github.com/NeptuneG/go-back/db/types"
+	db "github.com/NeptuneG/go-back/app/db/sqlc"
+	"github.com/NeptuneG/go-back/pkg/types"
 	faktory "github.com/contribsys/faktory/client"
 	"github.com/gin-gonic/gin"
 )

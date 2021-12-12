@@ -1,8 +1,8 @@
 package server
 
 import (
-	db "github.com/NeptuneG/go-back/db/sqlc"
-	"github.com/NeptuneG/go-back/server/controller"
+	db "github.com/NeptuneG/go-back/app/db/sqlc"
+	"github.com/NeptuneG/go-back/app/server/controller"
 	"github.com/gin-gonic/gin"
 )
 

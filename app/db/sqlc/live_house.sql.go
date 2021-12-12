@@ -6,7 +6,7 @@ package db
 import (
 	"context"
 
-	"github.com/NeptuneG/go-back/db/types"
+	"github.com/NeptuneG/go-back/pkg/types"
 	"github.com/google/uuid"
 )
 

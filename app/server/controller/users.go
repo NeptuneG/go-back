@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	db "github.com/NeptuneG/go-back/db/sqlc"
-	"github.com/NeptuneG/go-back/db/types"
+	db "github.com/NeptuneG/go-back/app/db/sqlc"
+	"github.com/NeptuneG/go-back/pkg/types"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )

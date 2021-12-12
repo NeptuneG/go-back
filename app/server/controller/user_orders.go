@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 
-	db "github.com/NeptuneG/go-back/db/sqlc"
+	db "github.com/NeptuneG/go-back/app/db/sqlc"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

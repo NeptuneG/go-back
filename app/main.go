@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
-	db "github.com/NeptuneG/go-back/db/sqlc"
-	"github.com/NeptuneG/go-back/server"
+	db "github.com/NeptuneG/go-back/app/db/sqlc"
+	"github.com/NeptuneG/go-back/app/server"
 	_ "github.com/lib/pq"
 )
 

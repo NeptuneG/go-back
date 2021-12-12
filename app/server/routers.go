@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/NeptuneG/go-back/server/controller"
+	"github.com/NeptuneG/go-back/app/server/controller"
 	"github.com/gin-gonic/gin"
 )
 

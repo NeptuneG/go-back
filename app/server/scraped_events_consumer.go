@@ -8,8 +8,8 @@ import (
 	"log"
 	"time"
 
-	db "github.com/NeptuneG/go-back/db/sqlc"
-	"github.com/NeptuneG/go-back/db/types"
+	db "github.com/NeptuneG/go-back/app/db/sqlc"
+	"github.com/NeptuneG/go-back/pkg/types"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 )
