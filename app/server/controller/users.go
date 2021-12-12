@@ -2,8 +2,10 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	db "github.com/NeptuneG/go-back/db/sqlc"
+	"github.com/NeptuneG/go-back/db/types"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,8 +37,17 @@ func (controller *Controller) CreateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	user_points, err := controller.store.CreateUserPoints(ctx, db.CreateUserPointsParams{
+		UserID:      user.ID,
+		Points:      1000,
+		Description: types.NewNullString("Initial points"),
+	})
 
-	ctx.JSON(http.StatusCreated, map[string]string{"email": user.Email})
+	ctx.JSON(http.StatusCreated, map[string]string{
+		"id":     user.ID.String(),
+		"email":  user.Email,
+		"points": strconv.Itoa(int(user_points.Points)),
+	})
 }
 
 func encryptPassword(password string) (string, error) {

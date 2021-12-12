@@ -40,6 +40,7 @@
 - [ ] logging
 - [ ] k8s
 - [ ] pagination
+- [ ] hot reaload debug
 
 ## Notes
 

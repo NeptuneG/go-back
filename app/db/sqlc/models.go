@@ -60,3 +60,12 @@ type UserOrder struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type UserPoint struct {
+	ID          uuid.UUID        `json:"id"`
+	UserID      uuid.UUID        `json:"user_id"`
+	Points      int32            `json:"points"`
+	Description types.NullString `json:"description"`
+	CreatedAt   time.Time        `json:"created_at"`
+	UpdatedAt   time.Time        `json:"updated_at"`
+}

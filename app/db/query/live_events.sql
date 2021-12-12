@@ -46,10 +46,6 @@ FROM live_events
 INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
 WHERE live_houses.slug = $1;
 
--- name: GetLiveEventAvailableSeatsById :one
-SELECT available_seats FROM live_events
-WHERE id = $1 LIMIT 1;
-
 -- name: UpdateLiveEventAvailableSeatsById :exec
 UPDATE live_events SET available_seats = $1
 WHERE id = $2;

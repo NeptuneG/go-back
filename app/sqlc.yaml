@@ -30,13 +30,3 @@ overrides:
   - go_type: "github.com/NeptuneG/go-back/db/types.NullTime"
     db_type: "timestamptz"
     nullable: true
-  - go_type: "github.com/NeptuneG/go-back/db/types.NullInt32"
-    db_type: "int4"
-    nullable: true
-  - go_type: "github.com/NeptuneG/go-back/db/types.NullInt32"
-    db_type: "pg_catalog.int4"
-    nullable: true
-  - go_type: "github.com/NeptuneG/go-back/db/types.NullInt32"
-    db_type: "integer"
-    nullable: true
-

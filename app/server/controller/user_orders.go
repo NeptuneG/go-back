@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	db "github.com/NeptuneG/go-back/db/sqlc"
-	"github.com/NeptuneG/go-back/server/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -12,6 +11,7 @@ import (
 type createUserOrderRequest struct {
 	UserID      uuid.UUID `json:"user_id" binding:"required"`
 	LiveEventID uuid.UUID `json:"live_event_id" binding:"required"`
+	Points      *int32    `json:"points"`
 }
 
 func (controller *Controller) CreateUserOrder(ctx *gin.Context) {
@@ -21,11 +21,11 @@ func (controller *Controller) CreateUserOrder(ctx *gin.Context) {
 		return
 	}
 
-	err := service.CreateUserOrder(ctx, controller.store, db.CreateUserOrderParams{
+	if err := controller.store.CreateUserOrderTx(ctx, db.CreateUserOrderTxParams{
 		UserID:      req.UserID,
 		LiveEventID: req.LiveEventID,
-	})
-	if err != nil {
+		Points:      req.Points,
+	}); err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

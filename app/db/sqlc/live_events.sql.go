@@ -200,18 +200,6 @@ func (q *Queries) GetAllLiveEventsByLiveHouseSlug(ctx context.Context, slug type
 	return items, nil
 }
 
-const getLiveEventAvailableSeatsById = `-- name: GetLiveEventAvailableSeatsById :one
-SELECT available_seats FROM live_events
-WHERE id = $1 LIMIT 1
-`
-
-func (q *Queries) GetLiveEventAvailableSeatsById(ctx context.Context, id uuid.UUID) (int32, error) {
-	row := q.queryRow(ctx, q.getLiveEventAvailableSeatsByIdStmt, getLiveEventAvailableSeatsById, id)
-	var available_seats int32
-	err := row.Scan(&available_seats)
-	return available_seats, err
-}
-
 const getLiveEventById = `-- name: GetLiveEventById :one
 SELECT id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at, available_seats FROM live_events
 WHERE id = $1 LIMIT 1
