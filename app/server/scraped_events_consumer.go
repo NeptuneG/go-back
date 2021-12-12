@@ -31,13 +31,13 @@ type createLiveEventRequest struct {
 	AvaiableSeats   *int32           `json:"avaiable_seats"`
 }
 
-func (request *createLiveEventRequest) toCreateLiveEventParams(live_house_id uuid.UUID) db.CreateLiveEventParams {
+func (request *createLiveEventRequest) toCreateLiveEventParams(liveHouseId uuid.UUID) db.CreateLiveEventParams {
 	availableSeats := int32(100)
 	if request.AvaiableSeats != nil {
 		availableSeats = *request.AvaiableSeats
 	}
 	return db.CreateLiveEventParams{
-		LiveHouseID:     live_house_id,
+		LiveHouseID:     liveHouseId,
 		Title:           request.Title,
 		Url:             request.Url,
 		Description:     request.Description,
@@ -50,7 +50,7 @@ func (request *createLiveEventRequest) toCreateLiveEventParams(live_house_id uui
 	}
 }
 
-func (scraped_events_consumer *ScrapedEventsConsumer) Start() {
+func (consumer *ScrapedEventsConsumer) Start() {
 	ctx := context.Background()
 	redisOptions := &redis.Options{
 		Addr: "redis:6379",
@@ -71,7 +71,7 @@ func (scraped_events_consumer *ScrapedEventsConsumer) Start() {
 				log.Fatal(err)
 				continue
 			}
-			if err := scraped_events_consumer.createLiveEvent(ctx, req); err != nil {
+			if err := consumer.createLiveEvent(ctx, req); err != nil {
 				log.Fatal(err)
 				continue
 			}
@@ -79,41 +79,41 @@ func (scraped_events_consumer *ScrapedEventsConsumer) Start() {
 	}()
 }
 
-func (scraped_events_consumer *ScrapedEventsConsumer) createLiveEvent(ctx context.Context, req createLiveEventRequest) error {
-	live_house_id, err := scraped_events_consumer.getLiveHouseIdBySlug(ctx, req.LiveHouseSlug)
+func (consumer *ScrapedEventsConsumer) createLiveEvent(ctx context.Context, req createLiveEventRequest) error {
+	liveHouseId, err := consumer.getLiveHouseIdBySlug(ctx, req.LiveHouseSlug)
 	if err != nil {
 		return err
 	}
-	create_params := req.toCreateLiveEventParams(live_house_id)
-	if _, err := scraped_events_consumer.store.CreateLiveEvent(ctx, create_params); err != nil {
+	create_params := req.toCreateLiveEventParams(liveHouseId)
+	if _, err := consumer.store.CreateLiveEvent(ctx, create_params); err != nil {
 		return err
 	}
 	return nil
 }
 
-var live_house_id_by_slug map[string]uuid.UUID
+var liveHouseIdBySlug map[string]uuid.UUID
 
-func (scraped_events_consumer *ScrapedEventsConsumer) getLiveHouseIdBySlug(ctx context.Context, live_house_slug string) (uuid.UUID, error) {
-	if live_house_slug == "" {
-		return uuid.Nil, errors.New("live_house_slug is empty")
+func (consumer *ScrapedEventsConsumer) getLiveHouseIdBySlug(ctx context.Context, liveHouseSlug string) (uuid.UUID, error) {
+	if liveHouseSlug == "" {
+		return uuid.Nil, errors.New("liveHouseSlug is empty")
 	}
 
-	if live_house_id_by_slug == nil {
-		live_house_id_and_slugs, err := scraped_events_consumer.store.GetAllLiveHousesIdAndSlugs(ctx)
+	if liveHouseIdBySlug == nil {
+		liveHouseIdAndSlugs, err := consumer.store.GetAllLiveHousesIdAndSlugs(ctx)
 		if err != nil {
 			return uuid.Nil, err
 		}
-		live_house_id_by_slug = make(map[string]uuid.UUID)
-		for _, live_house_id_and_slug := range live_house_id_and_slugs {
-			if live_house_id_and_slug.Slug.Valid {
-				live_house_id_by_slug[live_house_id_and_slug.Slug.String] = live_house_id_and_slug.ID
+		liveHouseIdBySlug = make(map[string]uuid.UUID)
+		for _, liveHouseIdAndSlug := range liveHouseIdAndSlugs {
+			if liveHouseIdAndSlug.Slug.Valid {
+				liveHouseIdBySlug[liveHouseIdAndSlug.Slug.String] = liveHouseIdAndSlug.ID
 			}
 		}
 	}
-	live_house_id, ok := live_house_id_by_slug[live_house_slug]
+	liveHouseId, ok := liveHouseIdBySlug[liveHouseSlug]
 	if ok {
-		return live_house_id, nil
+		return liveHouseId, nil
 	} else {
-		return uuid.Nil, fmt.Errorf("live_house_id of live_house_slug (%s) is not found", live_house_slug)
+		return uuid.Nil, fmt.Errorf("liveHouseId of liveHouseSlug (%s) is not found", liveHouseSlug)
 	}
 }

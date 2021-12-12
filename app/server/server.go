@@ -7,19 +7,19 @@ import (
 )
 
 type Server struct {
-	router                  *gin.Engine
-	scraped_events_consumer *ScrapedEventsConsumer
+	router                *gin.Engine
+	scrapedEventsConsumer *ScrapedEventsConsumer
 }
 
 func NewServer(store *db.Store) *Server {
 	controller := controller.NewController(store)
 	router := newRouter(controller)
-	scraped_consumer := &ScrapedEventsConsumer{store: store}
+	consumer := &ScrapedEventsConsumer{store: store}
 
-	return &Server{router: router, scraped_events_consumer: scraped_consumer}
+	return &Server{router: router, scrapedEventsConsumer: consumer}
 }
 
 func (server *Server) Start(address string) error {
-	server.scraped_events_consumer.Start()
+	server.scrapedEventsConsumer.Start()
 	return server.router.Run(address)
 }

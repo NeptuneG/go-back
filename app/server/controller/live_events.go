@@ -29,14 +29,14 @@ func (controller *Controller) CreateScrapeLiveEventsJob(ctx *gin.Context) {
 		return
 	}
 
-	var year_month string
+	var yearMonth string
 	if req.YearMonth != nil {
-		year_month = req.YearMonth.Format("200601")
+		yearMonth = req.YearMonth.Format("200601")
 	} else {
-		year_month = time.Now().Format("200601")
+		yearMonth = time.Now().Format("200601")
 	}
 
-	job := faktory.NewJob(slugToJobName(req.LiveHouseSlug), year_month)
+	job := faktory.NewJob(slugToJobName(req.LiveHouseSlug), yearMonth)
 	if err = client.Push(job); err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -66,18 +66,18 @@ func (controller *Controller) GetLiveEvents(ctx *gin.Context) {
 	}
 
 	if req.LiveHouseSlug == nil {
-		live_events, err := controller.store.GetAllLiveEvents(ctx)
+		liveEvents, err := controller.store.GetAllLiveEvents(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveEventsRow{"live_events": live_events})
+		ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveEventsRow{"liveEvents": liveEvents})
 	} else {
-		live_events, err := controller.store.GetAllLiveEventsByLiveHouseSlug(ctx, types.NewNullString(*req.LiveHouseSlug))
+		liveEvents, err := controller.store.GetAllLiveEventsByLiveHouseSlug(ctx, types.NewNullString(*req.LiveHouseSlug))
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveEventsByLiveHouseSlugRow{"live_events": live_events})
+		ctx.JSON(http.StatusOK, map[string][]db.GetAllLiveEventsByLiveHouseSlugRow{"liveEvents": liveEvents})
 	}
 }
