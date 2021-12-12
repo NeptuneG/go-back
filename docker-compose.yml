@@ -1,17 +1,23 @@
 version: "3.9"
 
 services:
-  # app:
-  #   container_name: go-back-app
-  #   build:
-  #     context: ./app
-  #     target: dev
-  #   volumes:
-  #     - ./app:/app
-  #   ports:
-  #     - "3000:3000"
-  #   links:
-  #     - db
+  app:
+    container_name: go-back-app
+    build:
+      context: ./app
+      target: dev
+    volumes:
+      - ./app:/app
+    ports:
+      - "3000:3000"
+      - "2345:2345"
+    links:
+      - db
+    environment:
+      FAKTORY_PROVIDER: FAKTORY_URL
+      FAKTORY_URL: tcp://faktory:7419
+    security_opt:
+      - seccomp:unconfined
   db:
     container_name: go-back-db
     image: postgres:14.1-alpine3.14
@@ -44,6 +50,8 @@ services:
       context: ./faktory-workers
     environment:
       TZ: 'Asia/Tokyo'
+      FAKTORY_PROVIDER: FAKTORY_URL
+      FAKTORY_URL: tcp://faktory:7419
     volumes:
       - ./faktory-workers:/app
     depends_on:

@@ -31,6 +31,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
+	if q.createUserOrderStmt, err = db.PrepareContext(ctx, createUserOrder); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUserOrder: %w", err)
+	}
+	if q.createUserPointsStmt, err = db.PrepareContext(ctx, createUserPoints); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUserPoints: %w", err)
+	}
 	if q.getAllLiveEventsStmt, err = db.PrepareContext(ctx, getAllLiveEvents); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllLiveEvents: %w", err)
 	}
@@ -58,6 +64,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
 	}
+	if q.getUserPointsStmt, err = db.PrepareContext(ctx, getUserPoints); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserPoints: %w", err)
+	}
+	if q.updateLiveEventAvailableSeatsByIdStmt, err = db.PrepareContext(ctx, updateLiveEventAvailableSeatsById); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateLiveEventAvailableSeatsById: %w", err)
+	}
 	return &q, nil
 }
 
@@ -76,6 +88,16 @@ func (q *Queries) Close() error {
 	if q.createUserStmt != nil {
 		if cerr := q.createUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
+		}
+	}
+	if q.createUserOrderStmt != nil {
+		if cerr := q.createUserOrderStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserOrderStmt: %w", cerr)
+		}
+	}
+	if q.createUserPointsStmt != nil {
+		if cerr := q.createUserPointsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserPointsStmt: %w", cerr)
 		}
 	}
 	if q.getAllLiveEventsStmt != nil {
@@ -123,6 +145,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
 		}
 	}
+	if q.getUserPointsStmt != nil {
+		if cerr := q.getUserPointsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserPointsStmt: %w", cerr)
+		}
+	}
+	if q.updateLiveEventAvailableSeatsByIdStmt != nil {
+		if cerr := q.updateLiveEventAvailableSeatsByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateLiveEventAvailableSeatsByIdStmt: %w", cerr)
+		}
+	}
 	return err
 }
 
@@ -160,37 +192,45 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                                  DBTX
-	tx                                  *sql.Tx
-	createLiveEventStmt                 *sql.Stmt
-	createLiveHouseStmt                 *sql.Stmt
-	createUserStmt                      *sql.Stmt
-	getAllLiveEventsStmt                *sql.Stmt
-	getAllLiveEventsByLiveHouseSlugStmt *sql.Stmt
-	getAllLiveHousesStmt                *sql.Stmt
-	getAllLiveHousesDefaultStmt         *sql.Stmt
-	getAllLiveHousesIdAndSlugsStmt      *sql.Stmt
-	getLiveEventByIdStmt                *sql.Stmt
-	getLiveEventsByLiveHouseStmt        *sql.Stmt
-	getLiveHouseByIdStmt                *sql.Stmt
-	getUserStmt                         *sql.Stmt
+	db                                    DBTX
+	tx                                    *sql.Tx
+	createLiveEventStmt                   *sql.Stmt
+	createLiveHouseStmt                   *sql.Stmt
+	createUserStmt                        *sql.Stmt
+	createUserOrderStmt                   *sql.Stmt
+	createUserPointsStmt                  *sql.Stmt
+	getAllLiveEventsStmt                  *sql.Stmt
+	getAllLiveEventsByLiveHouseSlugStmt   *sql.Stmt
+	getAllLiveHousesStmt                  *sql.Stmt
+	getAllLiveHousesDefaultStmt           *sql.Stmt
+	getAllLiveHousesIdAndSlugsStmt        *sql.Stmt
+	getLiveEventByIdStmt                  *sql.Stmt
+	getLiveEventsByLiveHouseStmt          *sql.Stmt
+	getLiveHouseByIdStmt                  *sql.Stmt
+	getUserStmt                           *sql.Stmt
+	getUserPointsStmt                     *sql.Stmt
+	updateLiveEventAvailableSeatsByIdStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                                  tx,
-		tx:                                  tx,
-		createLiveEventStmt:                 q.createLiveEventStmt,
-		createLiveHouseStmt:                 q.createLiveHouseStmt,
-		createUserStmt:                      q.createUserStmt,
-		getAllLiveEventsStmt:                q.getAllLiveEventsStmt,
-		getAllLiveEventsByLiveHouseSlugStmt: q.getAllLiveEventsByLiveHouseSlugStmt,
-		getAllLiveHousesStmt:                q.getAllLiveHousesStmt,
-		getAllLiveHousesDefaultStmt:         q.getAllLiveHousesDefaultStmt,
-		getAllLiveHousesIdAndSlugsStmt:      q.getAllLiveHousesIdAndSlugsStmt,
-		getLiveEventByIdStmt:                q.getLiveEventByIdStmt,
-		getLiveEventsByLiveHouseStmt:        q.getLiveEventsByLiveHouseStmt,
-		getLiveHouseByIdStmt:                q.getLiveHouseByIdStmt,
-		getUserStmt:                         q.getUserStmt,
+		db:                                    tx,
+		tx:                                    tx,
+		createLiveEventStmt:                   q.createLiveEventStmt,
+		createLiveHouseStmt:                   q.createLiveHouseStmt,
+		createUserStmt:                        q.createUserStmt,
+		createUserOrderStmt:                   q.createUserOrderStmt,
+		createUserPointsStmt:                  q.createUserPointsStmt,
+		getAllLiveEventsStmt:                  q.getAllLiveEventsStmt,
+		getAllLiveEventsByLiveHouseSlugStmt:   q.getAllLiveEventsByLiveHouseSlugStmt,
+		getAllLiveHousesStmt:                  q.getAllLiveHousesStmt,
+		getAllLiveHousesDefaultStmt:           q.getAllLiveHousesDefaultStmt,
+		getAllLiveHousesIdAndSlugsStmt:        q.getAllLiveHousesIdAndSlugsStmt,
+		getLiveEventByIdStmt:                  q.getLiveEventByIdStmt,
+		getLiveEventsByLiveHouseStmt:          q.getLiveEventsByLiveHouseStmt,
+		getLiveHouseByIdStmt:                  q.getLiveHouseByIdStmt,
+		getUserStmt:                           q.getUserStmt,
+		getUserPointsStmt:                     q.getUserPointsStmt,
+		updateLiveEventAvailableSeatsByIdStmt: q.updateLiveEventAvailableSeatsByIdStmt,
 	}
 }

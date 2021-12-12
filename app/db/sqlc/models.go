@@ -32,6 +32,7 @@ type LiveEvent struct {
 	Slug            types.NullString `json:"slug"`
 	CreatedAt       time.Time        `json:"created_at"`
 	UpdatedAt       time.Time        `json:"updated_at"`
+	AvailableSeats  int32            `json:"available_seats"`
 }
 
 type LiveHouse struct {
@@ -58,4 +59,13 @@ type UserOrder struct {
 	UserID      uuid.UUID `json:"user_id"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type UserPoint struct {
+	ID          uuid.UUID        `json:"id"`
+	UserID      uuid.UUID        `json:"user_id"`
+	Points      int32            `json:"points"`
+	Description types.NullString `json:"description"`
+	CreatedAt   time.Time        `json:"created_at"`
+	UpdatedAt   time.Time        `json:"updated_at"`
 }
