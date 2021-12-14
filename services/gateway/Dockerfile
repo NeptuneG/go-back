@@ -17,8 +17,8 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -o /usr/bin/user ./services/user
+RUN go build -o /usr/bin/gateway ./services/gateway
 
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/user
+WORKDIR /go/src/github.com/NeptuneG/go-back/services/gateway
 
-CMD ["/usr/bin/user"]
+CMD ["/usr/bin/gateway"]

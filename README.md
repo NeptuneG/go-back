@@ -54,6 +54,8 @@
 - redis list LPUSH & BRPop
     - able to persist data
     - no ack?
+- `protoc --proto_path=proto proto/*.proto --go_out=plugins=grpc:proto`
+    - [bufbuild/buf: A new way of working with Protocol Buffers.](https://github.com/bufbuild/buf)
 
 ## 🤯🤯🤯
 
@@ -72,3 +74,6 @@
 
 ### Debug
 - [Setup Go with VSCode in Docker and Air for debugging - DEV Community 👩‍💻👨‍💻](https://dev.to/andreidascalu/setup-go-with-vscode-in-docker-for-debugging-24ch)
+
+### grpc
+- [gRPC-go 入门（1）：Hello World - 知乎](https://zhuanlan.zhihu.com/p/258879142)

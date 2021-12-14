@@ -1,39 +1,39 @@
+.PHONY: build-gateway-svc
+build-gateway-svc:
+	docker build -t neptuneg/go-back/gateway-service:latest --file ./services/gateway/Dockerfile .
+
+.PHONY: build-user-svc
+build-user-svc:
+	docker build -t neptuneg/go-back/user-service:latest --file ./services/user/Dockerfile .
+
 .PHONY: generate-migrate
 generate-migrate:
-	docker exec go-back-app migrate create -dir /app/db/migrations -ext sql $(NAME)
+	docker exec go-back-app migrate create -dir db/migrations -ext sql $(NAME)
 
-.PHONY: db-create
-db-create:
-	docker exec go-back-db createdb --username=dev --owner=dev back_development
-	docker exec go-back-db createdb --username=dev --owner=dev back_test
+.PHONY: user-db-create
+user-db-create:
+	docker exec user-db createdb --username=dev --owner=dev user_development
+	docker exec user-db createdb --username=dev --owner=dev user_test
 
-.PHONY: db-drop
-db-drop:
-	docker exec go-back-db dropdb --username=dev -f back_development
-	docker exec go-back-db dropdb --username=dev -f back_test
+.PHONY: user-db-drop
+user-db-drop:
+	docker exec user-db dropdb --username=dev -f user_development
+	docker exec user-db dropdb --username=dev -f user_test
 
-.PHONY: db-migrate
-db-migrate:
-	docker exec -it go-back-app migrate \
-	-database postgresql://dev@db/back_development?sslmode=disable \
-	-path /app/db/migrations \
+.PHONY: user-db-migrate
+user-db-migrate:
+	docker exec -it user-service migrate \
+	-database postgresql://dev@user-db/user_development?sslmode=disable \
+	-path db/migrations \
 	-verbose up
 
-.PHONY: db-rollback
-db-rollback:
-	docker exec -it go-back-app migrate \
-	-database postgresql://dev@db/back_development?sslmode=disable \
-	-path /app/db/migrations \
+.PHONY: user-db-rollback
+user-db-rollback:
+	docker exec -it user-service migrate \
+	-database postgresql://dev@user-db/user_development?sslmode=disable \
+	-path db/migrations \
 	-verbose down $(or $(STEP), 1)
 
-.PHONY: db-seed
-db-seed:
-	cat app/db/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d back_development -c
-
-.PHONY: sqlc-generate
-sqlc-generate:
-	cd app && sqlc generate
-
-.PHONY: go-mod-tidy
-go-mod-tidy:
-	docker exec go-back-app go mod tidy -compat=1.17
+.PHONY: user-sqlc-generate
+user-sqlc-generate:
+	cd services/user && sqlc generate
