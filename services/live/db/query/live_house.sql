@@ -9,6 +9,10 @@ INSERT INTO live_houses (
 SELECT * FROM live_houses
 WHERE id = $1 LIMIT 1;
 
+-- name: GetLiveHouseBySlug :one
+SELECT * FROM live_houses
+WHERE slug = $1 LIMIT 1;
+
 -- name: GetAllLiveHouses :many
 SELECT * FROM live_houses
 ORDER BY id

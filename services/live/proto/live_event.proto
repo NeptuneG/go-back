@@ -5,9 +5,11 @@ package neptuneg.go_back.serivces.live_event;
 
 import "google/protobuf/timestamp.proto";
 
+import "services/live/proto/live_house.proto";
+
 message LiveEvent {
   string id = 1;
-  string live_house_id = 2;
+  live_house.LiveHouse live_house = 2;
   string title = 3;
   string url = 4;
   string description = 5;

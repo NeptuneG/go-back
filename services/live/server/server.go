@@ -4,12 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
 	"github.com/NeptuneG/go-back/services/live/proto"
-	"github.com/google/uuid"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -24,13 +22,32 @@ func New(dbConn *sql.DB) *LiveService {
 	}
 }
 
+func (liveService *LiveService) CreateLiveHouse(ctx context.Context, req *proto.CreateLiveHouseRequest) (*proto.CreateLiveHouseResponse, error) {
+	liveHouse, err := liveService.store.CreateLiveHouse(ctx, db.CreateLiveHouseParams{
+		Name:    req.Name,
+		Address: types.NewNullString(req.Address),
+		Slug:    types.NewNullString(req.Slug),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &proto.CreateLiveHouseResponse{
+		LiveHouse: &proto.LiveHouse{
+			Id:      liveHouse.ID.String(),
+			Name:    liveHouse.Name,
+			Address: liveHouse.Address.String,
+			Slug:    liveHouse.Slug.String,
+		},
+	}, nil
+}
+
 func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.CreateLiveEventRequest) (*proto.CreateLiveEventResponse, error) {
-	liveHouseId, err := liveService.getLiveHouseIdBySlug(ctx, req.LiveHouseSlug)
+	liveHouse, err := liveService.getLiveHouseBySlug(ctx, req.LiveHouseSlug)
 	if err != nil {
 		return nil, err
 	}
 	liveEvent, err := liveService.store.CreateLiveEvent(ctx, db.CreateLiveEventParams{
-		LiveHouseID:     liveHouseId,
+		LiveHouseID:     liveHouse.ID,
 		Title:           req.Title,
 		Url:             req.Url,
 		Description:     types.NewNullString(req.Description),
@@ -46,8 +63,12 @@ func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.
 	}
 	return &proto.CreateLiveEventResponse{
 		LiveEvent: &proto.LiveEvent{
-			Id:              liveEvent.ID.String(),
-			LiveHouseId:     liveEvent.LiveHouseID.String(),
+			Id: liveEvent.ID.String(),
+			LiveHouse: &proto.LiveHouse{
+				Id:   liveHouse.ID.String(),
+				Name: liveHouse.Name,
+				Slug: liveHouse.Slug.String,
+			},
 			Title:           liveEvent.Title,
 			Url:             liveEvent.Url,
 			Description:     liveEvent.Description.String,
@@ -61,30 +82,25 @@ func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.
 	}, nil
 }
 
-var liveHouseIdBySlug map[string]uuid.UUID
+var liveHousesBySlug map[string]db.LiveHouse
 
-func (liveService *LiveService) getLiveHouseIdBySlug(ctx context.Context, liveHouseSlug string) (uuid.UUID, error) {
+func (liveService *LiveService) getLiveHouseBySlug(ctx context.Context, liveHouseSlug string) (*db.LiveHouse, error) {
 	if liveHouseSlug == "" {
-		return uuid.Nil, errors.New("liveHouseSlug is empty")
+		return nil, errors.New("liveHouseSlug is empty")
 	}
 
-	if liveHouseIdBySlug == nil {
-		liveHouseIdAndSlugs, err := liveService.store.GetAllLiveHousesIdAndSlugs(ctx)
-		if err != nil {
-			return uuid.Nil, err
-		}
-		liveHouseIdBySlug = make(map[string]uuid.UUID)
-		for _, liveHouseIdAndSlug := range liveHouseIdAndSlugs {
-			if liveHouseIdAndSlug.Slug.Valid {
-				liveHouseIdBySlug[liveHouseIdAndSlug.Slug.String] = liveHouseIdAndSlug.ID
-			}
-		}
+	if liveHousesBySlug == nil {
+		liveHousesBySlug = make(map[string]db.LiveHouse)
 	}
-	liveHouseId, ok := liveHouseIdBySlug[liveHouseSlug]
-	if ok {
-		return liveHouseId, nil
+	if liveHouse, ok := liveHousesBySlug[liveHouseSlug]; ok {
+		return &liveHouse, nil
 	} else {
-		return uuid.Nil, fmt.Errorf("liveHouseId of liveHouseSlug (%s) is not found", liveHouseSlug)
+		liveHouse, err := liveService.store.GetLiveHouseBySlug(ctx, types.NewNullString(liveHouseSlug))
+		if err != nil {
+			return nil, err
+		}
+		liveHousesBySlug[liveHouseSlug] = liveHouse
+		return &liveHouse, nil
 	}
 }
 
@@ -104,5 +120,39 @@ func (liveService *LiveService) ListLiveHouses(ctx context.Context, req *proto.L
 	}
 	return &proto.ListLiveHousesResponse{
 		LiveHouses: liveHousesResp,
+	}, nil
+}
+
+func (liveService *LiveService) ListLiveEvents(ctx context.Context, req *proto.ListLiveEventsRequest) (*proto.ListLiveEventsResponse, error) {
+	liveEvents, err := liveService.store.GetAllLiveEvents(ctx)
+	if err != nil {
+		return nil, err
+	}
+	liveEventsResp := make([]*proto.LiveEvent, 0, len(liveEvents))
+	for _, liveEvent := range liveEvents {
+		liveHouse, err := liveService.getLiveHouseBySlug(ctx, liveEvent.LiveHouseSlug.String)
+		if err != nil {
+			return nil, err
+		}
+		liveEventsResp = append(liveEventsResp, &proto.LiveEvent{
+			Id: liveEvent.ID.String(),
+			LiveHouse: &proto.LiveHouse{
+				Id:   liveHouse.ID.String(),
+				Name: liveHouse.Name,
+				Slug: liveHouse.Slug.String,
+			},
+			Title:           liveEvent.Title,
+			Url:             liveEvent.Url,
+			Description:     liveEvent.Description.String,
+			PriceInfo:       liveEvent.PriceInfo.String,
+			StageOneOpenAt:  timestamppb.New(liveEvent.StageOneOpenAt.Time),
+			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
+			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
+			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			AvailableSeats:  liveEvent.AvailableSeats,
+		})
+	}
+	return &proto.ListLiveEventsResponse{
+		LiveEvents: liveEventsResp,
 	}, nil
 }

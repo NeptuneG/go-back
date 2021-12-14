@@ -175,3 +175,22 @@ func (q *Queries) GetLiveHouseById(ctx context.Context, id uuid.UUID) (LiveHouse
 	)
 	return i, err
 }
+
+const getLiveHouseBySlug = `-- name: GetLiveHouseBySlug :one
+SELECT id, name, address, slug, created_at, updated_at FROM live_houses
+WHERE slug = $1 LIMIT 1
+`
+
+func (q *Queries) GetLiveHouseBySlug(ctx context.Context, slug types.NullString) (LiveHouse, error) {
+	row := q.queryRow(ctx, q.getLiveHouseBySlugStmt, getLiveHouseBySlug, slug)
+	var i LiveHouse
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Address,
+		&i.Slug,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}

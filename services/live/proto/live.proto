@@ -67,7 +67,9 @@ message CreateLiveEventRequest {
 
 message CreateLiveEventResponse { live_event.LiveEvent live_event = 1; }
 
-message ListLiveEventsRequest {}
+message ListLiveEventsRequest {
+  string live_house_slug = 1;
+}
 
 message ListLiveEventsResponse {
   repeated live_event.LiveEvent live_events = 1;
