@@ -6,9 +6,9 @@ build-gateway-svc:
 build-user-svc:
 	docker build -t neptuneg/go-back/user-service:latest --file ./services/user/Dockerfile .
 
-.PHONY: generate-migrate
-generate-migrate:
-	docker exec go-back-app migrate create -dir db/migrations -ext sql $(NAME)
+.PHONY: user-generate-migrate
+user-generate-migrate:
+	docker exec user-service migrate create -dir db/migrations -ext sql $(NAME)
 
 .PHONY: user-db-create
 user-db-create:
@@ -37,3 +37,43 @@ user-db-rollback:
 .PHONY: user-sqlc-generate
 user-sqlc-generate:
 	cd services/user && sqlc generate
+
+.PHONY: build-live-svc
+build-live-svc:
+	docker build -t neptuneg/go-back/live-service:latest --file ./services/live/Dockerfile .
+
+.PHONY: live-generate-migrate
+live-generate-migrate:
+	docker exec live-service migrate create -dir db/migrations -ext sql $(NAME)
+
+.PHONY: live-db-create
+live-db-create:
+	docker exec live-db createdb --username=dev --owner=dev live_development
+	docker exec live-db createdb --username=dev --owner=dev live_test
+
+.PHONY: live-db-drop
+live-db-drop:
+	docker exec live-db dropdb --username=dev -f live_development
+	docker exec live-db dropdb --username=dev -f live_test
+
+.PHONY: live-db-seed
+live-db-seed:
+	cat services/live/db/seeds.sql | xargs -0 docker exec live-db psql -U dev -d live_development -c
+
+.PHONY: live-db-migrate
+live-db-migrate:
+	docker exec -it live-service migrate \
+	-database postgresql://dev@live-db/live_development?sslmode=disable \
+	-path db/migrations \
+	-verbose up
+
+.PHONY: live-db-rollback
+live-db-rollback:
+	docker exec -it live-service migrate \
+	-database postgresql://dev@live-db/live_development?sslmode=disable \
+	-path db/migrations \
+	-verbose down $(or $(STEP), 1)
+
+.PHONY: live-sqlc-generate
+live-sqlc-generate:
+	cd services/live && sqlc generate

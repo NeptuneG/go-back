@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS live_events;
+DROP TABLE IF EXISTS artists;
+DROP TABLE IF EXISTS live_houses;
