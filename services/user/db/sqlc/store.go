@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/NeptuneG/go-back/pkg/types"
+	"github.com/NeptuneG/go-back/services/user/proto"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,37 +22,24 @@ func NewStore(db *sql.DB) *Store {
 	}
 }
 
-type CreateUserTxParams struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type CreateUserTxResult struct {
-	Id     string
-	Email  string
-	Points int32
-}
-
-var nullCreateUserTxResult CreateUserTxResult
-
-func (store *Store) CreateUserTx(ctx context.Context, param CreateUserTxParams) (CreateUserTxResult, error) {
+func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nullCreateUserTxResult, err
+		return nil, err
 	}
 
 	queries := New(tx)
-	encrypted_password, err := encryptPassword(param.Password)
+	encrypted_password, err := encryptPassword(req.Password)
 	if err != nil {
-		return nullCreateUserTxResult, err
+		return nil, err
 	}
 	arg := CreateUserParams{
-		Email:             param.Email,
+		Email:             req.Email,
 		EncryptedPassword: encrypted_password,
 	}
 	user, err := queries.CreateUser(ctx, arg)
 	if err != nil {
-		return nullCreateUserTxResult, err
+		return nil, err
 	}
 	user_points, err := queries.CreateUserPoints(ctx, CreateUserPointsParams{
 		UserID:      user.ID,
@@ -61,15 +49,17 @@ func (store *Store) CreateUserTx(ctx context.Context, param CreateUserTxParams) 
 
 	if err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
-			return nullCreateUserTxResult, fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
+			return nil, fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
 		}
-		return nullCreateUserTxResult, err
+		return nil, err
 	}
 
-	return CreateUserTxResult{
-		Id:     user.ID.String(),
-		Email:  user.Email,
-		Points: user_points.Points,
+	return &proto.CreateUserResponse{
+		User: &proto.User{
+			Id:     user.ID.String(),
+			Email:  user.Email,
+			Points: user_points.Points,
+		},
 	}, tx.Commit()
 }
 

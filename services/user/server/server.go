@@ -20,15 +20,5 @@ func New(dbConn *sql.DB) *UserService {
 }
 
 func (userService *UserService) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
-	result, err := userService.store.CreateUserTx(ctx, db.CreateUserTxParams{
-		Email:    req.Email,
-		Password: req.Password,
-	})
-	return &proto.CreateUserResponse{
-		User: &proto.User{
-			Id:     result.Id,
-			Email:  result.Email,
-			Points: result.Points,
-		},
-	}, err
+	return userService.store.CreateUserTx(ctx, req)
 }
