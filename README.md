@@ -64,7 +64,7 @@
 
 ## 🤯🤯🤯
 
-- create order elegantly against available seats
+- create a live event elegantly against available seats
 
 ## References
 
