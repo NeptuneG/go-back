@@ -41,6 +41,9 @@
 - [ ] logging
 - [ ] k8s
 - [ ] pagination
+- [ ] service discovery
+- [ ] config center
+- [ ] health check
 - [ ] hot reaload debug
     - air does not work well due to 2345 is occupied
 
