@@ -40,6 +40,18 @@ services:
       - "2348:2345"
     links:
       - live-db
+  scraper-service:
+    <<: *service
+    container_name: scraper-service
+    image: neptuneg/go-back/scraper-service
+    ports:
+      - "2349:2345"
+    environment:
+      FAKTORY_PROVIDER: FAKTORY_URL
+      FAKTORY_URL: tcp://faktory:7419
+    links:
+      - faktory
+      - redis
   user-db:
     <<: *service-db
     container_name: user-db
@@ -81,6 +93,7 @@ services:
       - ./services/faktory-workers:/app
     depends_on:
       - faktory
+      - redis
 volumes:
   redis:
   faktory:
