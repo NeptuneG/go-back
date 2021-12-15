@@ -41,6 +41,7 @@
 - [ ] k8s
 - [ ] pagination
 - [ ] hot reaload debug
+    - air does not work well due to 2345 is occupied
 
 ## Notes
 
