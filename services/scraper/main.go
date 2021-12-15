@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 
-	live "github.com/NeptuneG/go-back/services/live/proto"
+	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	"github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
 	"github.com/NeptuneG/go-back/services/scraper/consumer"
-	"github.com/NeptuneG/go-back/services/scraper/proto"
 	"github.com/NeptuneG/go-back/services/scraper/server"
 	"google.golang.org/grpc"
 )

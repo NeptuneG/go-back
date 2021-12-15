@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	live "github.com/NeptuneG/go-back/services/live/proto"
-	scraper "github.com/NeptuneG/go-back/services/scraper/proto"
-	user "github.com/NeptuneG/go-back/services/user/proto"
+	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	scraper "github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
+	user "github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )

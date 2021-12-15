@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/NeptuneG/go-back/services/user/proto"
+	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/services/user/server"
 	"google.golang.org/grpc"
 

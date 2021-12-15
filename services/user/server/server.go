@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	db "github.com/NeptuneG/go-back/services/user/db/sqlc"
-	"github.com/NeptuneG/go-back/services/user/proto"
 )
 
 type UserService struct {

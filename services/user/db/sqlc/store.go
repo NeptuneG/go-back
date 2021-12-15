@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
-	"github.com/NeptuneG/go-back/services/user/proto"
 	"golang.org/x/crypto/bcrypt"
 )
 

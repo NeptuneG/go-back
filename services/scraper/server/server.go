@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/NeptuneG/go-back/services/scraper/proto"
+	"github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
 	faktory "github.com/contribsys/faktory/client"
 )
 
