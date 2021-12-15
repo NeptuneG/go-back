@@ -137,9 +137,10 @@ func (liveService *LiveService) ListLiveEvents(ctx context.Context, req *proto.L
 		liveEventsResp = append(liveEventsResp, &proto.LiveEvent{
 			Id: liveEvent.ID.String(),
 			LiveHouse: &proto.LiveHouse{
-				Id:   liveHouse.ID.String(),
-				Name: liveHouse.Name,
-				Slug: liveHouse.Slug.String,
+				Id:      liveHouse.ID.String(),
+				Name:    liveHouse.Name,
+				Address: liveHouse.Address.String,
+				Slug:    liveHouse.Slug.String,
 			},
 			Title:           liveEvent.Title,
 			Url:             liveEvent.Url,
