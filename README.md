@@ -9,6 +9,7 @@
     - [Configuration file (version 1) — sqlc 1.10.0 documentation](https://docs.sqlc.dev/en/stable/reference/config.html)
 - setup
     ```bash
+    make build-services
     docker-compose build
     docker-compose up -d
     make db-create

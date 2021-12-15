@@ -103,3 +103,10 @@ db-migrate:
 .PHONY: db-seed
 db-seed:
 	cat services/live/db/seeds.sql | xargs -0 docker exec live-db psql -U dev -d live_development -c
+
+.PHONY: build-services
+build-services:
+	docker build -t neptuneg/go-back/gateway-service:latest --file ./services/gateway/Dockerfile .
+	docker build -t neptuneg/go-back/user-service:latest --file ./services/user/Dockerfile .
+	docker build -t neptuneg/go-back/live-service:latest --file ./services/live/Dockerfile .
+	docker build -t neptuneg/go-back/scraper-service:latest --file ./services/scraper/Dockerfile .
