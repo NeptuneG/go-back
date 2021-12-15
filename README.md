@@ -11,7 +11,7 @@
     ```bash
     docker-compose build
     docker-compose up -d
-    make create-db
+    make db-create
     make db-migrate
     ```
 - generate db migration
