@@ -2,17 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to app",
+            "name": "Attach to User-Service",
             "type": "go",
             "request": "attach",
             "mode": "remote",
             "substitutePath": [
                 {
-                    "from": "${workspaceRoot}/app",
-                    "to": "/app",
+                    "from": "${workspaceRoot}",
+                    "to": "/go/src/github.com/NeptuneG/go-back",
                 },
             ],
-            "port": 2345,
+            "port": 2346,
             "host": "127.0.0.1",
             "showLog": true,
             "apiVersion": 2,

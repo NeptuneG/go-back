@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "github.com/NeptuneG/go-back/services/user/proto";
+package neptuneg.go_back.serivces.user;
+
+import "google/api/annotations.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post : "/v1/users"
+      body : "*"
+    };
+  };
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CreateUserResponse { User user = 1; }
+
+message User {
+  string id = 1;
+  string email = 2;
+  int32 points = 3;
+}

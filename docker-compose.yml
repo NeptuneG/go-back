@@ -1,43 +1,80 @@
 version: "3.9"
+x-svc-setting: &service
+  volumes:
+    - .:/go/src/github.com/NeptuneG/go-back
+  entrypoint: ["air", "-c", ".air.toml"]
+  security_opt:
+    - seccomp:unconfined
+  stdin_open: true
+  tty: true
+x-svc-db-setting: &service-db
+  image: postgres:14.1-alpine3.14
+  environment:
+    TZ: 'Asia/Tokyo'
+    POSTGRES_USER: dev
+    POSTGRES_HOST_AUTH_METHOD: trust
 
 services:
-  app:
-    container_name: go-back-app
-    build:
-      context: ./app
-      target: dev
-    volumes:
-      - ./app:/app
+  gateway-service:
+    <<: *service
+    container_name: gateway-service
+    image: neptuneg/go-back/gateway-service
     ports:
-      - "3000:3000"
-      - "2345:2345"
+      - "4000:4000"
+      - "2347:2345"
     links:
-      - db
+      - user-service
+  user-service:
+    <<: *service
+    container_name: user-service
+    image: neptuneg/go-back/user-service
+    ports:
+      - "2346:2345"
+    links:
+      - user-db
+  live-service:
+    <<: *service
+    container_name: live-service
+    image: neptuneg/go-back/live-service
+    ports:
+      - "2348:2345"
+    links:
+      - live-db
+  scraper-service:
+    <<: *service
+    container_name: scraper-service
+    image: neptuneg/go-back/scraper-service
+    ports:
+      - "2349:2345"
     environment:
       FAKTORY_PROVIDER: FAKTORY_URL
       FAKTORY_URL: tcp://faktory:7419
-    security_opt:
-      - seccomp:unconfined
-  db:
-    container_name: go-back-db
-    image: postgres:14.1-alpine3.14
+    links:
+      - faktory
+      - redis
+  user-db:
+    <<: *service-db
+    container_name: user-db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - data:/var/lib/postgresql/data
-    environment:
-      TZ: 'Asia/Tokyo'
-      POSTGRES_USER: dev
-      POSTGRES_HOST_AUTH_METHOD: trust
+      - user-data:/var/lib/postgresql/data
+  live-db:
+    <<: *service-db
+    container_name: live-db
+    ports:
+      - "5434:5432"
+    volumes:
+      - live-data:/var/lib/postgresql/data
   redis:
-    container_name: go-back-redis
+    container_name: redis
     image: redis:6.2.6-alpine3.14
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis:/data
   faktory:
-    container_name: go-back-faktory
+    container_name: faktory
     image: contribsys/faktory:latest
     volumes:
       - faktory:/var/lib/faktory
@@ -45,19 +82,20 @@ services:
       - "7419:7419"
       - "7420:7420"
   faktory-workers:
-    container_name: go-back-faktory-workers
+    container_name: faktory-workers
     build:
-      context: ./faktory-workers
+      context: ./services/faktory-workers
     environment:
       TZ: 'Asia/Tokyo'
       FAKTORY_PROVIDER: FAKTORY_URL
       FAKTORY_URL: tcp://faktory:7419
     volumes:
-      - ./faktory-workers:/app
+      - ./services/faktory-workers:/app
     depends_on:
       - faktory
-
+      - redis
 volumes:
-  data:
   redis:
   faktory:
+  user-data:
+  live-data:
