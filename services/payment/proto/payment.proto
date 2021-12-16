@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "github.com/NeptuneG/go-back/services/payment/proto";
+package neptuneg.go_back.serivces.payment;
+
+import "google/api/annotations.proto";
+
+service PaymentService {
+  rpc CreateLiveEventOrder(CreateLiveEventOrderRequest)
+      returns (CreateLiveEventOrderResponse) {
+    option (google.api.http) = {
+      post : "/v1/payments/live_events"
+      body : "*"
+    };
+  };
+}
+
+message CreateLiveEventOrderRequest {
+  string user_id = 1;
+  string live_event_id = 2;
+  int32 price = 3;
+  int32 user_points = 4;
+}
+
+message CreateLiveEventOrderResponse { string status = 1; }

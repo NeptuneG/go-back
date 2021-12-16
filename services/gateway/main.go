@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	payment "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	scraper "github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
 	user "github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -41,6 +42,14 @@ func main() {
 		panic(err)
 	}
 	if err = live.RegisterLiveServiceHandlerClient(ctx, mux, live.NewLiveServiceClient(liveConn)); err != nil {
+		panic(err)
+	}
+
+	paymentConn, err := grpc.DialContext(ctx, "payent-service:3377", opts...)
+	if err != nil {
+		panic(err)
+	}
+	if err = payment.RegisterPaymentServiceHandlerClient(ctx, mux, payment.NewPaymentServiceClient(paymentConn)); err != nil {
 		panic(err)
 	}
 
