@@ -9,23 +9,23 @@
     - [Configuration file (version 1) — sqlc 1.10.0 documentation](https://docs.sqlc.dev/en/stable/reference/config.html)
 - setup
     ```bash
-    make build-services
+    make build-images-all
     docker-compose build
     docker-compose up -d
-    make db-create
-    make db-migrate
+    make db-create-all
+    make db-migrate-all
     ```
 - generate db migration
     ```bash
-    make generate-migrate NAME=#{snake_case_migration_name}
+    make svc-generate-migrate svc=#{service_name} NAME=#{snake_case_migration_name}
     ```
 - db migrate
     ```bash
-    make db-migrate
+    make svc-db-migrate svc=#{service_name}
     ```
 - db rollback
     ```bash
-    make db-rollback STEP=n # default STEP is 1
+    make svc-db-rollback svc=#{service_name} STEP=n # default STEP is 1
     ```
 
 ## DB Diagram
@@ -44,7 +44,9 @@
 - [ ] service discovery
 - [ ] config center
 - [ ] health check
-- [ ] hot reaload debug
+- [ ] cache
+- [ ] rate limit & timeout
+- [ ] hot reload debug
     - air does not work well due to 2345 is occupied
 
 ## Notes
