@@ -18,5 +18,6 @@ message LiveEvent {
   google.protobuf.Timestamp stage_one_start_at = 8;
   google.protobuf.Timestamp stage_two_open_at = 9;
   google.protobuf.Timestamp stage_two_start_at = 10;
-  int32 available_seats = 11;
+  int32 seats = 11;
+  int32 available_seats = 12;
 }

@@ -164,6 +164,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "seats": {
+          "type": "integer",
+          "format": "int32"
+        },
         "availableSeats": {
           "type": "integer",
           "format": "int32"
@@ -258,6 +262,10 @@
         "stageTwoStartAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "seats": {
+          "type": "integer",
+          "format": "int32"
         },
         "availableSeats": {
           "type": "integer",

@@ -56,6 +56,7 @@ func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.
 		StageOneStartAt: req.StageOneStartAt.AsTime(),
 		StageTwoOpenAt:  types.NewNullTime(req.StageTwoOpenAt.AsTime()),
 		StageTwoStartAt: types.NewNullTime(req.StageTwoStartAt.AsTime()),
+		Seats:           req.Seats,
 		AvailableSeats:  req.AvailableSeats,
 	})
 	if err != nil {
@@ -77,6 +78,7 @@ func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.
 			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
 			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
 			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			Seats:           liveEvent.Seats,
 			AvailableSeats:  liveEvent.AvailableSeats,
 		},
 	}, nil
@@ -150,6 +152,7 @@ func (liveService *LiveService) ListLiveEvents(ctx context.Context, req *proto.L
 			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
 			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
 			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			Seats:           liveEvent.Seats,
 			AvailableSeats:  liveEvent.AvailableSeats,
 		})
 	}

@@ -25,9 +25,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
-	if q.createUserOrderStmt, err = db.PrepareContext(ctx, createUserOrder); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateUserOrder: %w", err)
-	}
 	if q.createUserPointsStmt, err = db.PrepareContext(ctx, createUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUserPoints: %w", err)
 	}
@@ -45,11 +42,6 @@ func (q *Queries) Close() error {
 	if q.createUserStmt != nil {
 		if cerr := q.createUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
-		}
-	}
-	if q.createUserOrderStmt != nil {
-		if cerr := q.createUserOrderStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createUserOrderStmt: %w", cerr)
 		}
 	}
 	if q.createUserPointsStmt != nil {
@@ -107,7 +99,6 @@ type Queries struct {
 	db                   DBTX
 	tx                   *sql.Tx
 	createUserStmt       *sql.Stmt
-	createUserOrderStmt  *sql.Stmt
 	createUserPointsStmt *sql.Stmt
 	getUserStmt          *sql.Stmt
 	getUserPointsStmt    *sql.Stmt
@@ -118,7 +109,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		db:                   tx,
 		tx:                   tx,
 		createUserStmt:       q.createUserStmt,
-		createUserOrderStmt:  q.createUserOrderStmt,
 		createUserPointsStmt: q.createUserPointsStmt,
 		getUserStmt:          q.getUserStmt,
 		getUserPointsStmt:    q.getUserPointsStmt,

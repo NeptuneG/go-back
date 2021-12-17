@@ -23,6 +23,7 @@ type LiveEvent struct {
 	Slug            types.NullString `json:"slug"`
 	CreatedAt       time.Time        `json:"created_at"`
 	UpdatedAt       time.Time        `json:"updated_at"`
+	Seats           int32            `json:"seats"`
 	AvailableSeats  int32            `json:"available_seats"`
 }
 

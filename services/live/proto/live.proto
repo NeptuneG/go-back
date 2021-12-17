@@ -62,7 +62,8 @@ message CreateLiveEventRequest {
   google.protobuf.Timestamp stage_one_start_at = 7;
   google.protobuf.Timestamp stage_two_open_at = 8;
   google.protobuf.Timestamp stage_two_start_at = 9;
-  int32 available_seats = 10;
+  int32 seats = 10;
+  int32 available_seats = 11;
 }
 
 message CreateLiveEventResponse { live_event.LiveEvent live_event = 1; }

@@ -2,7 +2,7 @@ version: "3.9"
 x-svc-setting: &service
   volumes:
     - .:/go/src/github.com/NeptuneG/go-back
-  entrypoint: ["air", "-c", ".air.toml"]
+  entrypoint: ["air", "-c", "../../.air.toml"]
   security_opt:
     - seccomp:unconfined
   stdin_open: true
@@ -24,6 +24,9 @@ services:
       - "2347:2345"
     links:
       - user-service
+      - live-service
+      - scraper-service
+      - payment-service
   user-service:
     <<: *service
     container_name: user-service

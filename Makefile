@@ -58,7 +58,13 @@ db-migrate-all:
 
 .PHONY: db-seed-all
 db-seed-all:
-	make svc-db-migrate svc=live
+	make svc-db-seed svc=live
+
+.PHONY: sqlc-generate-all
+sqlc-generate-all:
+	make svc-sqlc-generate svc=user
+	make svc-sqlc-generate svc=live
+	make svc-sqlc-generate svc=payment
 
 .PHONY: build-images-all
 build-images-all:

@@ -25,6 +25,7 @@ type createLiveEventMessage struct {
 	StageOneStartAt time.Time        `json:"stage_one_start_at" binding:"required"`
 	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
 	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	Seats           *int32           `json:"seats"`
 	AvailableSeats  *int32           `json:"available_seats"`
 }
 
@@ -69,6 +70,7 @@ func (consumer *ScrapedEventsConsumer) Start(ctx context.Context) {
 				StageOneStartAt: timestamppb.New(reqMsg.StageOneStartAt),
 				StageTwoOpenAt:  timestamppb.New(reqMsg.StageTwoOpenAt.Time),
 				StageTwoStartAt: timestamppb.New(reqMsg.StageTwoStartAt.Time),
+				Seats:           seats(reqMsg.Seats),
 				AvailableSeats:  availableSeats(reqMsg.AvailableSeats),
 			}); err != nil {
 				log.Fatal(err)
@@ -76,6 +78,14 @@ func (consumer *ScrapedEventsConsumer) Start(ctx context.Context) {
 			}
 		}
 	}()
+}
+
+func seats(raw *int32) int32 {
+	if raw == nil {
+		return 100
+	} else {
+		return *raw
+	}
 }
 
 func availableSeats(raw *int32) int32 {

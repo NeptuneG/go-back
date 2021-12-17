@@ -4,9 +4,9 @@ INSERT INTO live_events (
   description, price_info,
   stage_one_open_at, stage_one_start_at,
   stage_two_open_at, stage_two_start_at,
-  available_seats
+  seats, available_seats
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 ) RETURNING *;
 
 -- name: GetLiveEventById :one
@@ -27,7 +27,7 @@ SELECT
   live_events.description, live_events.price_info,
   live_events.stage_one_open_at, live_events.stage_one_start_at,
   live_events.stage_two_open_at, live_events.stage_two_start_at,
-  live_events.available_seats,
+  live_events.seats, live_events.available_seats,
   live_events.slug
 FROM live_events
 INNER JOIN live_houses ON live_events.live_house_id = live_houses.id;
@@ -40,7 +40,7 @@ SELECT
   live_events.description, live_events.price_info,
   live_events.stage_one_open_at, live_events.stage_one_start_at,
   live_events.stage_two_open_at, live_events.stage_two_start_at,
-  live_events.available_seats,
+  live_events.seats, live_events.available_seats,
   live_events.slug
 FROM live_events
 INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
