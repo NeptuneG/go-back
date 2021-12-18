@@ -204,6 +204,14 @@
         }
       }
     },
+    "liveIsLiveEventExistResponse": {
+      "type": "object",
+      "properties": {
+        "exist": {
+          "type": "boolean"
+        }
+      }
+    },
     "liveListLiveEventsResponse": {
       "type": "object",
       "properties": {

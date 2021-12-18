@@ -28,11 +28,17 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserPointsStmt, err = db.PrepareContext(ctx, createUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUserPoints: %w", err)
 	}
-	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
-		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
+	}
+	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
 	}
 	if q.getUserPointsStmt, err = db.PrepareContext(ctx, getUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserPoints: %w", err)
+	}
+	if q.isUserExistStmt, err = db.PrepareContext(ctx, isUserExist); err != nil {
+		return nil, fmt.Errorf("error preparing query IsUserExist: %w", err)
 	}
 	return &q, nil
 }
@@ -49,14 +55,24 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createUserPointsStmt: %w", cerr)
 		}
 	}
-	if q.getUserStmt != nil {
-		if cerr := q.getUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
+	if q.getUserByEmailStmt != nil {
+		if cerr := q.getUserByEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByEmailStmt: %w", cerr)
+		}
+	}
+	if q.getUserByIDStmt != nil {
+		if cerr := q.getUserByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
 		}
 	}
 	if q.getUserPointsStmt != nil {
 		if cerr := q.getUserPointsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserPointsStmt: %w", cerr)
+		}
+	}
+	if q.isUserExistStmt != nil {
+		if cerr := q.isUserExistStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing isUserExistStmt: %w", cerr)
 		}
 	}
 	return err
@@ -100,8 +116,10 @@ type Queries struct {
 	tx                   *sql.Tx
 	createUserStmt       *sql.Stmt
 	createUserPointsStmt *sql.Stmt
-	getUserStmt          *sql.Stmt
+	getUserByEmailStmt   *sql.Stmt
+	getUserByIDStmt      *sql.Stmt
 	getUserPointsStmt    *sql.Stmt
+	isUserExistStmt      *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -110,7 +128,9 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                   tx,
 		createUserStmt:       q.createUserStmt,
 		createUserPointsStmt: q.createUserPointsStmt,
-		getUserStmt:          q.getUserStmt,
+		getUserByEmailStmt:   q.getUserByEmailStmt,
+		getUserByIDStmt:      q.getUserByIDStmt,
 		getUserPointsStmt:    q.getUserPointsStmt,
+		isUserExistStmt:      q.isUserExistStmt,
 	}
 }

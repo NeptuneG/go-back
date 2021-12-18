@@ -37,6 +37,8 @@ service LiveService {
       get : "/v1/live_events"
     };
   };
+
+  rpc IsLiveEventExist(IsLiveEventExistRequest) returns (IsLiveEventExistResponse);
 }
 
 message CreateLiveHouseRequest {
@@ -68,10 +70,10 @@ message CreateLiveEventRequest {
 
 message CreateLiveEventResponse { live_event.LiveEvent live_event = 1; }
 
-message ListLiveEventsRequest {
-  string live_house_slug = 1;
-}
+message ListLiveEventsRequest { string live_house_slug = 1; }
 
-message ListLiveEventsResponse {
-  repeated live_event.LiveEvent live_events = 1;
-}
+message ListLiveEventsResponse { repeated live_event.LiveEvent live_events = 1; }
+
+message IsLiveEventExistRequest { string id = 1; }
+
+message IsLiveEventExistResponse { bool exist = 1; }

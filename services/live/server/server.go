@@ -8,6 +8,7 @@ import (
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
+	"github.com/google/uuid"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -158,5 +159,19 @@ func (liveService *LiveService) ListLiveEvents(ctx context.Context, req *proto.L
 	}
 	return &proto.ListLiveEventsResponse{
 		LiveEvents: liveEventsResp,
+	}, nil
+}
+
+func (liveService *LiveService) IsLiveEventExist(ctx context.Context, req *proto.IsLiveEventExistRequest) (*proto.IsLiveEventExistResponse, error) {
+	liveEventID, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	exist, err := liveService.store.IsLiveEventExist(ctx, liveEventID)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.IsLiveEventExistResponse{
+		Exist: exist,
 	}, nil
 }

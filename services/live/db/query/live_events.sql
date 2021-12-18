@@ -49,3 +49,6 @@ WHERE live_houses.slug = $1;
 -- name: UpdateLiveEventAvailableSeatsById :exec
 UPDATE live_events SET available_seats = $1
 WHERE id = $2;
+
+-- name: IsLiveEventExist :one
+SELECT EXISTS(SELECT live_events.id from live_events where live_events.id = $1);

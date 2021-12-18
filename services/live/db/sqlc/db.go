@@ -55,6 +55,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getLiveHouseBySlugStmt, err = db.PrepareContext(ctx, getLiveHouseBySlug); err != nil {
 		return nil, fmt.Errorf("error preparing query GetLiveHouseBySlug: %w", err)
 	}
+	if q.isLiveEventExistStmt, err = db.PrepareContext(ctx, isLiveEventExist); err != nil {
+		return nil, fmt.Errorf("error preparing query IsLiveEventExist: %w", err)
+	}
 	if q.updateLiveEventAvailableSeatsByIdStmt, err = db.PrepareContext(ctx, updateLiveEventAvailableSeatsById); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateLiveEventAvailableSeatsById: %w", err)
 	}
@@ -118,6 +121,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getLiveHouseBySlugStmt: %w", cerr)
 		}
 	}
+	if q.isLiveEventExistStmt != nil {
+		if cerr := q.isLiveEventExistStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing isLiveEventExistStmt: %w", cerr)
+		}
+	}
 	if q.updateLiveEventAvailableSeatsByIdStmt != nil {
 		if cerr := q.updateLiveEventAvailableSeatsByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateLiveEventAvailableSeatsByIdStmt: %w", cerr)
@@ -173,6 +181,7 @@ type Queries struct {
 	getLiveEventsByLiveHouseStmt          *sql.Stmt
 	getLiveHouseByIdStmt                  *sql.Stmt
 	getLiveHouseBySlugStmt                *sql.Stmt
+	isLiveEventExistStmt                  *sql.Stmt
 	updateLiveEventAvailableSeatsByIdStmt *sql.Stmt
 }
 
@@ -191,6 +200,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getLiveEventsByLiveHouseStmt:          q.getLiveEventsByLiveHouseStmt,
 		getLiveHouseByIdStmt:                  q.getLiveHouseByIdStmt,
 		getLiveHouseBySlugStmt:                q.getLiveHouseBySlugStmt,
+		isLiveEventExistStmt:                  q.isLiveEventExistStmt,
 		updateLiveEventAvailableSeatsByIdStmt: q.updateLiveEventAvailableSeatsByIdStmt,
 	}
 }

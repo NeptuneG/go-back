@@ -12,6 +12,20 @@ service UserService {
       body : "*"
     };
   };
+
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get : "/v1/users/{id}"
+    };
+  };
+
+  rpc IsUserExist(IsUserExistRequest) returns (IsUserExistResponse);
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  int32 points = 3;
 }
 
 message CreateUserRequest {
@@ -21,8 +35,10 @@ message CreateUserRequest {
 
 message CreateUserResponse { User user = 1; }
 
-message User {
-  string id = 1;
-  string email = 2;
-  int32 points = 3;
-}
+message GetUserRequest { string id = 1; }
+
+message GetUserResponse { User user = 1; }
+
+message IsUserExistRequest { string id = 1; }
+
+message IsUserExistResponse { bool exist = 1; }

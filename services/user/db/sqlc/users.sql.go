@@ -5,6 +5,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -34,21 +36,61 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id, email, encrypted_password, reset_password_token, created_at, updated_at FROM users
-WHERE email = $1 LIMIT 1
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT
+  users.id,
+  users.email,
+  SUM(user_points.points) as points
+FROM users
+INNER JOIN user_points ON users.id = user_points.user_id
+WHERE users.email = $1
+GROUP BY users.id
 `
 
-func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
-	row := q.queryRow(ctx, q.getUserStmt, getUser, email)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.EncryptedPassword,
-		&i.ResetPasswordToken,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
+type GetUserByEmailRow struct {
+	ID     uuid.UUID `json:"id"`
+	Email  string    `json:"email"`
+	Points int64     `json:"points"`
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.queryRow(ctx, q.getUserByEmailStmt, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(&i.ID, &i.Email, &i.Points)
 	return i, err
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT
+  users.id,
+  users.email,
+  SUM(user_points.points) as points
+FROM users
+INNER JOIN user_points ON users.id = user_points.user_id
+WHERE users.id = $1
+GROUP BY users.id
+`
+
+type GetUserByIDRow struct {
+	ID     uuid.UUID `json:"id"`
+	Email  string    `json:"email"`
+	Points int64     `json:"points"`
+}
+
+func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (GetUserByIDRow, error) {
+	row := q.queryRow(ctx, q.getUserByIDStmt, getUserByID, id)
+	var i GetUserByIDRow
+	err := row.Scan(&i.ID, &i.Email, &i.Points)
+	return i, err
+}
+
+const isUserExist = `-- name: IsUserExist :one
+SELECT EXISTS(SELECT users.id from users where users.id = $1)
+`
+
+func (q *Queries) IsUserExist(ctx context.Context, id uuid.UUID) (bool, error) {
+	row := q.queryRow(ctx, q.isUserExistStmt, isUserExist, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

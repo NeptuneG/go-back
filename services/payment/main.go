@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"net"
@@ -19,26 +20,35 @@ const (
 )
 
 func main() {
-	conn, err := sql.Open(dbDriver, dbSource)
+	dbConn, err := sql.Open(dbDriver, dbSource)
 	defer func() {
-		if err := conn.Close(); err != nil {
+		if err := dbConn.Close(); err != nil {
 			log.Fatal(err)
 		}
 	}()
 	if err != nil {
 		log.Fatal("Connecting database failed:", err)
+		return
 	}
 
 	srv := grpc.NewServer()
-	proto.RegisterPaymentServiceServer(srv, server.New(conn))
+	ctx := context.Background()
+	service, err := server.New(ctx, dbConn)
+	if err != nil {
+		log.Fatalf("failed to create server: %v", err)
+		return
+	}
+	proto.RegisterPaymentServiceServer(srv, service)
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
+		return
 	}
 
 	err = srv.Serve(listener)
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
+		return
 	}
 }

@@ -22,6 +22,7 @@ type LiveServiceClient interface {
 	ListLiveHouses(ctx context.Context, in *ListLiveHousesRequest, opts ...grpc.CallOption) (*ListLiveHousesResponse, error)
 	CreateLiveEvent(ctx context.Context, in *CreateLiveEventRequest, opts ...grpc.CallOption) (*CreateLiveEventResponse, error)
 	ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error)
+	IsLiveEventExist(ctx context.Context, in *IsLiveEventExistRequest, opts ...grpc.CallOption) (*IsLiveEventExistResponse, error)
 }
 
 type liveServiceClient struct {
@@ -68,6 +69,15 @@ func (c *liveServiceClient) ListLiveEvents(ctx context.Context, in *ListLiveEven
 	return out, nil
 }
 
+func (c *liveServiceClient) IsLiveEventExist(ctx context.Context, in *IsLiveEventExistRequest, opts ...grpc.CallOption) (*IsLiveEventExistResponse, error) {
+	out := new(IsLiveEventExistResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/IsLiveEventExist", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LiveServiceServer is the server API for LiveService service.
 // All implementations must embed UnimplementedLiveServiceServer
 // for forward compatibility
@@ -76,6 +86,7 @@ type LiveServiceServer interface {
 	ListLiveHouses(context.Context, *ListLiveHousesRequest) (*ListLiveHousesResponse, error)
 	CreateLiveEvent(context.Context, *CreateLiveEventRequest) (*CreateLiveEventResponse, error)
 	ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error)
+	IsLiveEventExist(context.Context, *IsLiveEventExistRequest) (*IsLiveEventExistResponse, error)
 	mustEmbedUnimplementedLiveServiceServer()
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedLiveServiceServer) CreateLiveEvent(context.Context, *CreateLi
 }
 func (UnimplementedLiveServiceServer) ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLiveEvents not implemented")
+}
+func (UnimplementedLiveServiceServer) IsLiveEventExist(context.Context, *IsLiveEventExistRequest) (*IsLiveEventExistResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsLiveEventExist not implemented")
 }
 func (UnimplementedLiveServiceServer) mustEmbedUnimplementedLiveServiceServer() {}
 
@@ -180,6 +194,24 @@ func _LiveService_ListLiveEvents_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LiveService_IsLiveEventExist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsLiveEventExistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LiveServiceServer).IsLiveEventExist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/IsLiveEventExist",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LiveServiceServer).IsLiveEventExist(ctx, req.(*IsLiveEventExistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LiveService_ServiceDesc is the grpc.ServiceDesc for LiveService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +234,10 @@ var LiveService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListLiveEvents",
 			Handler:    _LiveService_ListLiveEvents_Handler,
+		},
+		{
+			MethodName: "IsLiveEventExist",
+			Handler:    _LiveService_IsLiveEventExist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -287,6 +287,17 @@ func (q *Queries) GetLiveEventsByLiveHouse(ctx context.Context, arg GetLiveEvent
 	return items, nil
 }
 
+const isLiveEventExist = `-- name: IsLiveEventExist :one
+SELECT EXISTS(SELECT live_events.id from live_events where live_events.id = $1)
+`
+
+func (q *Queries) IsLiveEventExist(ctx context.Context, id uuid.UUID) (bool, error) {
+	row := q.queryRow(ctx, q.isLiveEventExistStmt, isLiveEventExist, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const updateLiveEventAvailableSeatsById = `-- name: UpdateLiveEventAvailableSeatsById :exec
 UPDATE live_events SET available_seats = $1
 WHERE id = $2
