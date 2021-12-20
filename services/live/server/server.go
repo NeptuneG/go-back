@@ -175,3 +175,7 @@ func (liveService *LiveService) IsLiveEventExist(ctx context.Context, req *proto
 		Exist: exist,
 	}, nil
 }
+
+func (liveService *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
+	return liveService.store.ReserveSeatTx(ctx, req)
+}

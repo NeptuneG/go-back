@@ -4,3 +4,7 @@ INSERT INTO live_event_orders (
 ) VALUES (
   $1, $2, $3, $4
 ) RETURNING *;
+
+-- name: UpdateLiveEventOrderState :exec
+UPDATE live_event_orders SET state = $1
+WHERE id = $2;

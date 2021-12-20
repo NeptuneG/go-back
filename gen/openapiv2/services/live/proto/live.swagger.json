@@ -234,6 +234,14 @@
         }
       }
     },
+    "liveReserveSeatResponse": {
+      "type": "object",
+      "properties": {
+        "liveEvent": {
+          "$ref": "#/definitions/live_eventLiveEvent"
+        }
+      }
+    },
     "live_eventLiveEvent": {
       "type": "object",
       "properties": {

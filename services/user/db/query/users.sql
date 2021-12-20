@@ -27,3 +27,4 @@ GROUP BY users.id;
 
 -- name: IsUserExist :one
 SELECT EXISTS(SELECT users.id from users where users.id = $1);
+

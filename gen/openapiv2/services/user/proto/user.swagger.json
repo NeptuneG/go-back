@@ -107,6 +107,14 @@
         }
       }
     },
+    "userConsumeUserPointsResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/userUser"
+        }
+      }
+    },
     "userCreateUserRequest": {
       "type": "object",
       "properties": {
@@ -152,8 +160,8 @@
           "type": "string"
         },
         "points": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string",
+          "format": "int64"
         }
       }
     }

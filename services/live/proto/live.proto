@@ -39,6 +39,8 @@ service LiveService {
   };
 
   rpc IsLiveEventExist(IsLiveEventExistRequest) returns (IsLiveEventExistResponse);
+
+  rpc ReserveSeat(ReserveSeatRequest) returns (ReserveSeatResponse);
 }
 
 message CreateLiveHouseRequest {
@@ -77,3 +79,11 @@ message ListLiveEventsResponse { repeated live_event.LiveEvent live_events = 1; 
 message IsLiveEventExistRequest { string id = 1; }
 
 message IsLiveEventExistResponse { bool exist = 1; }
+
+message ReserveSeatRequest {
+  string live_event_id = 1;
+}
+
+message ReserveSeatResponse {
+  live_event.LiveEvent live_event = 1;
+}

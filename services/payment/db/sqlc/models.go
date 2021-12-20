@@ -3,10 +3,32 @@
 package db
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type State string
+
+const (
+	StateCreated  State = "created"
+	StatePaid     State = "paid"
+	StateRefunded State = "refunded"
+	StateFailed   State = "failed"
+)
+
+func (e *State) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = State(s)
+	case string:
+		*e = State(s)
+	default:
+		return fmt.Errorf("unsupported scan type for State: %T", src)
+	}
+	return nil
+}
 
 type LiveEventOrder struct {
 	ID          uuid.UUID `json:"id"`
@@ -16,4 +38,5 @@ type LiveEventOrder struct {
 	UserPoints  int32     `json:"user_points"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	State       State     `json:"state"`
 }

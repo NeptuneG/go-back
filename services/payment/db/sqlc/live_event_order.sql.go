@@ -14,7 +14,7 @@ INSERT INTO live_event_orders (
   user_id, live_event_id, price, user_points
 ) VALUES (
   $1, $2, $3, $4
-) RETURNING id, user_id, live_event_id, price, user_points, created_at, updated_at
+) RETURNING id, user_id, live_event_id, price, user_points, created_at, updated_at, state
 `
 
 type CreateLiveEventOrderParams struct {
@@ -40,6 +40,22 @@ func (q *Queries) CreateLiveEventOrder(ctx context.Context, arg CreateLiveEventO
 		&i.UserPoints,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.State,
 	)
 	return i, err
+}
+
+const updateLiveEventOrderState = `-- name: UpdateLiveEventOrderState :exec
+UPDATE live_event_orders SET state = $1
+WHERE id = $2
+`
+
+type UpdateLiveEventOrderStateParams struct {
+	State State     `json:"state"`
+	ID    uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateLiveEventOrderState(ctx context.Context, arg UpdateLiveEventOrderStateParams) error {
+	_, err := q.exec(ctx, q.updateLiveEventOrderStateStmt, updateLiveEventOrderState, arg.State, arg.ID)
+	return err
 }

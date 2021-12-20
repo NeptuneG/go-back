@@ -25,6 +25,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createLiveEventOrderStmt, err = db.PrepareContext(ctx, createLiveEventOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateLiveEventOrder: %w", err)
 	}
+	if q.updateLiveEventOrderStateStmt, err = db.PrepareContext(ctx, updateLiveEventOrderState); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateLiveEventOrderState: %w", err)
+	}
 	return &q, nil
 }
 
@@ -33,6 +36,11 @@ func (q *Queries) Close() error {
 	if q.createLiveEventOrderStmt != nil {
 		if cerr := q.createLiveEventOrderStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createLiveEventOrderStmt: %w", cerr)
+		}
+	}
+	if q.updateLiveEventOrderStateStmt != nil {
+		if cerr := q.updateLiveEventOrderStateStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateLiveEventOrderStateStmt: %w", cerr)
 		}
 	}
 	return err
@@ -72,15 +80,17 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                       DBTX
-	tx                       *sql.Tx
-	createLiveEventOrderStmt *sql.Stmt
+	db                            DBTX
+	tx                            *sql.Tx
+	createLiveEventOrderStmt      *sql.Stmt
+	updateLiveEventOrderStateStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                       tx,
-		tx:                       tx,
-		createLiveEventOrderStmt: q.createLiveEventOrderStmt,
+		db:                            tx,
+		tx:                            tx,
+		createLiveEventOrderStmt:      q.createLiveEventOrderStmt,
+		updateLiveEventOrderStateStmt: q.updateLiveEventOrderStateStmt,
 	}
 }

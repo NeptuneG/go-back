@@ -58,7 +58,7 @@ func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserReque
 		User: &proto.User{
 			Id:     user.ID.String(),
 			Email:  user.Email,
-			Points: user_points.Points,
+			Points: int64(user_points.Points),
 		},
 	}, tx.Commit()
 }

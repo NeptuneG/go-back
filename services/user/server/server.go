@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
+	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/user/db/sqlc"
 	"github.com/google/uuid"
 )
@@ -34,7 +35,7 @@ func (userService *UserService) GetUser(ctx context.Context, req *proto.GetUserR
 		User: &proto.User{
 			Id:     user.ID.String(),
 			Email:  user.Email,
-			Points: int32(user.Points),
+			Points: user.Points,
 		},
 	}, err
 }
@@ -51,4 +52,27 @@ func (userService *UserService) IsUserExist(ctx context.Context, req *proto.IsUs
 	return &proto.IsUserExistResponse{
 		Exist: exist,
 	}, nil
+}
+
+func (userService *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeUserPointsRequest) (*proto.ConsumeUserPointsResponse, error) {
+	userID, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	_, err = userService.store.CreateUserPoints(ctx, db.CreateUserPointsParams{
+		UserID:      userID,
+		Points:      -req.Points,
+		Description: types.NewNullString(req.Description),
+	})
+	if err != nil {
+		return nil, err
+	}
+	user, err := userService.store.GetUserByID(ctx, userID)
+	return &proto.ConsumeUserPointsResponse{
+		User: &proto.User{
+			Id:     user.ID.String(),
+			Email:  user.Email,
+			Points: user.Points,
+		},
+	}, err
 }
