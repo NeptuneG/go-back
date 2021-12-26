@@ -3,11 +3,19 @@ package server
 import (
 	"context"
 	"database/sql"
+	"log"
+	"time"
 
 	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/user/db/sqlc"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+var (
+	count = 0
 )
 
 type UserService struct {
@@ -55,6 +63,13 @@ func (userService *UserService) IsUserExist(ctx context.Context, req *proto.IsUs
 }
 
 func (userService *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeUserPointsRequest) (*proto.ConsumeUserPointsResponse, error) {
+	// force a retry
+	count++
+	log.Print("count: ", count)
+	if count%3 != 0 {
+		return nil, status.Error(codes.Internal, "just failed")
+	}
+
 	userID, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, err
@@ -67,6 +82,14 @@ func (userService *UserService) ConsumeUserPoints(ctx context.Context, req *prot
 	if err != nil {
 		return nil, err
 	}
+
+	// mock delay
+	if false {
+		log.Println("mock delay")
+		time.Sleep(10 * time.Second)
+		log.Println("mock delay done")
+	}
+
 	user, err := userService.store.GetUserByID(ctx, userID)
 	return &proto.ConsumeUserPointsResponse{
 		User: &proto.User{

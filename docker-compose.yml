@@ -51,6 +51,8 @@ services:
       - "2350:2345"
     links:
       - payment-db
+    environment:
+      GRPC_GO_RETRY: on
   scraper-service:
     <<: *service
     container_name: scraper-service
