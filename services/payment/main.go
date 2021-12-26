@@ -35,20 +35,20 @@ func main() {
 	ctx := context.Background()
 	service, err := server.New(ctx, dbConn)
 	if err != nil {
-		log.Fatalf("failed to create server: %v", err)
+		log.Printf("failed to create server: %v", err)
 		return
 	}
 	proto.RegisterPaymentServiceServer(srv, service)
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Printf("failed to listen: %v", err)
 		return
 	}
 
 	err = srv.Serve(listener)
 	if err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Printf("failed to serve: %v", err)
 		return
 	}
 }

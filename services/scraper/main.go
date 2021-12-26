@@ -26,7 +26,7 @@ func main() {
 	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx, "live-service:3377", opts...)
 	if err != nil {
-		log.Fatalf("failed to dial grpc server: %v", err)
+		log.Printf("failed to dial grpc server: %v", err)
 		return
 	}
 
@@ -40,11 +40,11 @@ func main() {
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Printf("failed to listen: %v", err)
 	}
 
 	err = srv.Serve(listener)
 	if err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Printf("failed to serve: %v", err)
 	}
 }

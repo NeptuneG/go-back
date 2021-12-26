@@ -63,7 +63,7 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.
 
 	liveEventOrder, err := s.initLiveEventOrder(ctx, req)
 	if err != nil {
-		log.Fatalf("failed to init live event order: %v", err)
+		log.Printf("failed to init live event order: %v", err)
 		return nil, err
 	}
 	log.Println("live event order created:", liveEventOrder)
@@ -74,7 +74,7 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.
 		go func() {
 			defer wg.Done()
 			if err := s.consumeUserPoints(ctx, req); err != nil {
-				log.Fatalf("failed to consume user points: %v", err)
+				log.Printf("failed to consume user points: %v", err)
 			}
 			log.Println("consumed user points:", req.UserPoints)
 		}()
@@ -85,7 +85,7 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.
 		defer wg.Done()
 		creditCardPayment := req.Price - req.UserPoints
 		if err := s.consumeUserCreditCard(ctx, creditCardPayment); err != nil {
-			log.Fatalf("failed to consume user credit card: %v", err)
+			log.Printf("failed to consume user credit card: %v", err)
 		}
 		log.Println("consumed user credit card:", creditCardPayment)
 	}()
@@ -94,14 +94,14 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.
 	go func() {
 		defer wg.Done()
 		if err := s.reserveSeat(ctx, req.LiveEventId); err != nil {
-			log.Fatalf("failed to reserve a seat: %v", err)
+			log.Printf("failed to reserve a seat: %v", err)
 		}
 		log.Println("reserved a seat for", req.LiveEventId)
 	}()
 
 	wg.Wait()
 	if err := s.completeliveEventOrder(ctx, liveEventOrder); err != nil {
-		log.Fatalf("failed to complete live event order: %v", err)
+		log.Printf("failed to complete live event order: %v", err)
 	}
 	log.Println("complete live event order:", liveEventOrder)
 
