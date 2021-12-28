@@ -21,7 +21,10 @@ type LiveServiceClient interface {
 	CreateLiveHouse(ctx context.Context, in *CreateLiveHouseRequest, opts ...grpc.CallOption) (*CreateLiveHouseResponse, error)
 	ListLiveHouses(ctx context.Context, in *ListLiveHousesRequest, opts ...grpc.CallOption) (*ListLiveHousesResponse, error)
 	CreateLiveEvent(ctx context.Context, in *CreateLiveEventRequest, opts ...grpc.CallOption) (*CreateLiveEventResponse, error)
+	GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error)
 	ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error)
+	ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error)
+	RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*RollbackSeatReservationResponse, error)
 }
 
 type liveServiceClient struct {
@@ -59,9 +62,36 @@ func (c *liveServiceClient) CreateLiveEvent(ctx context.Context, in *CreateLiveE
 	return out, nil
 }
 
+func (c *liveServiceClient) GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error) {
+	out := new(GetLiveEventResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *liveServiceClient) ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error) {
 	out := new(ListLiveEventsResponse)
 	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *liveServiceClient) ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error) {
+	out := new(ReserveSeatResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ReserveSeat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *liveServiceClient) RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*RollbackSeatReservationResponse, error) {
+	out := new(RollbackSeatReservationResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +105,10 @@ type LiveServiceServer interface {
 	CreateLiveHouse(context.Context, *CreateLiveHouseRequest) (*CreateLiveHouseResponse, error)
 	ListLiveHouses(context.Context, *ListLiveHousesRequest) (*ListLiveHousesResponse, error)
 	CreateLiveEvent(context.Context, *CreateLiveEventRequest) (*CreateLiveEventResponse, error)
+	GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error)
 	ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error)
+	ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error)
+	RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*RollbackSeatReservationResponse, error)
 	mustEmbedUnimplementedLiveServiceServer()
 }
 
@@ -92,8 +125,17 @@ func (UnimplementedLiveServiceServer) ListLiveHouses(context.Context, *ListLiveH
 func (UnimplementedLiveServiceServer) CreateLiveEvent(context.Context, *CreateLiveEventRequest) (*CreateLiveEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLiveEvent not implemented")
 }
+func (UnimplementedLiveServiceServer) GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLiveEvent not implemented")
+}
 func (UnimplementedLiveServiceServer) ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLiveEvents not implemented")
+}
+func (UnimplementedLiveServiceServer) ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReserveSeat not implemented")
+}
+func (UnimplementedLiveServiceServer) RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*RollbackSeatReservationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollbackSeatReservation not implemented")
 }
 func (UnimplementedLiveServiceServer) mustEmbedUnimplementedLiveServiceServer() {}
 
@@ -162,6 +204,24 @@ func _LiveService_CreateLiveEvent_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LiveService_GetLiveEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLiveEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LiveServiceServer).GetLiveEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LiveServiceServer).GetLiveEvent(ctx, req.(*GetLiveEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _LiveService_ListLiveEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListLiveEventsRequest)
 	if err := dec(in); err != nil {
@@ -176,6 +236,42 @@ func _LiveService_ListLiveEvents_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).ListLiveEvents(ctx, req.(*ListLiveEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LiveService_ReserveSeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReserveSeatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LiveServiceServer).ReserveSeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/ReserveSeat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LiveServiceServer).ReserveSeat(ctx, req.(*ReserveSeatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LiveService_RollbackSeatReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollbackSeatReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, req.(*RollbackSeatReservationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -200,8 +296,20 @@ var LiveService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _LiveService_CreateLiveEvent_Handler,
 		},
 		{
+			MethodName: "GetLiveEvent",
+			Handler:    _LiveService_GetLiveEvent_Handler,
+		},
+		{
 			MethodName: "ListLiveEvents",
 			Handler:    _LiveService_ListLiveEvents_Handler,
+		},
+		{
+			MethodName: "ReserveSeat",
+			Handler:    _LiveService_ReserveSeat_Handler,
+		},
+		{
+			MethodName: "RollbackSeatReservation",
+			Handler:    _LiveService_RollbackSeatReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -12,7 +12,7 @@
                     "to": "/go/src/github.com/NeptuneG/go-back",
                 },
             ],
-            "port": 2346,
+            "port": 2350,
             "host": "127.0.0.1",
             "showLog": true,
             "apiVersion": 2,

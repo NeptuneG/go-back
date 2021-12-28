@@ -1,0 +1,375 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "services/live/proto/live.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LiveService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/live_events": {
+      "get": {
+        "operationId": "LiveService_ListLiveEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/liveListLiveEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "liveHouseSlug",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LiveService"
+        ]
+      },
+      "post": {
+        "operationId": "LiveService_CreateLiveEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/liveCreateLiveEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/liveCreateLiveEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "LiveService"
+        ]
+      }
+    },
+    "/v1/live_events/{id}": {
+      "get": {
+        "operationId": "LiveService_GetLiveEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/liveGetLiveEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LiveService"
+        ]
+      }
+    },
+    "/v1/live_houses": {
+      "get": {
+        "operationId": "LiveService_ListLiveHouses",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/liveListLiveHousesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "LiveService"
+        ]
+      },
+      "post": {
+        "operationId": "LiveService_CreateLiveHouse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/liveCreateLiveHouseResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/liveCreateLiveHouseRequest"
+            }
+          }
+        ],
+        "tags": [
+          "LiveService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "liveCreateLiveEventRequest": {
+      "type": "object",
+      "properties": {
+        "liveHouseSlug": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "priceInfo": {
+          "type": "string"
+        },
+        "stageOneOpenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stageOneStartAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stageTwoOpenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stageTwoStartAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "seats": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "availableSeats": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "liveCreateLiveEventResponse": {
+      "type": "object",
+      "properties": {
+        "liveEvent": {
+          "$ref": "#/definitions/live_eventLiveEvent"
+        }
+      }
+    },
+    "liveCreateLiveHouseRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
+    },
+    "liveCreateLiveHouseResponse": {
+      "type": "object",
+      "properties": {
+        "liveHouse": {
+          "$ref": "#/definitions/live_houseLiveHouse"
+        }
+      }
+    },
+    "liveGetLiveEventResponse": {
+      "type": "object",
+      "properties": {
+        "liveEvent": {
+          "$ref": "#/definitions/live_eventLiveEvent"
+        }
+      }
+    },
+    "liveListLiveEventsResponse": {
+      "type": "object",
+      "properties": {
+        "liveEvents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/live_eventLiveEvent"
+          }
+        }
+      }
+    },
+    "liveListLiveHousesResponse": {
+      "type": "object",
+      "properties": {
+        "liveHouses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/live_houseLiveHouse"
+          }
+        }
+      }
+    },
+    "liveReserveSeatResponse": {
+      "type": "object",
+      "properties": {
+        "liveEvent": {
+          "$ref": "#/definitions/live_eventLiveEvent"
+        }
+      }
+    },
+    "liveRollbackSeatReservationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "live_eventLiveEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "liveHouse": {
+          "$ref": "#/definitions/live_houseLiveHouse"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "priceInfo": {
+          "type": "string"
+        },
+        "stageOneOpenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stageOneStartAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stageTwoOpenAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stageTwoStartAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "seats": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "availableSeats": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "live_houseLiveHouse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

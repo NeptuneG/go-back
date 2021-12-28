@@ -18,14 +18,6 @@ type User struct {
 	UpdatedAt          time.Time        `json:"updated_at"`
 }
 
-type UserOrder struct {
-	ID          uuid.UUID `json:"id"`
-	LiveEventID uuid.UUID `json:"live_event_id"`
-	UserID      uuid.UUID `json:"user_id"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-}
-
 type UserPoint struct {
 	ID          uuid.UUID        `json:"id"`
 	UserID      uuid.UUID        `json:"user_id"`
@@ -33,4 +25,5 @@ type UserPoint struct {
 	Description types.NullString `json:"description"`
 	CreatedAt   time.Time        `json:"created_at"`
 	UpdatedAt   time.Time        `json:"updated_at"`
+	OrderID     types.NullUUID   `json:"order_id"`
 }

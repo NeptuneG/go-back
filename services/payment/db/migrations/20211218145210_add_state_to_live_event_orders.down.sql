@@ -1,0 +1,2 @@
+ALTER TABLE live_event_orders DROP COLUMN IF EXISTS state;
+DROP TYPE IF EXISTS state;

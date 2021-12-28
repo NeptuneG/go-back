@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
-	"github.com/NeptuneG/go-back/services/user/proto"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -45,6 +45,7 @@ func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserReque
 		UserID:      user.ID,
 		Points:      1000,
 		Description: types.NewNullString("Initial points"),
+		OrderID:     types.NewNullUUID(nil),
 	})
 
 	if err != nil {
@@ -58,7 +59,7 @@ func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserReque
 		User: &proto.User{
 			Id:     user.ID.String(),
 			Email:  user.Email,
-			Points: user_points.Points,
+			Points: int64(user_points.Points),
 		},
 	}, tx.Commit()
 }

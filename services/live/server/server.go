@@ -5,20 +5,24 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
-	"github.com/NeptuneG/go-back/services/live/proto"
+	"github.com/google/uuid"
+	"go.uber.org/zap"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type LiveService struct {
 	proto.UnimplementedLiveServiceServer
-	store *db.Store
+	store  *db.Store
+	logger *zap.Logger
 }
 
-func New(dbConn *sql.DB) *LiveService {
+func New(dbConn *sql.DB, logger *zap.Logger) *LiveService {
 	return &LiveService{
-		store: db.NewStore(dbConn),
+		store:  db.NewStore(dbConn),
+		logger: logger,
 	}
 }
 
@@ -56,6 +60,7 @@ func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.
 		StageOneStartAt: req.StageOneStartAt.AsTime(),
 		StageTwoOpenAt:  types.NewNullTime(req.StageTwoOpenAt.AsTime()),
 		StageTwoStartAt: types.NewNullTime(req.StageTwoStartAt.AsTime()),
+		Seats:           req.Seats,
 		AvailableSeats:  req.AvailableSeats,
 	})
 	if err != nil {
@@ -77,6 +82,7 @@ func (liveService *LiveService) CreateLiveEvent(ctx context.Context, req *proto.
 			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
 			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
 			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			Seats:           liveEvent.Seats,
 			AvailableSeats:  liveEvent.AvailableSeats,
 		},
 	}, nil
@@ -150,10 +156,50 @@ func (liveService *LiveService) ListLiveEvents(ctx context.Context, req *proto.L
 			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
 			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
 			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			Seats:           liveEvent.Seats,
 			AvailableSeats:  liveEvent.AvailableSeats,
 		})
 	}
 	return &proto.ListLiveEventsResponse{
 		LiveEvents: liveEventsResp,
 	}, nil
+}
+
+func (liveService *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventRequest) (*proto.GetLiveEventResponse, error) {
+	uuid, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	liveEvent, err := liveService.store.GetLiveEventById(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.GetLiveEventResponse{
+		LiveEvent: &proto.LiveEvent{
+			Id: liveEvent.ID.String(),
+			LiveHouse: &proto.LiveHouse{
+				Id:   liveEvent.LiveHouseID.String(),
+				Name: liveEvent.LiveHouseName,
+				Slug: liveEvent.LiveHouseSlug.String,
+			},
+			Title:           liveEvent.Title,
+			Url:             liveEvent.Url,
+			Description:     liveEvent.Description.String,
+			PriceInfo:       liveEvent.PriceInfo.String,
+			StageOneOpenAt:  timestamppb.New(liveEvent.StageOneOpenAt.Time),
+			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
+			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
+			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			Seats:           liveEvent.Seats,
+			AvailableSeats:  liveEvent.AvailableSeats,
+		},
+	}, nil
+}
+
+func (liveService *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
+	return liveService.store.ReserveSeatTx(ctx, req)
+}
+
+func (liveService *LiveService) RollbackSeatReservation(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*proto.RollbackSeatReservationResponse, error) {
+	return liveService.store.RollbackSeatReservationTx(ctx, req)
 }
