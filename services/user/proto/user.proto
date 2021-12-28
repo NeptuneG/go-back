@@ -21,6 +21,9 @@ service UserService {
 
   rpc ConsumeUserPoints(ConsumeUserPointsRequest)
       returns (ConsumeUserPointsResponse);
+
+  rpc RollbackConsumeUserPoints(RollbackConsumeUserPointsRequest)
+      returns (RollbackConsumeUserPointsResponse);
 }
 
 message User {
@@ -44,6 +47,11 @@ message ConsumeUserPointsRequest {
   string id = 1;
   int32 points = 2;
   string description = 3;
+  string order_id = 4;
 }
 
 message ConsumeUserPointsResponse { User user = 1; }
+
+message RollbackConsumeUserPointsRequest { string order_id = 1; }
+
+message RollbackConsumeUserPointsResponse { bool success = 1; }

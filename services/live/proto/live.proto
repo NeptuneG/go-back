@@ -45,6 +45,8 @@ service LiveService {
   };
 
   rpc ReserveSeat(ReserveSeatRequest) returns (ReserveSeatResponse);
+
+  rpc RollbackSeatReservation(RollbackSeatReservationRequest) returns (RollbackSeatReservationResponse);
 }
 
 message CreateLiveHouseRequest {
@@ -89,3 +91,7 @@ message ListLiveEventsResponse {
 message ReserveSeatRequest { string live_event_id = 1; }
 
 message ReserveSeatResponse { live_event.LiveEvent live_event = 1; }
+
+message RollbackSeatReservationRequest { string live_event_id = 1; }
+
+message RollbackSeatReservationResponse { bool success = 1; }

@@ -24,6 +24,7 @@ type LiveServiceClient interface {
 	GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error)
 	ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error)
 	ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error)
+	RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*RollbackSeatReservationResponse, error)
 }
 
 type liveServiceClient struct {
@@ -88,6 +89,15 @@ func (c *liveServiceClient) ReserveSeat(ctx context.Context, in *ReserveSeatRequ
 	return out, nil
 }
 
+func (c *liveServiceClient) RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*RollbackSeatReservationResponse, error) {
+	out := new(RollbackSeatReservationResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LiveServiceServer is the server API for LiveService service.
 // All implementations must embed UnimplementedLiveServiceServer
 // for forward compatibility
@@ -98,6 +108,7 @@ type LiveServiceServer interface {
 	GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error)
 	ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error)
 	ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error)
+	RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*RollbackSeatReservationResponse, error)
 	mustEmbedUnimplementedLiveServiceServer()
 }
 
@@ -122,6 +133,9 @@ func (UnimplementedLiveServiceServer) ListLiveEvents(context.Context, *ListLiveE
 }
 func (UnimplementedLiveServiceServer) ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReserveSeat not implemented")
+}
+func (UnimplementedLiveServiceServer) RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*RollbackSeatReservationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollbackSeatReservation not implemented")
 }
 func (UnimplementedLiveServiceServer) mustEmbedUnimplementedLiveServiceServer() {}
 
@@ -244,6 +258,24 @@ func _LiveService_ReserveSeat_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LiveService_RollbackSeatReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollbackSeatReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, req.(*RollbackSeatReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LiveService_ServiceDesc is the grpc.ServiceDesc for LiveService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -274,6 +306,10 @@ var LiveService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReserveSeat",
 			Handler:    _LiveService_ReserveSeat_Handler,
+		},
+		{
+			MethodName: "RollbackSeatReservation",
+			Handler:    _LiveService_RollbackSeatReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

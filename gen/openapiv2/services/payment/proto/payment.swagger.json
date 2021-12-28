@@ -72,7 +72,7 @@
     "paymentCreateLiveEventOrderResponse": {
       "type": "object",
       "properties": {
-        "status": {
+        "state": {
           "type": "string"
         }
       }

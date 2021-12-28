@@ -21,6 +21,7 @@ type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	ConsumeUserPoints(ctx context.Context, in *ConsumeUserPointsRequest, opts ...grpc.CallOption) (*ConsumeUserPointsResponse, error)
+	RollbackConsumeUserPoints(ctx context.Context, in *RollbackConsumeUserPointsRequest, opts ...grpc.CallOption) (*RollbackConsumeUserPointsResponse, error)
 }
 
 type userServiceClient struct {
@@ -58,6 +59,15 @@ func (c *userServiceClient) ConsumeUserPoints(ctx context.Context, in *ConsumeUs
 	return out, nil
 }
 
+func (c *userServiceClient) RollbackConsumeUserPoints(ctx context.Context, in *RollbackConsumeUserPointsRequest, opts ...grpc.CallOption) (*RollbackConsumeUserPointsResponse, error) {
+	out := new(RollbackConsumeUserPointsResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.user.UserService/RollbackConsumeUserPoints", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type UserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	ConsumeUserPoints(context.Context, *ConsumeUserPointsRequest) (*ConsumeUserPointsResponse, error)
+	RollbackConsumeUserPoints(context.Context, *RollbackConsumeUserPointsRequest) (*RollbackConsumeUserPointsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserRequest) 
 }
 func (UnimplementedUserServiceServer) ConsumeUserPoints(context.Context, *ConsumeUserPointsRequest) (*ConsumeUserPointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConsumeUserPoints not implemented")
+}
+func (UnimplementedUserServiceServer) RollbackConsumeUserPoints(context.Context, *RollbackConsumeUserPointsRequest) (*RollbackConsumeUserPointsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollbackConsumeUserPoints not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -148,6 +162,24 @@ func _UserService_ConsumeUserPoints_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_RollbackConsumeUserPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollbackConsumeUserPointsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).RollbackConsumeUserPoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.user.UserService/RollbackConsumeUserPoints",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).RollbackConsumeUserPoints(ctx, req.(*RollbackConsumeUserPointsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConsumeUserPoints",
 			Handler:    _UserService_ConsumeUserPoints_Handler,
+		},
+		{
+			MethodName: "RollbackConsumeUserPoints",
+			Handler:    _UserService_RollbackConsumeUserPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

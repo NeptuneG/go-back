@@ -22,4 +22,4 @@ message CreateLiveEventOrderRequest {
   int32 user_points = 4;
 }
 
-message CreateLiveEventOrderResponse { string status = 1; }
+message CreateLiveEventOrderResponse { string state = 1; }

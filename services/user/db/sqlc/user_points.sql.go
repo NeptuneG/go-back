@@ -12,20 +12,26 @@ import (
 
 const createUserPoints = `-- name: CreateUserPoints :one
 INSERT INTO user_points (
-  user_id, points, description
+  user_id, points, description, order_id
 ) VALUES (
-  $1, $2, $3
-) RETURNING id, user_id, points, description, created_at, updated_at
+  $1, $2, $3, $4
+) RETURNING id, user_id, points, description, created_at, updated_at, order_id
 `
 
 type CreateUserPointsParams struct {
 	UserID      uuid.UUID        `json:"user_id"`
 	Points      int32            `json:"points"`
 	Description types.NullString `json:"description"`
+	OrderID     types.NullUUID   `json:"order_id"`
 }
 
 func (q *Queries) CreateUserPoints(ctx context.Context, arg CreateUserPointsParams) (UserPoint, error) {
-	row := q.queryRow(ctx, q.createUserPointsStmt, createUserPoints, arg.UserID, arg.Points, arg.Description)
+	row := q.queryRow(ctx, q.createUserPointsStmt, createUserPoints,
+		arg.UserID,
+		arg.Points,
+		arg.Description,
+		arg.OrderID,
+	)
 	var i UserPoint
 	err := row.Scan(
 		&i.ID,
@@ -34,8 +40,18 @@ func (q *Queries) CreateUserPoints(ctx context.Context, arg CreateUserPointsPara
 		&i.Description,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.OrderID,
 	)
 	return i, err
+}
+
+const deleteUserPointsByOrderID = `-- name: DeleteUserPointsByOrderID :exec
+DELETE FROM user_points WHERE order_id = $1
+`
+
+func (q *Queries) DeleteUserPointsByOrderID(ctx context.Context, orderID types.NullUUID) error {
+	_, err := q.exec(ctx, q.deleteUserPointsByOrderIDStmt, deleteUserPointsByOrderID, orderID)
+	return err
 }
 
 const getUserPoints = `-- name: GetUserPoints :one

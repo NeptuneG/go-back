@@ -61,3 +61,29 @@ func (store *Store) ReserveSeatTx(ctx context.Context, req *proto.ReserveSeatReq
 		},
 	}, tx.Commit()
 }
+
+func (store *Store) RollbackSeatReservationTx(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*proto.RollbackSeatReservationResponse, error) {
+	tx, err := store.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	queries := New(tx)
+	liveEventID, err := uuid.Parse(req.LiveEventId)
+
+	if err != nil {
+		return nil, err
+	}
+	liveEvent, err := queries.GetLiveEventById(ctx, liveEventID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = queries.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
+		ID:             liveEventID,
+		AvailableSeats: liveEvent.AvailableSeats + 1,
+	}); err != nil {
+		return nil, err
+	}
+	return &proto.RollbackSeatReservationResponse{Success: true}, tx.Commit()
+}

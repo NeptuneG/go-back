@@ -28,6 +28,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserPointsStmt, err = db.PrepareContext(ctx, createUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUserPoints: %w", err)
 	}
+	if q.deleteUserPointsByOrderIDStmt, err = db.PrepareContext(ctx, deleteUserPointsByOrderID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteUserPointsByOrderID: %w", err)
+	}
 	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
 	}
@@ -50,6 +53,11 @@ func (q *Queries) Close() error {
 	if q.createUserPointsStmt != nil {
 		if cerr := q.createUserPointsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserPointsStmt: %w", cerr)
+		}
+	}
+	if q.deleteUserPointsByOrderIDStmt != nil {
+		if cerr := q.deleteUserPointsByOrderIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteUserPointsByOrderIDStmt: %w", cerr)
 		}
 	}
 	if q.getUserByEmailStmt != nil {
@@ -104,23 +112,25 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                   DBTX
-	tx                   *sql.Tx
-	createUserStmt       *sql.Stmt
-	createUserPointsStmt *sql.Stmt
-	getUserByEmailStmt   *sql.Stmt
-	getUserByIDStmt      *sql.Stmt
-	getUserPointsStmt    *sql.Stmt
+	db                            DBTX
+	tx                            *sql.Tx
+	createUserStmt                *sql.Stmt
+	createUserPointsStmt          *sql.Stmt
+	deleteUserPointsByOrderIDStmt *sql.Stmt
+	getUserByEmailStmt            *sql.Stmt
+	getUserByIDStmt               *sql.Stmt
+	getUserPointsStmt             *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                   tx,
-		tx:                   tx,
-		createUserStmt:       q.createUserStmt,
-		createUserPointsStmt: q.createUserPointsStmt,
-		getUserByEmailStmt:   q.getUserByEmailStmt,
-		getUserByIDStmt:      q.getUserByIDStmt,
-		getUserPointsStmt:    q.getUserPointsStmt,
+		db:                            tx,
+		tx:                            tx,
+		createUserStmt:                q.createUserStmt,
+		createUserPointsStmt:          q.createUserPointsStmt,
+		deleteUserPointsByOrderIDStmt: q.deleteUserPointsByOrderIDStmt,
+		getUserByEmailStmt:            q.getUserByEmailStmt,
+		getUserByIDStmt:               q.getUserByIDStmt,
+		getUserPointsStmt:             q.getUserPointsStmt,
 	}
 }

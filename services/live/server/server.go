@@ -199,3 +199,7 @@ func (liveService *LiveService) GetLiveEvent(ctx context.Context, req *proto.Get
 func (liveService *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
 	return liveService.store.ReserveSeatTx(ctx, req)
 }
+
+func (liveService *LiveService) RollbackSeatReservation(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*proto.RollbackSeatReservationResponse, error) {
+	return liveService.store.RollbackSeatReservationTx(ctx, req)
+}

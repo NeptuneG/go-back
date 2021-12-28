@@ -23,13 +23,22 @@ const (
 	timeout     = time.Second * 5
 	retryPolicy = `{
 		"methodConfig": [{
-			"name": [{
+			"name": [
+				{
 					"service": "neptuneg.go_back.serivces.live.LiveService",
 					"method": "ReserveSeat"
 				},
 				{
+					"service": "neptuneg.go_back.serivces.live.LiveService",
+					"method": "RollbackSeatReservation"
+				},
+				{
 					"service": "neptuneg.go_back.serivces.user.UserService",
 					"method": "ConsumeUserPoints"
+				},
+				{
+					"service": "neptuneg.go_back.serivces.user.UserService",
+					"method": "RollbackConsumeUserPoints"
 				}
 			],
 			"retryPolicy": {
@@ -102,7 +111,7 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if err := s.consumeUserPoints(ctx, req, liveEvent); err != nil {
+			if err := s.consumeUserPoints(ctx, req, liveEvent, liveEventOrder.ID); err != nil {
 				s.logger.Error("failed to consume user points", zap.Error(err))
 				isSuccess = false
 			} else {
@@ -138,17 +147,14 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 	if err := s.completeliveEventOrder(ctx, liveEventOrder, isSuccess); err != nil {
 		s.logger.Error("failed to complete live event order", zap.Error(err))
 	}
-	s.logger.Info("live event order completed", zap.String("live_event_order_id", liveEventOrder.ID.String()))
+	s.logger.Info("live event order completed", zap.String("id", liveEventOrder.ID.String()), zap.Any("state", liveEventOrder.State))
 
 	if liveEventOrder.State == db.StateFailed {
-		if err := s.rollbackLiveEventOrder(ctx, liveEventOrder); err != nil {
-			s.logger.Error("failed to rollback live event order", zap.Error(err))
-			return nil, err
-		}
+		s.rollbackLiveEventOrder(ctx, liveEventOrder)
 	}
 
 	return &paymentProto.CreateLiveEventOrderResponse{
-		Status: string(liveEventOrder.State),
+		State: string(liveEventOrder.State),
 	}, nil
 }
 
@@ -214,13 +220,14 @@ func (s *PaymentService) initLiveEventOrder(ctx context.Context, req *paymentPro
 	return &liveEventOrder, err
 }
 
-func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest, liveEvent *liveProto.LiveEvent) error {
+func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest, liveEvent *liveProto.LiveEvent, orderId uuid.UUID) error {
 	done := make(chan error)
 	go func() {
 		_, err := s.userClient.ConsumeUserPoints(ctx, &userProto.ConsumeUserPointsRequest{
 			Id:          req.UserId,
 			Points:      req.UserPoints,
 			Description: "order: " + liveEvent.Title,
+			OrderId:     orderId.String(),
 		})
 		s.logger.Debug("ConsumeUserPoints responded", zap.Any("code", status.Code(err)))
 		done <- err
@@ -237,9 +244,9 @@ func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProt
 func (s *PaymentService) consumeUserCreditCard(ctx context.Context, payment int32) error {
 	done := make(chan error)
 	go func() {
-		time.Sleep(3 * time.Second)
 		result := rand.Intn(10)
 		// result := 5
+		s.logger.Debug("consumeUserCreditCard result", zap.Int("result", result))
 		if result%10 == 5 {
 			done <- errors.New("credit card error")
 		} else {
@@ -275,18 +282,55 @@ func (s *PaymentService) reserveSeat(ctx context.Context, liveEventID string) er
 
 func (s *PaymentService) completeliveEventOrder(ctx context.Context, liveEventOrder *db.LiveEventOrder, isSuccess bool) error {
 	s.logger.Info("begin completeliveEventOrder", zap.Bool("isSuccess", isSuccess))
-	var state db.State
 	if isSuccess {
-		state = db.StatePaid
+		liveEventOrder.State = db.StatePaid
 	} else {
-		state = db.StateFailed
+		liveEventOrder.State = db.StateFailed
 	}
 	return s.store.UpdateLiveEventOrderState(ctx, db.UpdateLiveEventOrderStateParams{
 		ID:    liveEventOrder.ID,
-		State: state,
+		State: liveEventOrder.State,
 	})
 }
 
-func (s *PaymentService) rollbackLiveEventOrder(ctx context.Context, liveEventOrder *db.LiveEventOrder) error {
-	return nil
+func (s *PaymentService) rollbackLiveEventOrder(ctx context.Context, liveEventOrder *db.LiveEventOrder) {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err := s.liveClient.RollbackSeatReservation(ctx, &liveProto.RollbackSeatReservationRequest{
+			LiveEventId: liveEventOrder.LiveEventID.String(),
+		})
+		s.logger.Debug("RollbackSeatReservation responded", zap.Any("code", status.Code(err)))
+		if err != nil {
+			s.logger.Fatal("failed to rollback seat reservation", zap.Error(err))
+			// notify for manual follow up
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err := s.userClient.RollbackConsumeUserPoints(ctx, &userProto.RollbackConsumeUserPointsRequest{
+			OrderId: liveEventOrder.ID.String(),
+		})
+		s.logger.Debug("RollbackConsumeUserPoints responded", zap.Any("code", status.Code(err)))
+		if err != nil {
+			s.logger.Fatal("failed to rollback consume user points", zap.Error(err))
+			// notify for manual follow up
+		}
+	}()
+
+	if liveEventOrder.UserPoints != 0 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			result := rand.Intn(10)
+			s.logger.Debug("rollbackConsumeUserCreditCard result", zap.Int("result", result))
+			if result%10 == 5 {
+				s.logger.Fatal("failed to rollback consume user credit card")
+			}
+		}()
+	}
+	wg.Wait()
 }

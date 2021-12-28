@@ -45,6 +45,7 @@ func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserReque
 		UserID:      user.ID,
 		Points:      1000,
 		Description: types.NewNullString("Initial points"),
+		OrderID:     types.NewNullUUID(nil),
 	})
 
 	if err != nil {

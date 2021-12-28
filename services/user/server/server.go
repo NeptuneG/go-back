@@ -62,10 +62,15 @@ func (s *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeU
 	if err != nil {
 		return nil, err
 	}
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, err
+	}
 	_, err = s.store.CreateUserPoints(ctx, db.CreateUserPointsParams{
 		UserID:      userID,
 		Points:      -req.Points,
 		Description: types.NewNullString(req.Description),
+		OrderID:     types.NewNullUUID(&orderID),
 	})
 	if err != nil {
 		return nil, err
@@ -86,4 +91,19 @@ func (s *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeU
 			Points: user.Points,
 		},
 	}, err
+}
+
+func (s *UserService) RollbackConsumeUserPoints(ctx context.Context, req *proto.RollbackConsumeUserPointsRequest) (*proto.RollbackConsumeUserPointsResponse, error) {
+	orderId, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.store.DeleteUserPointsByOrderID(ctx, types.NewNullUUID(&orderId)); err != nil {
+		return nil, err
+	}
+
+	return &proto.RollbackConsumeUserPointsResponse{
+		Success: true,
+	}, nil
 }
