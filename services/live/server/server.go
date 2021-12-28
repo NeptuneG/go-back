@@ -162,17 +162,34 @@ func (liveService *LiveService) ListLiveEvents(ctx context.Context, req *proto.L
 	}, nil
 }
 
-func (liveService *LiveService) IsLiveEventExist(ctx context.Context, req *proto.IsLiveEventExistRequest) (*proto.IsLiveEventExistResponse, error) {
-	liveEventID, err := uuid.Parse(req.Id)
+func (liveService *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventRequest) (*proto.GetLiveEventResponse, error) {
+	uuid, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	exist, err := liveService.store.IsLiveEventExist(ctx, liveEventID)
+	liveEvent, err := liveService.store.GetLiveEventById(ctx, uuid)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.IsLiveEventExistResponse{
-		Exist: exist,
+	return &proto.GetLiveEventResponse{
+		LiveEvent: &proto.LiveEvent{
+			Id: liveEvent.ID.String(),
+			LiveHouse: &proto.LiveHouse{
+				Id:   liveEvent.LiveHouseID.String(),
+				Name: liveEvent.LiveHouseName,
+				Slug: liveEvent.LiveHouseSlug.String,
+			},
+			Title:           liveEvent.Title,
+			Url:             liveEvent.Url,
+			Description:     liveEvent.Description.String,
+			PriceInfo:       liveEvent.PriceInfo.String,
+			StageOneOpenAt:  timestamppb.New(liveEvent.StageOneOpenAt.Time),
+			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
+			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
+			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+			Seats:           liveEvent.Seats,
+			AvailableSeats:  liveEvent.AvailableSeats,
+		},
 	}, nil
 }
 

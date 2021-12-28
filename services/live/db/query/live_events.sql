@@ -10,8 +10,13 @@ INSERT INTO live_events (
 ) RETURNING *;
 
 -- name: GetLiveEventById :one
-SELECT * FROM live_events
-WHERE id = $1 LIMIT 1;
+SELECT
+  live_events.*,
+  live_houses.name AS live_house_name,
+  live_houses.slug AS live_house_slug
+FROM live_events
+INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
+WHERE live_events.id = $1;
 
 -- name: GetLiveEventsByLiveHouse :many
 SELECT * FROM live_events
@@ -49,6 +54,3 @@ WHERE live_houses.slug = $1;
 -- name: UpdateLiveEventAvailableSeatsById :exec
 UPDATE live_events SET available_seats = $1
 WHERE id = $2;
-
--- name: IsLiveEventExist :one
-SELECT EXISTS(SELECT live_events.id from live_events where live_events.id = $1);

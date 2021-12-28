@@ -32,13 +32,17 @@ service LiveService {
     };
   };
 
+  rpc GetLiveEvent(GetLiveEventRequest) returns (GetLiveEventResponse) {
+    option (google.api.http) = {
+      get : "/v1/live_events/{id}"
+    };
+  };
+
   rpc ListLiveEvents(ListLiveEventsRequest) returns (ListLiveEventsResponse) {
     option (google.api.http) = {
       get : "/v1/live_events"
     };
   };
-
-  rpc IsLiveEventExist(IsLiveEventExistRequest) returns (IsLiveEventExistResponse);
 
   rpc ReserveSeat(ReserveSeatRequest) returns (ReserveSeatResponse);
 }
@@ -72,18 +76,16 @@ message CreateLiveEventRequest {
 
 message CreateLiveEventResponse { live_event.LiveEvent live_event = 1; }
 
+message GetLiveEventRequest { string id = 1; }
+
+message GetLiveEventResponse { live_event.LiveEvent live_event = 1; }
+
 message ListLiveEventsRequest { string live_house_slug = 1; }
 
-message ListLiveEventsResponse { repeated live_event.LiveEvent live_events = 1; }
-
-message IsLiveEventExistRequest { string id = 1; }
-
-message IsLiveEventExistResponse { bool exist = 1; }
-
-message ReserveSeatRequest {
-  string live_event_id = 1;
+message ListLiveEventsResponse {
+  repeated live_event.LiveEvent live_events = 1;
 }
 
-message ReserveSeatResponse {
-  live_event.LiveEvent live_event = 1;
-}
+message ReserveSeatRequest { string live_event_id = 1; }
+
+message ReserveSeatResponse { live_event.LiveEvent live_event = 1; }

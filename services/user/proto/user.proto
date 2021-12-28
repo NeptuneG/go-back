@@ -19,9 +19,8 @@ service UserService {
     };
   };
 
-  rpc IsUserExist(IsUserExistRequest) returns (IsUserExistResponse);
-
-  rpc ConsumeUserPoints(ConsumeUserPointsRequest) returns (ConsumeUserPointsResponse);
+  rpc ConsumeUserPoints(ConsumeUserPointsRequest)
+      returns (ConsumeUserPointsResponse);
 }
 
 message User {
@@ -41,16 +40,10 @@ message GetUserRequest { string id = 1; }
 
 message GetUserResponse { User user = 1; }
 
-message IsUserExistRequest { string id = 1; }
-
-message IsUserExistResponse { bool exist = 1; }
-
 message ConsumeUserPointsRequest {
   string id = 1;
   int32 points = 2;
   string description = 3;
 }
 
-message ConsumeUserPointsResponse {
-  User user = 1;
-}
+message ConsumeUserPointsResponse { User user = 1; }

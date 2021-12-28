@@ -9,12 +9,13 @@ import (
 	"sync"
 	"time"
 
-	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
-	payment "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
-	user "github.com/NeptuneG/go-back/gen/go/services/user/proto"
+	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	paymentProto "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
+	userProto "github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	db "github.com/NeptuneG/go-back/services/payment/db/sqlc"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
@@ -43,9 +44,9 @@ const (
 )
 
 type PaymentService struct {
-	payment.UnimplementedPaymentServiceServer
-	userClient user.UserServiceClient
-	liveClient live.LiveServiceClient
+	paymentProto.UnimplementedPaymentServiceServer
+	userClient userProto.UserServiceClient
+	liveClient liveProto.LiveServiceClient
 	store      *db.Store
 }
 
@@ -70,15 +71,19 @@ func New(ctx context.Context, dbConn *sql.DB) (*PaymentService, error) {
 	}
 
 	return &PaymentService{
-		userClient: user.NewUserServiceClient(userConn),
-		liveClient: live.NewLiveServiceClient(liveConn),
+		userClient: userProto.NewUserServiceClient(userConn),
+		liveClient: liveProto.NewLiveServiceClient(liveConn),
 		store:      db.NewStore(dbConn),
 	}, nil
 }
 
-func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.CreateLiveEventOrderRequest) (*payment.CreateLiveEventOrderResponse, error) {
-	if err := s.validateRequest(ctx, req); err != nil {
-		return nil, err
+func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest) (*paymentProto.CreateLiveEventOrderResponse, error) {
+	liveEvent, user := s.getLiveEventOrderRelations(ctx, req)
+	if liveEvent == nil || user == nil {
+		return nil, status.Error(codes.InvalidArgument, "failed to get live event or user")
+	}
+	if err := s.validateCreateLiveEventOrderRequest(liveEvent, user, req); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	liveEventOrder, err := s.initLiveEventOrder(ctx, req)
@@ -95,7 +100,7 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if err := s.consumeUserPoints(ctx, req); err != nil {
+			if err := s.consumeUserPoints(ctx, req, liveEvent); err != nil {
 				log.Printf("failed to consume user points: %v", err)
 				isSuccess = false
 			} else {
@@ -140,35 +145,56 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *payment.
 		}
 	}
 
-	return &payment.CreateLiveEventOrderResponse{
+	return &paymentProto.CreateLiveEventOrderResponse{
 		Status: string(liveEventOrder.State),
 	}, nil
 }
 
-func (s *PaymentService) validateRequest(ctx context.Context, req *payment.CreateLiveEventOrderRequest) error {
-	userExistResp, err := s.userClient.IsUserExist(ctx, &user.IsUserExistRequest{
-		Id: req.UserId,
-	})
-	if err != nil {
-		return err
-	}
-	if !userExistResp.Exist {
-		return errors.New("user not exist")
-	}
+func (s *PaymentService) getLiveEventOrderRelations(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest) (*liveProto.LiveEvent, *userProto.User) {
+	liveEventCh := make(chan *liveProto.LiveEvent)
+	userCh := make(chan *userProto.User)
 
-	liveEventExistResp, err := s.liveClient.IsLiveEventExist(ctx, &live.IsLiveEventExistRequest{
-		Id: req.LiveEventId,
-	})
-	if err != nil {
-		return err
+	go func() {
+		liveEventResp, err := s.liveClient.GetLiveEvent(ctx, &liveProto.GetLiveEventRequest{
+			Id: req.LiveEventId,
+		})
+		if err != nil {
+			log.Printf("failed to get live event: %v", err)
+			liveEventCh <- nil
+		} else {
+			liveEventCh <- liveEventResp.LiveEvent
+		}
+	}()
+
+	go func() {
+		userResp, err := s.userClient.GetUser(ctx, &userProto.GetUserRequest{
+			Id: req.UserId,
+		})
+		if err != nil {
+			log.Printf("failed to get user: %v", err)
+			userCh <- nil
+		} else {
+			userCh <- userResp.User
+		}
+	}()
+
+	return <-liveEventCh, <-userCh
+}
+
+func (s *PaymentService) validateCreateLiveEventOrderRequest(liveEvent *liveProto.LiveEvent, user *userProto.User, req *paymentProto.CreateLiveEventOrderRequest) error {
+	if user.Points < int64(req.UserPoints) {
+		return errors.New("user points not enough")
 	}
-	if !liveEventExistResp.Exist {
-		return errors.New("live event not exist")
+	if liveEvent.AvailableSeats == 0 {
+		return errors.New("no seats available")
+	}
+	if liveEvent.StageOneStartAt.AsTime().Before(time.Now()) {
+		return errors.New("live event has started")
 	}
 	return nil
 }
 
-func (s *PaymentService) initLiveEventOrder(ctx context.Context, req *payment.CreateLiveEventOrderRequest) (*db.LiveEventOrder, error) {
+func (s *PaymentService) initLiveEventOrder(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest) (*db.LiveEventOrder, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, err
@@ -186,15 +212,15 @@ func (s *PaymentService) initLiveEventOrder(ctx context.Context, req *payment.Cr
 	return &liveEventOrder, err
 }
 
-func (s *PaymentService) consumeUserPoints(ctx context.Context, req *payment.CreateLiveEventOrderRequest) error {
+func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest, liveEvent *liveProto.LiveEvent) error {
 	done := make(chan error)
 	go func() {
-		_, err := s.userClient.ConsumeUserPoints(ctx, &user.ConsumeUserPointsRequest{
+		_, err := s.userClient.ConsumeUserPoints(ctx, &userProto.ConsumeUserPointsRequest{
 			Id:          req.UserId,
 			Points:      req.UserPoints,
-			Description: "consume user points for live event order",
+			Description: "order: " + liveEvent.Title,
 		})
-		log.Println("ConsumeUserPoints responsed =", status.Code(err))
+		log.Println("ConsumeUserPoints responded =", status.Code(err))
 		done <- err
 	}()
 
@@ -230,10 +256,10 @@ func (s *PaymentService) consumeUserCreditCard(ctx context.Context, payment int3
 func (s *PaymentService) reserveSeat(ctx context.Context, liveEventID string) error {
 	done := make(chan error)
 	go func() {
-		_, err := s.liveClient.ReserveSeat(ctx, &live.ReserveSeatRequest{
+		_, err := s.liveClient.ReserveSeat(ctx, &liveProto.ReserveSeatRequest{
 			LiveEventId: liveEventID,
 		})
-		log.Println("ReserveSeat responsed =", status.Code(err))
+		log.Println("ReserveSeat responded =", status.Code(err))
 		done <- err
 	}()
 

@@ -76,6 +76,36 @@
         ]
       }
     },
+    "/v1/live_events/{id}": {
+      "get": {
+        "operationId": "LiveService_GetLiveEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/liveGetLiveEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LiveService"
+        ]
+      }
+    },
     "/v1/live_houses": {
       "get": {
         "operationId": "LiveService_ListLiveHouses",
@@ -204,11 +234,11 @@
         }
       }
     },
-    "liveIsLiveEventExistResponse": {
+    "liveGetLiveEventResponse": {
       "type": "object",
       "properties": {
-        "exist": {
-          "type": "boolean"
+        "liveEvent": {
+          "$ref": "#/definitions/live_eventLiveEvent"
         }
       }
     },

@@ -208,13 +208,38 @@ func (q *Queries) GetAllLiveEventsByLiveHouseSlug(ctx context.Context, slug type
 }
 
 const getLiveEventById = `-- name: GetLiveEventById :one
-SELECT id, live_house_id, title, url, description, price_info, stage_one_open_at, stage_one_start_at, stage_two_open_at, stage_two_start_at, slug, created_at, updated_at, seats, available_seats FROM live_events
-WHERE id = $1 LIMIT 1
+SELECT
+  live_events.id, live_events.live_house_id, live_events.title, live_events.url, live_events.description, live_events.price_info, live_events.stage_one_open_at, live_events.stage_one_start_at, live_events.stage_two_open_at, live_events.stage_two_start_at, live_events.slug, live_events.created_at, live_events.updated_at, live_events.seats, live_events.available_seats,
+  live_houses.name AS live_house_name,
+  live_houses.slug AS live_house_slug
+FROM live_events
+INNER JOIN live_houses ON live_events.live_house_id = live_houses.id
+WHERE live_events.id = $1
 `
 
-func (q *Queries) GetLiveEventById(ctx context.Context, id uuid.UUID) (LiveEvent, error) {
+type GetLiveEventByIdRow struct {
+	ID              uuid.UUID        `json:"id"`
+	LiveHouseID     uuid.UUID        `json:"live_house_id"`
+	Title           string           `json:"title"`
+	Url             string           `json:"url"`
+	Description     types.NullString `json:"description"`
+	PriceInfo       types.NullString `json:"price_info"`
+	StageOneOpenAt  types.NullTime   `json:"stage_one_open_at"`
+	StageOneStartAt time.Time        `json:"stage_one_start_at"`
+	StageTwoOpenAt  types.NullTime   `json:"stage_two_open_at"`
+	StageTwoStartAt types.NullTime   `json:"stage_two_start_at"`
+	Slug            types.NullString `json:"slug"`
+	CreatedAt       time.Time        `json:"created_at"`
+	UpdatedAt       time.Time        `json:"updated_at"`
+	Seats           int32            `json:"seats"`
+	AvailableSeats  int32            `json:"available_seats"`
+	LiveHouseName   string           `json:"live_house_name"`
+	LiveHouseSlug   types.NullString `json:"live_house_slug"`
+}
+
+func (q *Queries) GetLiveEventById(ctx context.Context, id uuid.UUID) (GetLiveEventByIdRow, error) {
 	row := q.queryRow(ctx, q.getLiveEventByIdStmt, getLiveEventById, id)
-	var i LiveEvent
+	var i GetLiveEventByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.LiveHouseID,
@@ -231,6 +256,8 @@ func (q *Queries) GetLiveEventById(ctx context.Context, id uuid.UUID) (LiveEvent
 		&i.UpdatedAt,
 		&i.Seats,
 		&i.AvailableSeats,
+		&i.LiveHouseName,
+		&i.LiveHouseSlug,
 	)
 	return i, err
 }
@@ -285,17 +312,6 @@ func (q *Queries) GetLiveEventsByLiveHouse(ctx context.Context, arg GetLiveEvent
 		return nil, err
 	}
 	return items, nil
-}
-
-const isLiveEventExist = `-- name: IsLiveEventExist :one
-SELECT EXISTS(SELECT live_events.id from live_events where live_events.id = $1)
-`
-
-func (q *Queries) IsLiveEventExist(ctx context.Context, id uuid.UUID) (bool, error) {
-	row := q.queryRow(ctx, q.isLiveEventExistStmt, isLiveEventExist, id)
-	var exists bool
-	err := row.Scan(&exists)
-	return exists, err
 }
 
 const updateLiveEventAvailableSeatsById = `-- name: UpdateLiveEventAvailableSeatsById :exec

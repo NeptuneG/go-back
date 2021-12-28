@@ -142,14 +142,6 @@
         }
       }
     },
-    "userIsUserExistResponse": {
-      "type": "object",
-      "properties": {
-        "exist": {
-          "type": "boolean"
-        }
-      }
-    },
     "userUser": {
       "type": "object",
       "properties": {

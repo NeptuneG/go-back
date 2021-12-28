@@ -37,9 +37,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserPointsStmt, err = db.PrepareContext(ctx, getUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserPoints: %w", err)
 	}
-	if q.isUserExistStmt, err = db.PrepareContext(ctx, isUserExist); err != nil {
-		return nil, fmt.Errorf("error preparing query IsUserExist: %w", err)
-	}
 	return &q, nil
 }
 
@@ -68,11 +65,6 @@ func (q *Queries) Close() error {
 	if q.getUserPointsStmt != nil {
 		if cerr := q.getUserPointsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserPointsStmt: %w", cerr)
-		}
-	}
-	if q.isUserExistStmt != nil {
-		if cerr := q.isUserExistStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing isUserExistStmt: %w", cerr)
 		}
 	}
 	return err
@@ -119,7 +111,6 @@ type Queries struct {
 	getUserByEmailStmt   *sql.Stmt
 	getUserByIDStmt      *sql.Stmt
 	getUserPointsStmt    *sql.Stmt
-	isUserExistStmt      *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -131,6 +122,5 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getUserByEmailStmt:   q.getUserByEmailStmt,
 		getUserByIDStmt:      q.getUserByIDStmt,
 		getUserPointsStmt:    q.getUserPointsStmt,
-		isUserExistStmt:      q.isUserExistStmt,
 	}
 }

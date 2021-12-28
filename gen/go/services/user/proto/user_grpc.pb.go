@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion7
 type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
-	IsUserExist(ctx context.Context, in *IsUserExistRequest, opts ...grpc.CallOption) (*IsUserExistResponse, error)
 	ConsumeUserPoints(ctx context.Context, in *ConsumeUserPointsRequest, opts ...grpc.CallOption) (*ConsumeUserPointsResponse, error)
 }
 
@@ -50,15 +49,6 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opt
 	return out, nil
 }
 
-func (c *userServiceClient) IsUserExist(ctx context.Context, in *IsUserExistRequest, opts ...grpc.CallOption) (*IsUserExistResponse, error) {
-	out := new(IsUserExistResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.user.UserService/IsUserExist", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userServiceClient) ConsumeUserPoints(ctx context.Context, in *ConsumeUserPointsRequest, opts ...grpc.CallOption) (*ConsumeUserPointsResponse, error) {
 	out := new(ConsumeUserPointsResponse)
 	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.user.UserService/ConsumeUserPoints", in, out, opts...)
@@ -74,7 +64,6 @@ func (c *userServiceClient) ConsumeUserPoints(ctx context.Context, in *ConsumeUs
 type UserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
-	IsUserExist(context.Context, *IsUserExistRequest) (*IsUserExistResponse, error)
 	ConsumeUserPoints(context.Context, *ConsumeUserPointsRequest) (*ConsumeUserPointsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -88,9 +77,6 @@ func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserReq
 }
 func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
-}
-func (UnimplementedUserServiceServer) IsUserExist(context.Context, *IsUserExistRequest) (*IsUserExistResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsUserExist not implemented")
 }
 func (UnimplementedUserServiceServer) ConsumeUserPoints(context.Context, *ConsumeUserPointsRequest) (*ConsumeUserPointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConsumeUserPoints not implemented")
@@ -144,24 +130,6 @@ func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_IsUserExist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IsUserExistRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).IsUserExist(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.user.UserService/IsUserExist",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).IsUserExist(ctx, req.(*IsUserExistRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UserService_ConsumeUserPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ConsumeUserPointsRequest)
 	if err := dec(in); err != nil {
@@ -194,10 +162,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUser",
 			Handler:    _UserService_GetUser_Handler,
-		},
-		{
-			MethodName: "IsUserExist",
-			Handler:    _UserService_IsUserExist_Handler,
 		},
 		{
 			MethodName: "ConsumeUserPoints",

@@ -24,7 +24,3 @@ FROM users
 INNER JOIN user_points ON users.id = user_points.user_id
 WHERE users.email = $1
 GROUP BY users.id;
-
--- name: IsUserExist :one
-SELECT EXISTS(SELECT users.id from users where users.id = $1);
-

@@ -83,14 +83,3 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (GetUserByIDRow
 	err := row.Scan(&i.ID, &i.Email, &i.Points)
 	return i, err
 }
-
-const isUserExist = `-- name: IsUserExist :one
-SELECT EXISTS(SELECT users.id from users where users.id = $1)
-`
-
-func (q *Queries) IsUserExist(ctx context.Context, id uuid.UUID) (bool, error) {
-	row := q.queryRow(ctx, q.isUserExistStmt, isUserExist, id)
-	var exists bool
-	err := row.Scan(&exists)
-	return exists, err
-}

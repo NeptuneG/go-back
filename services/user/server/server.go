@@ -48,20 +48,6 @@ func (userService *UserService) GetUser(ctx context.Context, req *proto.GetUserR
 	}, err
 }
 
-func (userService *UserService) IsUserExist(ctx context.Context, req *proto.IsUserExistRequest) (*proto.IsUserExistResponse, error) {
-	userID, err := uuid.Parse(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	exist, err := userService.store.IsUserExist(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	return &proto.IsUserExistResponse{
-		Exist: exist,
-	}, nil
-}
-
 func (userService *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeUserPointsRequest) (*proto.ConsumeUserPointsResponse, error) {
 	// force a retry
 	count++

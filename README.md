@@ -45,9 +45,11 @@
 - [ ] config center
 - [ ] health check
 - [ ] cache
-- [ ] rate limit & timeout
+- [ ] rate limit
 - [ ] hot reload debug
     - air does not work well due to 2345 is occupied
+- [ ] timeout & retry
+- [ ] grpc responses
 
 ## Notes
 

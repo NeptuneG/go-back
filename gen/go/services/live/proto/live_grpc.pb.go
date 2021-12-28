@@ -21,8 +21,8 @@ type LiveServiceClient interface {
 	CreateLiveHouse(ctx context.Context, in *CreateLiveHouseRequest, opts ...grpc.CallOption) (*CreateLiveHouseResponse, error)
 	ListLiveHouses(ctx context.Context, in *ListLiveHousesRequest, opts ...grpc.CallOption) (*ListLiveHousesResponse, error)
 	CreateLiveEvent(ctx context.Context, in *CreateLiveEventRequest, opts ...grpc.CallOption) (*CreateLiveEventResponse, error)
+	GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error)
 	ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error)
-	IsLiveEventExist(ctx context.Context, in *IsLiveEventExistRequest, opts ...grpc.CallOption) (*IsLiveEventExistResponse, error)
 	ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error)
 }
 
@@ -61,18 +61,18 @@ func (c *liveServiceClient) CreateLiveEvent(ctx context.Context, in *CreateLiveE
 	return out, nil
 }
 
-func (c *liveServiceClient) ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error) {
-	out := new(ListLiveEventsResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents", in, out, opts...)
+func (c *liveServiceClient) GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error) {
+	out := new(GetLiveEventResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *liveServiceClient) IsLiveEventExist(ctx context.Context, in *IsLiveEventExistRequest, opts ...grpc.CallOption) (*IsLiveEventExistResponse, error) {
-	out := new(IsLiveEventExistResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/IsLiveEventExist", in, out, opts...)
+func (c *liveServiceClient) ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error) {
+	out := new(ListLiveEventsResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,8 +95,8 @@ type LiveServiceServer interface {
 	CreateLiveHouse(context.Context, *CreateLiveHouseRequest) (*CreateLiveHouseResponse, error)
 	ListLiveHouses(context.Context, *ListLiveHousesRequest) (*ListLiveHousesResponse, error)
 	CreateLiveEvent(context.Context, *CreateLiveEventRequest) (*CreateLiveEventResponse, error)
+	GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error)
 	ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error)
-	IsLiveEventExist(context.Context, *IsLiveEventExistRequest) (*IsLiveEventExistResponse, error)
 	ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error)
 	mustEmbedUnimplementedLiveServiceServer()
 }
@@ -114,11 +114,11 @@ func (UnimplementedLiveServiceServer) ListLiveHouses(context.Context, *ListLiveH
 func (UnimplementedLiveServiceServer) CreateLiveEvent(context.Context, *CreateLiveEventRequest) (*CreateLiveEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLiveEvent not implemented")
 }
+func (UnimplementedLiveServiceServer) GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLiveEvent not implemented")
+}
 func (UnimplementedLiveServiceServer) ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLiveEvents not implemented")
-}
-func (UnimplementedLiveServiceServer) IsLiveEventExist(context.Context, *IsLiveEventExistRequest) (*IsLiveEventExistResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsLiveEventExist not implemented")
 }
 func (UnimplementedLiveServiceServer) ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReserveSeat not implemented")
@@ -190,6 +190,24 @@ func _LiveService_CreateLiveEvent_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LiveService_GetLiveEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLiveEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LiveServiceServer).GetLiveEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LiveServiceServer).GetLiveEvent(ctx, req.(*GetLiveEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _LiveService_ListLiveEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListLiveEventsRequest)
 	if err := dec(in); err != nil {
@@ -204,24 +222,6 @@ func _LiveService_ListLiveEvents_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).ListLiveEvents(ctx, req.(*ListLiveEventsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _LiveService_IsLiveEventExist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IsLiveEventExistRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LiveServiceServer).IsLiveEventExist(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/IsLiveEventExist",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LiveServiceServer).IsLiveEventExist(ctx, req.(*IsLiveEventExistRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -264,12 +264,12 @@ var LiveService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _LiveService_CreateLiveEvent_Handler,
 		},
 		{
-			MethodName: "ListLiveEvents",
-			Handler:    _LiveService_ListLiveEvents_Handler,
+			MethodName: "GetLiveEvent",
+			Handler:    _LiveService_GetLiveEvent_Handler,
 		},
 		{
-			MethodName: "IsLiveEventExist",
-			Handler:    _LiveService_IsLiveEventExist_Handler,
+			MethodName: "ListLiveEvents",
+			Handler:    _LiveService_ListLiveEvents_Handler,
 		},
 		{
 			MethodName: "ReserveSeat",
