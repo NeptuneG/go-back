@@ -3,17 +3,18 @@ package consumer
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type ScrapedEventsConsumer struct {
 	liveClient live.LiveServiceClient
+	logger     *zap.Logger
 }
 type createLiveEventMessage struct {
 	LiveHouseSlug   string           `json:"live_house_slug"`
@@ -34,9 +35,10 @@ const (
 	msgQueueKey = "screped_live_events"
 )
 
-func New(liveClient live.LiveServiceClient) *ScrapedEventsConsumer {
+func New(liveClient live.LiveServiceClient, logger *zap.Logger) *ScrapedEventsConsumer {
 	return &ScrapedEventsConsumer{
 		liveClient: liveClient,
+		logger:     logger,
 	}
 }
 
@@ -53,11 +55,11 @@ func (consumer *ScrapedEventsConsumer) Start(ctx context.Context) {
 
 			message, err := raw.Result()
 			if err != nil {
-				log.Fatal(err)
+				consumer.logger.Error("failed to pop message from queue", zap.Error(err))
 				continue
 			}
 			if err := json.Unmarshal([]byte(message[1]), &reqMsg); err != nil {
-				log.Fatal(err)
+				consumer.logger.Error("failed to unmarshal message", zap.Error(err))
 				continue
 			}
 			if _, err := consumer.liveClient.CreateLiveEvent(ctx, &live.CreateLiveEventRequest{
@@ -73,7 +75,7 @@ func (consumer *ScrapedEventsConsumer) Start(ctx context.Context) {
 				Seats:           seats(reqMsg.Seats),
 				AvailableSeats:  availableSeats(reqMsg.AvailableSeats),
 			}); err != nil {
-				log.Fatal(err)
+				consumer.logger.Error("failed to create live event", zap.Error(err))
 				continue
 			}
 		}

@@ -2,11 +2,14 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"net"
 
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	"github.com/NeptuneG/go-back/pkg/logger"
 	"github.com/NeptuneG/go-back/services/live/server"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	_ "github.com/lib/pq"
@@ -19,26 +22,33 @@ const (
 )
 
 func main() {
+	logger := logger.New()
+	grpc_zap.ReplaceGrpcLogger(logger)
+
 	conn, err := sql.Open(dbDriver, dbSource)
 	defer func() {
 		if err := conn.Close(); err != nil {
-			log.Fatal(err)
+			logger.Fatal("failed to close database connection", zap.Error(err))
 		}
 	}()
 	if err != nil {
-		log.Fatal("Connecting database failed:", err)
+		logger.Fatal("failed to open database connection", zap.Error(err))
 	}
 
-	srv := grpc.NewServer()
-	proto.RegisterLiveServiceServer(srv, server.New(conn))
+	srv := grpc.NewServer(
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			grpc_zap.UnaryServerInterceptor(logger),
+		)),
+	)
+	proto.RegisterLiveServiceServer(srv, server.New(conn, logger))
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Printf("failed to listen: %v", err)
+		logger.Fatal("failed to listen", zap.Error(err))
 	}
 
 	err = srv.Serve(listener)
 	if err != nil {
-		log.Printf("failed to serve: %v", err)
+		logger.Fatal("failed to serve", zap.Error(err))
 	}
 }

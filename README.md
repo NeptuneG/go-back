@@ -39,6 +39,7 @@
 - [ ] slug
 - [ ] test
 - [ ] logging
+    - [uber-go/zap: Blazing fast, structured, leveled logging in Go.](https://github.com/uber-go/zap)
 - [ ] k8s
 - [ ] pagination
 - [ ] service discovery
