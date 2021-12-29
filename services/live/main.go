@@ -17,7 +17,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbSource = "postgres://dev@live-db/live_development?sslmode=disable"
+	dbSource = "postgres://dev@db/live_development?sslmode=disable"
 	port     = ":3377"
 )
 
