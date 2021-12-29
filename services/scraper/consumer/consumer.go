@@ -31,7 +31,7 @@ type createLiveEventMessage struct {
 }
 
 const (
-	redisAddr   = "redis:6379"
+	redisAddr   = "redis-mq:6379"
 	msgQueueKey = "screped_live_events"
 )
 
