@@ -9,7 +9,6 @@ import (
 	scraper "github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
 	user "github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/pkg/logger"
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -28,7 +27,6 @@ func main() {
 	}
 
 	logger := logger.New()
-	grpc_zap.ReplaceGrpcLogger(logger)
 
 	server := http.Server{
 		Addr:    ":4000",

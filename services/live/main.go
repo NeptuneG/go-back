@@ -7,8 +7,6 @@ import (
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/pkg/logger"
 	"github.com/NeptuneG/go-back/services/live/server"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
@@ -23,7 +21,6 @@ const (
 
 func main() {
 	logger := logger.New()
-	grpc_zap.ReplaceGrpcLogger(logger)
 
 	conn, err := sql.Open(dbDriver, dbSource)
 	defer func() {
@@ -35,11 +32,7 @@ func main() {
 		logger.Fatal("failed to open database connection", zap.Error(err))
 	}
 
-	srv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_zap.UnaryServerInterceptor(logger),
-		)),
-	)
+	srv := grpc.NewServer()
 	proto.RegisterLiveServiceServer(srv, server.New(conn, logger))
 
 	listener, err := net.Listen("tcp", port)

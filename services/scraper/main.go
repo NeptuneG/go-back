@@ -9,8 +9,6 @@ import (
 	"github.com/NeptuneG/go-back/pkg/logger"
 	"github.com/NeptuneG/go-back/services/scraper/consumer"
 	"github.com/NeptuneG/go-back/services/scraper/server"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -21,7 +19,6 @@ const (
 
 func main() {
 	logger := logger.New()
-	grpc_zap.ReplaceGrpcLogger(logger)
 
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
@@ -41,11 +38,7 @@ func main() {
 	consumer := consumer.New(liveClient, logger)
 	consumer.Start(ctx)
 
-	srv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_zap.UnaryServerInterceptor(logger),
-		)),
-	)
+	srv := grpc.NewServer()
 	proto.RegisterScrapeServiceServer(srv, &server.ScrapeService{})
 
 	listener, err := net.Listen("tcp", port)

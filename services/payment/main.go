@@ -8,8 +8,6 @@ import (
 	"github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	"github.com/NeptuneG/go-back/pkg/logger"
 	"github.com/NeptuneG/go-back/services/payment/server"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
@@ -24,7 +22,6 @@ const (
 
 func main() {
 	logger := logger.New()
-	grpc_zap.ReplaceGrpcLogger(logger)
 
 	dbConn, err := sql.Open(dbDriver, dbSource)
 	defer func() {
@@ -37,11 +34,7 @@ func main() {
 		return
 	}
 
-	srv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_zap.UnaryServerInterceptor(logger),
-		)),
-	)
+	srv := grpc.NewServer()
 	ctx := context.Background()
 	service, err := server.New(ctx, dbConn, logger)
 	if err != nil {
