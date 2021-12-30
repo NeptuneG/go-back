@@ -6,7 +6,6 @@ require (
 	github.com/contribsys/faktory v1.6.0
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
 	github.com/lib/pq v1.10.4
 	go.uber.org/zap v1.19.1

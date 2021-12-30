@@ -6,33 +6,23 @@ svc-build-image:
 svc-generate-migrate:
 	docker exec $(svc)-service migrate create -dir db/migrations -ext sql $(NAME)
 
-.PHONY: svc-db-create
-svc-db-create:
-	docker exec $(svc)-db createdb --username=dev --owner=dev $(svc)_development
-	docker exec $(svc)-db createdb --username=dev --owner=dev $(svc)_test
-
-.PHONY: svc-db-drop
-svc-db-drop:
-	docker exec $(svc)-db dropdb --username=dev -f $(svc)_development
-	docker exec $(svc)-db dropdb --username=dev -f $(svc)_test
-
 .PHONY: svc-db-migrate
 svc-db-migrate:
 	docker exec -it $(svc)-service migrate \
-	-database postgresql://dev@$(svc)-db/$(svc)_development?sslmode=disable \
+	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
 	-path db/migrations \
 	-verbose up
 
 .PHONY: svc-db-rollback
 svc-db-rollback:
 	docker exec -it $(svc)-service migrate \
-	-database postgresql://dev@$(svc)-db/$(svc)_development?sslmode=disable \
+	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
 	-path db/migrations \
 	-verbose down $(or $(STEP), 1)
 
 .PHONY: svc-db-seed
 svc-db-seed:
-	cat services/$(svc)/db/seeds.sql | xargs -0 docker exec $(svc)-db psql -U dev -d $(svc)_development -c
+	cat services/$(svc)/db/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d $(svc)_development -c
 
 .PHONY: svc-sqlc-generate
 svc-sqlc-generate:
@@ -40,15 +30,21 @@ svc-sqlc-generate:
 
 .PHONY: db-create-all
 db-create-all:
-	make svc-db-create svc=user
-	make svc-db-create svc=live
-	make svc-db-create svc=payment
+	docker exec go-back-db createdb --username=dev --owner=dev user_development
+	docker exec go-back-db createdb --username=dev --owner=dev user_test
+	docker exec go-back-db createdb --username=dev --owner=dev live_development
+	docker exec go-back-db createdb --username=dev --owner=dev live_test
+	docker exec go-back-db createdb --username=dev --owner=dev payment_development
+	docker exec go-back-db createdb --username=dev --owner=dev payment_test
 
 .PHONY: db-drop-all
 db-drop-all:
-	make svc-db-drop svc=user
-	make svc-db-drop svc=live
-	make svc-db-drop svc=payment
+	docker exec go-back-db dropdb --username=dev -f user_development
+	docker exec go-back-db dropdb --username=dev -f user_test
+	docker exec go-back-db dropdb --username=dev -f live_development
+	docker exec go-back-db dropdb --username=dev -f live_test
+	docker exec go-back-db dropdb --username=dev -f payment_development
+	docker exec go-back-db dropdb --username=dev -f payment_test
 
 .PHONY: db-migrate-all
 db-migrate-all:

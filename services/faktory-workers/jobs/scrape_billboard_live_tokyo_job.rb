@@ -5,7 +5,6 @@ class ScrapeBillboardLiveTokyoJob
 
   def perform(year_month)
     live_events = ScrapeBillboardLiveTokyo.new(year_month).call
-    # Redis.new(host: 'redis').publish('live_events', live_events.to_json)
     redis_client.lpush('screped_live_events', live_events.map(&:to_json))
     logger.info("#{live_events.count} events scraped for #{year_month}")
   rescue StandardError => e
@@ -20,6 +19,6 @@ class ScrapeBillboardLiveTokyoJob
   end
 
   def redis_client
-    @redis_client ||= Redis.new(host: 'redis')
+    @redis_client ||= Redis.new(host: 'redis-mq')
   end
 end

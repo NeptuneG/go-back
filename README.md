@@ -70,6 +70,7 @@
 ## 🤯🤯🤯
 
 - create a live event elegantly against available seats
+- log caller issue
 
 ## References
 
@@ -87,3 +88,6 @@
 
 ### grpc
 - [gRPC-go 入门（1）：Hello World - 知乎](https://zhuanlan.zhihu.com/p/258879142)
+
+### logging
+- [一文告诉你如何用好uber开源的zap日志库 | Tony Bai](https://tonybai.com/2021/07/14/uber-zap-advanced-usage/#comment-7590)
