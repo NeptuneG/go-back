@@ -100,7 +100,7 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 	liveEventOrder, err := s.initLiveEventOrder(ctx, req)
 	if err != nil {
 		s.logger.Error("failed to init live event order", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.Internal, "failed to init live event order")
 	}
 	s.logger.Info("live event order created", zap.String("id", liveEventOrder.ID.String()), zap.Any("state", liveEventOrder.State))
 
@@ -224,7 +224,7 @@ func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProt
 	done := make(chan error)
 	go func() {
 		_, err := s.userClient.ConsumeUserPoints(ctx, &userProto.ConsumeUserPointsRequest{
-			Id:          req.UserId,
+			UserId:      req.UserId,
 			Points:      req.UserPoints,
 			Description: "order: " + liveEvent.Title,
 			OrderId:     orderId.String(),
