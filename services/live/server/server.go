@@ -9,7 +9,6 @@ import (
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -17,14 +16,12 @@ import (
 
 type LiveService struct {
 	proto.UnimplementedLiveServiceServer
-	store  *db.Store
-	logger *zap.Logger
+	store *db.Store
 }
 
-func New(dbConn *sql.DB, logger *zap.Logger) *LiveService {
+func New(dbConn *sql.DB) *LiveService {
 	return &LiveService{
-		store:  db.NewStore(dbConn),
-		logger: logger,
+		store: db.NewStore(dbConn),
 	}
 }
 

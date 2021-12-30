@@ -6,7 +6,8 @@ import (
 
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
-	"github.com/NeptuneG/go-back/pkg/logger"
+	"github.com/NeptuneG/go-back/pkg/log"
+	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/NeptuneG/go-back/services/scraper/consumer"
 	"github.com/NeptuneG/go-back/services/scraper/server"
 	"go.uber.org/zap"
@@ -18,7 +19,6 @@ const (
 )
 
 func main() {
-	logger := logger.New()
 
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
@@ -29,13 +29,13 @@ func main() {
 	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx, "live-service:3377", opts...)
 	if err != nil {
-		logger.Fatal("failed to dial live-service", zap.Error(err))
+		log.Fatal("failed to dial live-service", logField.Error(err))
 		return
 	}
 
 	liveClient := live.NewLiveServiceClient(conn)
 
-	consumer := consumer.New(liveClient, logger)
+	consumer := consumer.New(liveClient)
 	consumer.Start(ctx)
 
 	srv := grpc.NewServer()
@@ -43,13 +43,13 @@ func main() {
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
-		logger.Fatal("failed to listen", zap.Error(err))
+		log.Fatal("failed to listen", zap.Error(err))
 		return
 	}
 
 	err = srv.Serve(listener)
 	if err != nil {
-		logger.Fatal("failed to serve", zap.Error(err))
+		log.Fatal("failed to serve", zap.Error(err))
 		return
 	}
 }

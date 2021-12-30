@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
+	"github.com/NeptuneG/go-back/pkg/log"
+	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/user/db/sqlc"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -20,15 +21,11 @@ var (
 
 type UserService struct {
 	proto.UnimplementedUserServiceServer
-	store  *db.Store
-	logger *zap.Logger
+	store *db.Store
 }
 
-func New(dbConn *sql.DB, logger *zap.Logger) *UserService {
-	return &UserService{
-		store:  db.NewStore(dbConn),
-		logger: logger,
-	}
+func New(dbConn *sql.DB) *UserService {
+	return &UserService{store: db.NewStore(dbConn)}
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
@@ -65,7 +62,7 @@ func (s *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeU
 
 	// force a retry
 	count++
-	s.logger.Debug("mock failure for retry", zap.Int("count", count))
+	log.Debug("mock failure for retry", logField.Int("count", count))
 	if count%3 != 0 {
 		return nil, status.Error(codes.Internal, "just failed")
 	}
@@ -82,9 +79,9 @@ func (s *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeU
 
 	// mock delay
 	if false {
-		s.logger.Debug("mock delay")
+		log.Debug("mock delay")
 		time.Sleep(10 * time.Second)
-		s.logger.Debug("mock delay done")
+		log.Debug("mock delay done")
 	}
 
 	user, err := s.store.GetUserByID(ctx, userID)

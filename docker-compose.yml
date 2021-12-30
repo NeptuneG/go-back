@@ -58,7 +58,7 @@ services:
       FAKTORY_URL: tcp://faktory:7419
     links:
       - faktory
-      - redis
+      - redis-mq
   db:
     image: postgres:14.1-alpine3.14
     container_name: go-back-db
@@ -97,7 +97,7 @@ services:
       - ./services/faktory-workers:/app
     depends_on:
       - faktory
-      - redis
+      - redis-mq
 volumes:
   redis-mq-data:
   faktory-data:
