@@ -70,7 +70,6 @@
 ## 🤯🤯🤯
 
 - create a live event elegantly against available seats
-- log caller issue
 
 ## References
 
