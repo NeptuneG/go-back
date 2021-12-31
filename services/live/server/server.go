@@ -224,9 +224,52 @@ func (s *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventR
 }
 
 func (s *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
-	return s.store.ReserveSeatTx(ctx, req)
+	liveEventID, err := uuid.Parse(req.LiveEventId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "failed to parse live event id")
+	}
+	if liveEvent, err := s.store.ReserveSeatTx(ctx, liveEventID); err != nil {
+		return nil, status.Error(codes.Internal, "failed to reserve seat")
+	} else {
+		log.Info("reserved seat",
+			logField.String("live_event_id", liveEvent.ID.String()),
+			logField.Int32("live_event_available_seats", liveEvent.AvailableSeats),
+		)
+		return &proto.ReserveSeatResponse{
+			LiveEvent: &proto.LiveEvent{
+				Id: liveEvent.ID.String(),
+				LiveHouse: &proto.LiveHouse{
+					Id:   liveEvent.LiveHouseID.String(),
+					Name: liveEvent.LiveHouseName,
+					Slug: liveEvent.LiveHouseSlug.String,
+				},
+				Title:           liveEvent.Title,
+				Url:             liveEvent.Url,
+				Description:     liveEvent.Description.String,
+				PriceInfo:       liveEvent.PriceInfo.String,
+				StageOneOpenAt:  timestamppb.New(liveEvent.StageOneOpenAt.Time),
+				StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
+				StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
+				StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
+				Seats:           liveEvent.Seats,
+				AvailableSeats:  liveEvent.AvailableSeats,
+			},
+		}, nil
+	}
 }
 
 func (s *LiveService) RollbackSeatReservation(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*emptypb.Empty, error) {
-	return s.store.RollbackSeatReservationTx(ctx, req)
+	liveEventID, err := uuid.Parse(req.LiveEventId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "failed to parse live event id")
+	}
+	if liveEvent, err := s.store.RollbackSeatReservationTx(ctx, liveEventID); err != nil {
+		return nil, status.Error(codes.Internal, "failed to rollback seat reservation")
+	} else {
+		log.Info("rollbacked seat reservation",
+			logField.String("live_event_id", liveEvent.ID.String()),
+			logField.Int32("live_event_available_seats", liveEvent.AvailableSeats),
+		)
+		return &emptypb.Empty{}, nil
+	}
 }

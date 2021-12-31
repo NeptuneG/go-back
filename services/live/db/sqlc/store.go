@@ -3,11 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
-	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Store struct {
@@ -22,69 +20,66 @@ func NewStore(db *sql.DB) *Store {
 	}
 }
 
-func (store *Store) ReserveSeatTx(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
+func (store *Store) execTx(ctx context.Context, fn func(*Queries) (interface{}, error)) (interface{}, error) {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	queries := New(tx)
-	liveEventID, err := uuid.Parse(req.LiveEventId)
+	q := New(tx)
+	result, err := fn(q)
 
 	if err != nil {
-		return nil, err
-	}
-	liveEvent, err := queries.GetLiveEventById(ctx, liveEventID)
-	if err != nil {
+		if rbErr := tx.Rollback(); rbErr != nil {
+			return nil, fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
+		}
 		return nil, err
 	}
 
-	if err = queries.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
-		ID:             liveEventID,
-		AvailableSeats: liveEvent.AvailableSeats - 1,
-	}); err != nil {
-		return nil, err
-	}
-	return &proto.ReserveSeatResponse{
-		LiveEvent: &proto.LiveEvent{
-			Id:              liveEvent.ID.String(),
-			LiveHouse:       nil,
-			Title:           liveEvent.Title,
-			Url:             liveEvent.Url,
-			Description:     liveEvent.Description.String,
-			PriceInfo:       liveEvent.PriceInfo.String,
-			StageOneOpenAt:  timestamppb.New(liveEvent.StageOneOpenAt.Time),
-			StageOneStartAt: timestamppb.New(liveEvent.StageOneStartAt),
-			StageTwoOpenAt:  timestamppb.New(liveEvent.StageTwoOpenAt.Time),
-			StageTwoStartAt: timestamppb.New(liveEvent.StageTwoStartAt.Time),
-			Seats:           liveEvent.Seats,
-			AvailableSeats:  liveEvent.AvailableSeats - 1,
-		},
-	}, tx.Commit()
+	return result, tx.Commit()
 }
 
-func (store *Store) RollbackSeatReservationTx(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*emptypb.Empty, error) {
-	tx, err := store.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	queries := New(tx)
-	liveEventID, err := uuid.Parse(req.LiveEventId)
-
-	if err != nil {
-		return nil, err
-	}
-	liveEvent, err := queries.GetLiveEventById(ctx, liveEventID)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = queries.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
-		ID:             liveEventID,
-		AvailableSeats: liveEvent.AvailableSeats + 1,
+func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
+	if result, err := store.execTx(ctx, func(q *Queries) (interface{}, error) {
+		liveEvent, err := q.GetLiveEventById(ctx, liveEventID)
+		if err != nil {
+			return nil, err
+		}
+		if liveEvent.AvailableSeats == 0 {
+			return nil, fmt.Errorf("no available seats")
+		}
+		liveEvent.AvailableSeats--
+		if err = q.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
+			ID:             liveEventID,
+			AvailableSeats: liveEvent.AvailableSeats,
+		}); err != nil {
+			return nil, err
+		}
+		return &liveEvent, nil
 	}); err != nil {
 		return nil, err
+	} else {
+		return result.(*GetLiveEventByIdRow), nil
 	}
-	return &emptypb.Empty{}, tx.Commit()
+}
+
+func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
+	if result, err := store.execTx(ctx, func(q *Queries) (interface{}, error) {
+		liveEvent, err := q.GetLiveEventById(ctx, liveEventID)
+		if err != nil {
+			return nil, err
+		}
+		liveEvent.AvailableSeats++
+		if err = q.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
+			ID:             liveEventID,
+			AvailableSeats: liveEvent.AvailableSeats,
+		}); err != nil {
+			return nil, err
+		}
+		return &liveEvent, err
+	}); err != nil {
+		return nil, err
+	} else {
+		return result.(*GetLiveEventByIdRow), nil
+	}
 }

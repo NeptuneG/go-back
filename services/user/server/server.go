@@ -11,6 +11,7 @@ import (
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/user/db/sqlc"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -55,7 +56,28 @@ func (s *UserService) Close() {
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
-	return s.store.CreateUserTx(ctx, req)
+	encrypted_password, err := encryptPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+	user, err := s.store.CreateUserTx(ctx, db.CreateUserParams{
+		Email:             req.Email,
+		EncryptedPassword: encrypted_password,
+	})
+	if err != nil {
+		log.Error("failed to create user", logField.Error(err))
+		return nil, status.Error(codes.Internal, "failed to create user")
+	}
+	log.Info("User created",
+		logField.String("email", user.Email),
+		logField.Int("points", 1000),
+	)
+	return &proto.CreateUserResponse{
+		User: &proto.User{
+			Id:     user.ID.String(),
+			Email:  user.Email,
+			Points: 1000,
+		}}, nil
 }
 
 func (s *UserService) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.GetUserResponse, error) {
@@ -131,4 +153,12 @@ func (s *UserService) RollbackConsumeUserPoints(ctx context.Context, req *proto.
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func encryptPassword(password string) (string, error) {
+	encrypt_bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(encrypt_bytes), nil
 }

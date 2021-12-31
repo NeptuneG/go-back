@@ -5,9 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/pkg/types"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Store struct {
@@ -22,31 +20,14 @@ func NewStore(db *sql.DB) *Store {
 	}
 }
 
-func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
+func (store *Store) execTx(ctx context.Context, fn func(*Queries) (interface{}, error)) (interface{}, error) {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	queries := New(tx)
-	encrypted_password, err := encryptPassword(req.Password)
-	if err != nil {
-		return nil, err
-	}
-	arg := CreateUserParams{
-		Email:             req.Email,
-		EncryptedPassword: encrypted_password,
-	}
-	user, err := queries.CreateUser(ctx, arg)
-	if err != nil {
-		return nil, err
-	}
-	user_points, err := queries.CreateUserPoints(ctx, CreateUserPointsParams{
-		UserID:      user.ID,
-		Points:      1000,
-		Description: types.NewNullString("Initial points"),
-		OrderID:     types.NewNullUUID(nil),
-	})
+	q := New(tx)
+	result, err := fn(q)
 
 	if err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
@@ -55,19 +36,25 @@ func (store *Store) CreateUserTx(ctx context.Context, req *proto.CreateUserReque
 		return nil, err
 	}
 
-	return &proto.CreateUserResponse{
-		User: &proto.User{
-			Id:     user.ID.String(),
-			Email:  user.Email,
-			Points: int64(user_points.Points),
-		},
-	}, tx.Commit()
+	return result, tx.Commit()
 }
 
-func encryptPassword(password string) (string, error) {
-	encrypt_bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
+func (store *Store) CreateUserTx(ctx context.Context, param CreateUserParams) (*User, error) {
+	if result, err := store.execTx(ctx, func(q *Queries) (interface{}, error) {
+		user, err := q.CreateUser(ctx, param)
+		if err != nil {
+			return nil, err
+		}
+		_, err = q.CreateUserPoints(ctx, CreateUserPointsParams{
+			UserID:      user.ID,
+			Points:      1000,
+			Description: types.NewNullString("Initial points"),
+			OrderID:     types.NewNullUUID(nil),
+		})
+		return &user, err
+	}); err != nil {
+		return nil, err
+	} else {
+		return result.(*User), nil
 	}
-	return string(encrypt_bytes), nil
 }
