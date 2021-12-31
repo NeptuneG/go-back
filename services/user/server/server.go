@@ -13,6 +13,13 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	_ "github.com/lib/pq"
+)
+
+const (
+	dbDriver = "postgres"
+	dbSource = "postgres://dev@db/user_development?sslmode=disable"
 )
 
 var (
@@ -21,11 +28,28 @@ var (
 
 type UserService struct {
 	proto.UnimplementedUserServiceServer
-	store *db.Store
+	store  *db.Store
+	dbConn *sql.DB
 }
 
-func New(dbConn *sql.DB) *UserService {
-	return &UserService{store: db.NewStore(dbConn)}
+func New() *UserService {
+	dbConn, err := sql.Open(dbDriver, dbSource)
+	if err != nil {
+		log.Fatal("failed to open database connection", logField.Error(err))
+		panic(err)
+	}
+	return &UserService{store: db.NewStore(dbConn), dbConn: dbConn}
+}
+
+func (s *UserService) Close() {
+	if err := s.store.Close(); err != nil {
+		log.Fatal("failed to close database connection", logField.Error(err))
+		panic(err)
+	}
+	if err := s.dbConn.Close(); err != nil {
+		log.Fatal("failed to close database connection", logField.Error(err))
+		panic(err)
+	}
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {

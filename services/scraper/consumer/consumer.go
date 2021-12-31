@@ -39,13 +39,17 @@ func New(liveClient live.LiveServiceClient) *ScrapedEventsConsumer {
 	return &ScrapedEventsConsumer{liveClient: liveClient}
 }
 
-func (consumer *ScrapedEventsConsumer) Start(ctx context.Context) {
+func (consumer *ScrapedEventsConsumer) Close() {
+}
+
+func (consumer *ScrapedEventsConsumer) Start() {
 	redisOptions := &redis.Options{
 		Addr: redisAddr,
 	}
 	redisClient := redis.NewClient(redisOptions)
 
 	go func() {
+		ctx := context.Background()
 		for {
 			raw := redisClient.BRPop(ctx, 0, msgQueueKey)
 			var reqMsg createLiveEventMessage
