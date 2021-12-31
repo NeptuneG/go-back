@@ -6,22 +6,49 @@ import (
 	"errors"
 
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	"github.com/NeptuneG/go-back/pkg/log"
+	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+
+	_ "github.com/lib/pq"
+)
+
+const (
+	dbDriver = "postgres"
+	dbSource = "postgres://dev@db/live_development?sslmode=disable"
 )
 
 type LiveService struct {
 	proto.UnimplementedLiveServiceServer
-	store *db.Store
+	store  *db.Store
+	dbConn *sql.DB
 }
 
-func New(dbConn *sql.DB) *LiveService {
+func New() *LiveService {
+	dbConn, err := sql.Open(dbDriver, dbSource)
+
+	if err != nil {
+		log.Fatal("failed to open database connection", logField.Error(err))
+		panic(err)
+	}
 	return &LiveService{
 		store: db.NewStore(dbConn),
+	}
+}
+
+func (s *LiveService) Close() {
+	if err := s.store.Close(); err != nil {
+		log.Error("failed to close database connection", logField.Error(err))
+		panic(err)
+	}
+	if err := s.dbConn.Close(); err != nil {
+		log.Fatal("failed to close database connection", logField.Error(err))
+		panic(err)
 	}
 }
 

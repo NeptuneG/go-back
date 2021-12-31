@@ -18,9 +18,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	_ "github.com/lib/pq"
 )
 
 const (
+	dbDriver    = "postgres"
+	dbSource    = "postgres://dev@db/payment_development?sslmode=disable"
 	timeout     = time.Second * 5
 	retryPolicy = `{
 		"methodConfig": [{
@@ -58,9 +62,16 @@ type PaymentService struct {
 	userClient userProto.UserServiceClient
 	liveClient liveProto.LiveServiceClient
 	store      *db.Store
+	dbConn     *sql.DB
 }
 
-func New(ctx context.Context, dbConn *sql.DB) (*PaymentService, error) {
+func New() *PaymentService {
+	dbConn, err := sql.Open(dbDriver, dbSource)
+	if err != nil {
+		log.Fatal("failed to open database connection", logField.Error(err))
+		panic(err)
+	}
+	ctx := context.Background()
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
 		grpc.WithBlock(),
@@ -71,20 +82,32 @@ func New(ctx context.Context, dbConn *sql.DB) (*PaymentService, error) {
 	userConn, err := grpc.DialContext(ctx, "user-service:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to user service", logField.Error(err))
-		return nil, err
+		panic(err)
 	}
 
 	liveConn, err := grpc.DialContext(ctx, "live-service:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", logField.Error(err))
-		return nil, err
+		panic(err)
 	}
 
 	return &PaymentService{
 		userClient: userProto.NewUserServiceClient(userConn),
 		liveClient: liveProto.NewLiveServiceClient(liveConn),
 		store:      db.NewStore(dbConn),
-	}, nil
+		dbConn:     dbConn,
+	}
+}
+
+func (s *PaymentService) Close() {
+	if err := s.store.Close(); err != nil {
+		log.Fatal("failed to close database connection", logField.Error(err))
+		panic(err)
+	}
+	if err := s.dbConn.Close(); err != nil {
+		log.Fatal("failed to close database connection", logField.Error(err))
+		panic(err)
+	}
 }
 
 func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentProto.CreateLiveEventOrderRequest) (*paymentProto.CreateLiveEventOrderResponse, error) {

@@ -1,48 +1,23 @@
 package main
 
 import (
-	"database/sql"
-	"net"
-
 	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
-	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
+	grpcServer "github.com/NeptuneG/go-back/pkg/grpc"
 	"github.com/NeptuneG/go-back/services/user/server"
 	"google.golang.org/grpc"
-
-	_ "github.com/lib/pq"
 )
 
 const (
-	dbDriver = "postgres"
-	dbSource = "postgres://dev@db/user_development?sslmode=disable"
-	port     = ":3377"
+	port = 3377
 )
 
 func main() {
-	conn, err := sql.Open(dbDriver, dbSource)
-	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Fatal("failed to close database connection", logField.Error(err))
-		}
-	}()
-	if err != nil {
-		log.Fatal("failed to open database connection", logField.Error(err))
-		return
-	}
+	server := server.New()
+	defer server.Close()
 
-	srv := grpc.NewServer()
-	proto.RegisterUserServiceServer(srv, server.New(conn))
+	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {
+		proto.RegisterUserServiceServer(srv, server)
+	})
 
-	listener, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatal("failed to listen", logField.Error(err))
-		return
-	}
-
-	err = srv.Serve(listener)
-	if err != nil {
-		log.Fatal("failed to serve", logField.Error(err))
-		return
-	}
+	gprcSrv.Start()
 }
