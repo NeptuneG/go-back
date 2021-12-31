@@ -130,7 +130,7 @@ func createStd() *Logger {
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-	zapLogger, err := config.Build()
+	zapLogger, err := config.Build(zap.AddCallerSkip(1))
 	if err != nil {
 		panic("failed to initialize zap logger")
 	}
