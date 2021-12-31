@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -21,7 +22,7 @@ type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	ConsumeUserPoints(ctx context.Context, in *ConsumeUserPointsRequest, opts ...grpc.CallOption) (*ConsumeUserPointsResponse, error)
-	RollbackConsumeUserPoints(ctx context.Context, in *RollbackConsumeUserPointsRequest, opts ...grpc.CallOption) (*RollbackConsumeUserPointsResponse, error)
+	RollbackConsumeUserPoints(ctx context.Context, in *RollbackConsumeUserPointsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userServiceClient struct {
@@ -59,8 +60,8 @@ func (c *userServiceClient) ConsumeUserPoints(ctx context.Context, in *ConsumeUs
 	return out, nil
 }
 
-func (c *userServiceClient) RollbackConsumeUserPoints(ctx context.Context, in *RollbackConsumeUserPointsRequest, opts ...grpc.CallOption) (*RollbackConsumeUserPointsResponse, error) {
-	out := new(RollbackConsumeUserPointsResponse)
+func (c *userServiceClient) RollbackConsumeUserPoints(ctx context.Context, in *RollbackConsumeUserPointsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.user.UserService/RollbackConsumeUserPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -75,7 +76,7 @@ type UserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	ConsumeUserPoints(context.Context, *ConsumeUserPointsRequest) (*ConsumeUserPointsResponse, error)
-	RollbackConsumeUserPoints(context.Context, *RollbackConsumeUserPointsRequest) (*RollbackConsumeUserPointsResponse, error)
+	RollbackConsumeUserPoints(context.Context, *RollbackConsumeUserPointsRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -92,7 +93,7 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserRequest) 
 func (UnimplementedUserServiceServer) ConsumeUserPoints(context.Context, *ConsumeUserPointsRequest) (*ConsumeUserPointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConsumeUserPoints not implemented")
 }
-func (UnimplementedUserServiceServer) RollbackConsumeUserPoints(context.Context, *RollbackConsumeUserPointsRequest) (*RollbackConsumeUserPointsResponse, error) {
+func (UnimplementedUserServiceServer) RollbackConsumeUserPoints(context.Context, *RollbackConsumeUserPointsRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollbackConsumeUserPoints not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

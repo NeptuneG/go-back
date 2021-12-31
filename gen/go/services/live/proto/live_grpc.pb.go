@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,7 +25,7 @@ type LiveServiceClient interface {
 	GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error)
 	ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error)
 	ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error)
-	RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*RollbackSeatReservationResponse, error)
+	RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type liveServiceClient struct {
@@ -89,8 +90,8 @@ func (c *liveServiceClient) ReserveSeat(ctx context.Context, in *ReserveSeatRequ
 	return out, nil
 }
 
-func (c *liveServiceClient) RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*RollbackSeatReservationResponse, error) {
-	out := new(RollbackSeatReservationResponse)
+func (c *liveServiceClient) RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -108,7 +109,7 @@ type LiveServiceServer interface {
 	GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error)
 	ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error)
 	ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error)
-	RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*RollbackSeatReservationResponse, error)
+	RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedLiveServiceServer()
 }
 
@@ -134,7 +135,7 @@ func (UnimplementedLiveServiceServer) ListLiveEvents(context.Context, *ListLiveE
 func (UnimplementedLiveServiceServer) ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReserveSeat not implemented")
 }
-func (UnimplementedLiveServiceServer) RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*RollbackSeatReservationResponse, error) {
+func (UnimplementedLiveServiceServer) RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollbackSeatReservation not implemented")
 }
 func (UnimplementedLiveServiceServer) mustEmbedUnimplementedLiveServiceServer() {}

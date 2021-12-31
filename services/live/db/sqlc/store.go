@@ -6,6 +6,7 @@ import (
 
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -62,7 +63,7 @@ func (store *Store) ReserveSeatTx(ctx context.Context, req *proto.ReserveSeatReq
 	}, tx.Commit()
 }
 
-func (store *Store) RollbackSeatReservationTx(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*proto.RollbackSeatReservationResponse, error) {
+func (store *Store) RollbackSeatReservationTx(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*emptypb.Empty, error) {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -85,5 +86,5 @@ func (store *Store) RollbackSeatReservationTx(ctx context.Context, req *proto.Ro
 	}); err != nil {
 		return nil, err
 	}
-	return &proto.RollbackSeatReservationResponse{Success: true}, tx.Commit()
+	return &emptypb.Empty{}, tx.Commit()
 }
