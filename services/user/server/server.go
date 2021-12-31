@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+
 	_ "github.com/lib/pq"
 )
 
@@ -118,7 +120,7 @@ func (s *UserService) ConsumeUserPoints(ctx context.Context, req *proto.ConsumeU
 	}, err
 }
 
-func (s *UserService) RollbackConsumeUserPoints(ctx context.Context, req *proto.RollbackConsumeUserPointsRequest) (*proto.RollbackConsumeUserPointsResponse, error) {
+func (s *UserService) RollbackConsumeUserPoints(ctx context.Context, req *proto.RollbackConsumeUserPointsRequest) (*emptypb.Empty, error) {
 	orderId, err := uuid.Parse(req.OrderId)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "failed to parse order id")
@@ -128,7 +130,5 @@ func (s *UserService) RollbackConsumeUserPoints(ctx context.Context, req *proto.
 		return nil, status.Error(codes.Internal, "failed to rollback user points")
 	}
 
-	return &proto.RollbackConsumeUserPointsResponse{
-		Success: true,
-	}, nil
+	return &emptypb.Empty{}, nil
 }

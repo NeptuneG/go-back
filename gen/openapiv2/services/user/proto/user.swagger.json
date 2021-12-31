@@ -142,14 +142,6 @@
         }
       }
     },
-    "userRollbackConsumeUserPointsResponse": {
-      "type": "object",
-      "properties": {
-        "success": {
-          "type": "boolean"
-        }
-      }
-    },
     "userUser": {
       "type": "object",
       "properties": {

@@ -4,6 +4,7 @@ option go_package = "github.com/NeptuneG/go-back/services/user/proto";
 package neptuneg.go_back.serivces.user;
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
@@ -23,7 +24,7 @@ service UserService {
       returns (ConsumeUserPointsResponse);
 
   rpc RollbackConsumeUserPoints(RollbackConsumeUserPointsRequest)
-      returns (RollbackConsumeUserPointsResponse);
+      returns (google.protobuf.Empty);
 }
 
 message User {
@@ -53,5 +54,3 @@ message ConsumeUserPointsRequest {
 message ConsumeUserPointsResponse { User user = 1; }
 
 message RollbackConsumeUserPointsRequest { string order_id = 1; }
-
-message RollbackConsumeUserPointsResponse { bool success = 1; }

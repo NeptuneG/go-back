@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 
 	_ "github.com/lib/pq"
@@ -226,6 +227,6 @@ func (s *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatReq
 	return s.store.ReserveSeatTx(ctx, req)
 }
 
-func (s *LiveService) RollbackSeatReservation(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*proto.RollbackSeatReservationResponse, error) {
+func (s *LiveService) RollbackSeatReservation(ctx context.Context, req *proto.RollbackSeatReservationRequest) (*emptypb.Empty, error) {
 	return s.store.RollbackSeatReservationTx(ctx, req)
 }
