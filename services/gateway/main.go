@@ -31,7 +31,7 @@ func main() {
 		Handler: mux,
 	}
 
-	userConn, err := grpc.DialContext(ctx, "user-service:3377", opts...)
+	userConn, err := grpc.DialContext(ctx, "user.default.svc.cluster.local:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to user service", logField.Error(err))
 		panic(err)
@@ -41,7 +41,7 @@ func main() {
 		panic(err)
 	}
 
-	liveConn, err := grpc.DialContext(ctx, "live-service:3377", opts...)
+	liveConn, err := grpc.DialContext(ctx, "live.default.svc.cluster.local:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", logField.Error(err))
 		panic(err)
@@ -51,7 +51,7 @@ func main() {
 		panic(err)
 	}
 
-	paymentConn, err := grpc.DialContext(ctx, "payment-service:3377", opts...)
+	paymentConn, err := grpc.DialContext(ctx, "payment.default.svc.cluster.local:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to payment service", logField.Error(err))
 		panic(err)
@@ -61,7 +61,7 @@ func main() {
 		panic(err)
 	}
 
-	scraperConn, err := grpc.DialContext(ctx, "scraper-service:3377", opts...)
+	scraperConn, err := grpc.DialContext(ctx, "scraper.default.svc.cluster.local:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to scraper service", logField.Error(err))
 		panic(err)

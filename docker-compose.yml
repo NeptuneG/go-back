@@ -1,65 +1,65 @@
 version: "3.9"
 x-svc-setting: &service
-  volumes:
-    - .:/go/src/github.com/NeptuneG/go-back
-  entrypoint: ["air", "-c", ".air.toml"]
+  # volumes:
+    # - .:/go/src/github.com/NeptuneG/go-back
+  # entrypoint: ["air", "-c", ".air.toml"]
   security_opt:
     - seccomp:unconfined
   stdin_open: true
   tty: true
 
 services:
-  gateway-service:
+  gateway.default.svc.cluster.local:
     <<: *service
     container_name: gateway-service
-    image: neptuneg/go-back/gateway-service
+    image: neptuneg/gateway-service
     ports:
       - "4000:4000"
       - "2347:2345"
     links:
-      - user-service
-      - live-service
-      - scraper-service
-      - payment-service
-  user-service:
+      - user.default.svc.cluster.local
+      - live.default.svc.cluster.local
+      - scraper.default.svc.cluster.local
+      - payment.default.svc.cluster.local
+  user.default.svc.cluster.local:
     <<: *service
     container_name: user-service
-    image: neptuneg/go-back/user-service
+    image: neptuneg/user-service
     ports:
       - "2346:2345"
     links:
-      - db
-  live-service:
+      - db.default.svc.cluster.local
+  live.default.svc.cluster.local:
     <<: *service
     container_name: live-service
-    image: neptuneg/go-back/live-service
+    image: neptuneg/live-service
     ports:
       - "2348:2345"
     links:
-      - db
-  payment-service:
+      - db.default.svc.cluster.local
+  payment.default.svc.cluster.local:
     <<: *service
     container_name: payment-service
-    image: neptuneg/go-back/payment-service
+    image: neptuneg/payment-service
     ports:
       - "2350:2345"
     links:
-      - db
+      - db.default.svc.cluster.local
     environment:
       GRPC_GO_RETRY: on
-  scraper-service:
+  scraper.default.svc.cluster.local:
     <<: *service
     container_name: scraper-service
-    image: neptuneg/go-back/scraper-service
+    image: neptuneg/scraper-service
     ports:
       - "2349:2345"
     environment:
       FAKTORY_PROVIDER: FAKTORY_URL
-      FAKTORY_URL: tcp://faktory:7419
+      FAKTORY_URL: tcp://faktory.default.svc.cluster.local:7419
     links:
-      - faktory
-      - redis-mq
-  db:
+      - faktory.default.svc.cluster.local
+      - redis-mq.default.svc.cluster.local
+  db.default.svc.cluster.local:
     image: postgres:14.1-alpine3.14
     container_name: go-back-db
     ports:
@@ -70,14 +70,14 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - db-data:/var/lib/postgresql/data
-  redis-mq:
+  redis-mq.default.svc.cluster.local:
     container_name: redis-mq
     image: redis:6.2.6-alpine3.14
     ports:
       - "6380:6379"
     volumes:
       - redis-mq-data:/data
-  faktory:
+  faktory.default.svc.cluster.local:
     container_name: faktory
     image: contribsys/faktory:latest
     volumes:
@@ -87,17 +87,18 @@ services:
       - "7420:7420"
   faktory-workers:
     container_name: faktory-workers
+    image: neptuneg/faktory-workers
     build:
       context: ./services/faktory-workers
     environment:
       TZ: 'Asia/Tokyo'
       FAKTORY_PROVIDER: FAKTORY_URL
-      FAKTORY_URL: tcp://faktory:7419
+      FAKTORY_URL: tcp://faktory.default.svc.cluster.local:7419
     volumes:
       - ./services/faktory-workers:/app
     depends_on:
-      - faktory
-      - redis-mq
+      - faktory.default.svc.cluster.local
+      - redis-mq.default.svc.cluster.local
 volumes:
   redis-mq-data:
   faktory-data:

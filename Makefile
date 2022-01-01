@@ -1,6 +1,10 @@
 .PHONY: svc-build-image
 svc-build-image:
-	docker build -t neptuneg/go-back/$(svc)-service:latest --file ./services/$(svc)/Dockerfile .
+	docker build -t neptuneg/$(svc)-service:latest --file ./services/$(svc)/Dockerfile .
+
+.PHONY: svc-push-image
+svc-push-image:
+	docker push neptuneg/$(svc)-service:latest
 
 .PHONY: svc-generate-migrate
 svc-generate-migrate:
@@ -9,14 +13,14 @@ svc-generate-migrate:
 .PHONY: svc-db-migrate
 svc-db-migrate:
 	docker exec -it $(svc)-service migrate \
-	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
+	-database postgresql://dev@db.default.svc.cluster.local/$(svc)_development?sslmode=disable \
 	-path db/migrations \
 	-verbose up
 
 .PHONY: svc-db-rollback
 svc-db-rollback:
 	docker exec -it $(svc)-service migrate \
-	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
+	-database postgresql://dev@db.default.svc.cluster.local/$(svc)_development?sslmode=disable \
 	-path db/migrations \
 	-verbose down $(or $(STEP), 1)
 
@@ -69,4 +73,14 @@ build-images-all:
 	make svc-build-image svc=gateway
 	make svc-build-image svc=scraper
 	make svc-build-image svc=payment
+	docker build -t neptuneg/faktory-workers:latest --file ./services/faktory-workers/Dockerfile ./services/faktory-workers
+
+.PHONY: push-images-all
+push-images-all:
+	make svc-push-image svc=user
+	make svc-push-image svc=live
+	make svc-push-image svc=gateway
+	make svc-push-image svc=scraper
+	make svc-push-image svc=payment
+	docker push neptuneg/faktory-workers:latest
 

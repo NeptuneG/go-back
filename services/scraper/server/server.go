@@ -27,9 +27,9 @@ func New() *ScrapeService {
 		grpc.WithBlock(),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 	}
-	conn, err := grpc.DialContext(context.Background(), "live-service:3377", opts...)
+	conn, err := grpc.DialContext(context.Background(), "live.default.svc.cluster.local:3377", opts...)
 	if err != nil {
-		log.Fatal("failed to dial live-service", logField.Error(err))
+		log.Fatal("failed to dial live service", logField.Error(err))
 		panic(err)
 	}
 
