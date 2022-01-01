@@ -21,7 +21,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbSource = "postgres://dev@db/live_development?sslmode=disable"
+	dbSource = "postgres://dev@db.default.svc.cluster.local/live_development?sslmode=disable"
 )
 
 type LiveService struct {

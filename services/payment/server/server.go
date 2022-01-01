@@ -24,7 +24,7 @@ import (
 
 const (
 	dbDriver    = "postgres"
-	dbSource    = "postgres://dev@db/payment_development?sslmode=disable"
+	dbSource    = "postgres://dev@db.default.svc.cluster.local/payment_development?sslmode=disable"
 	timeout     = time.Second * 5
 	retryPolicy = `{
 		"methodConfig": [{
@@ -79,13 +79,13 @@ func New() *PaymentService {
 		grpc.WithDefaultServiceConfig(retryPolicy),
 	}
 
-	userConn, err := grpc.DialContext(ctx, "user-service:3377", opts...)
+	userConn, err := grpc.DialContext(ctx, "user.default.svc.cluster.local:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to user service", logField.Error(err))
 		panic(err)
 	}
 
-	liveConn, err := grpc.DialContext(ctx, "live-service:3377", opts...)
+	liveConn, err := grpc.DialContext(ctx, "live.default.svc.cluster.local:3377", opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", logField.Error(err))
 		panic(err)

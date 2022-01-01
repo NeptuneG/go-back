@@ -19,6 +19,6 @@ class ScrapeBillboardLiveTokyoJob
   end
 
   def redis_client
-    @redis_client ||= Redis.new(host: 'redis-mq')
+    @redis_client ||= Redis.new(host: 'redis-mq.default.svc.cluster.local')
   end
 end

@@ -22,7 +22,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbSource = "postgres://dev@db/user_development?sslmode=disable"
+	dbSource = "postgres://dev@db.default.svc.cluster.local/user_development?sslmode=disable"
 )
 
 var (
