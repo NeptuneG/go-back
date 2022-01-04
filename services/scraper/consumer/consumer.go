@@ -3,6 +3,7 @@ package consumer
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"time"
 
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
@@ -31,7 +32,6 @@ type createLiveEventMessage struct {
 }
 
 const (
-	redisAddr   = "redis-mq.default.svc.cluster.local:6379"
 	msgQueueKey = "screped_live_events"
 )
 
@@ -44,7 +44,7 @@ func (consumer *ScrapedEventsConsumer) Close() {
 
 func (consumer *ScrapedEventsConsumer) Start() {
 	redisOptions := &redis.Options{
-		Addr: redisAddr,
+		Addr: os.Getenv("REDIS_MQ_SERVICE_HOST") + ":" + os.Getenv("REDIS_MQ_SERVICE_PORT"),
 	}
 	redisClient := redis.NewClient(redisOptions)
 

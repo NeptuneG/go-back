@@ -5,12 +5,14 @@ import (
 	"database/sql"
 	"errors"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
 	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	paymentProto "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	userProto "github.com/NeptuneG/go-back/gen/go/services/user/proto"
+	dbpkg "github.com/NeptuneG/go-back/pkg/db"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	db "github.com/NeptuneG/go-back/services/payment/db/sqlc"
@@ -23,8 +25,6 @@ import (
 )
 
 const (
-	dbDriver    = "postgres"
-	dbSource    = "postgres://dev@db.default.svc.cluster.local/payment_development?sslmode=disable"
 	timeout     = time.Second * 5
 	retryPolicy = `{
 		"methodConfig": [{
@@ -66,11 +66,7 @@ type PaymentService struct {
 }
 
 func New() *PaymentService {
-	dbConn, err := sql.Open(dbDriver, dbSource)
-	if err != nil {
-		log.Fatal("failed to open database connection", logField.Error(err))
-		panic(err)
-	}
+	dbConn := dbpkg.ConnectDatabase()
 	ctx := context.Background()
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
@@ -79,13 +75,13 @@ func New() *PaymentService {
 		grpc.WithDefaultServiceConfig(retryPolicy),
 	}
 
-	userConn, err := grpc.DialContext(ctx, "user.default.svc.cluster.local:3377", opts...)
+	userConn, err := grpc.DialContext(ctx, os.Getenv("USER_SERVICE_HOST")+":"+os.Getenv("USER_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to connect to user service", logField.Error(err))
 		panic(err)
 	}
 
-	liveConn, err := grpc.DialContext(ctx, "live.default.svc.cluster.local:3377", opts...)
+	liveConn, err := grpc.DialContext(ctx, os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", logField.Error(err))
 		panic(err)
