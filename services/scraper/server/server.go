@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"os"
 	"strings"
 
 	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
@@ -27,7 +28,7 @@ func New() *ScrapeService {
 		grpc.WithBlock(),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 	}
-	conn, err := grpc.DialContext(context.Background(), "live.default.svc.cluster.local:3377", opts...)
+	conn, err := grpc.DialContext(context.Background(), os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to dial live service", logField.Error(err))
 		panic(err)

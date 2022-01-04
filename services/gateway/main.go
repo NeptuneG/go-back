@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	payment "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
@@ -31,7 +32,7 @@ func main() {
 		Handler: mux,
 	}
 
-	userConn, err := grpc.DialContext(ctx, "user.default.svc.cluster.local:3377", opts...)
+	userConn, err := grpc.DialContext(ctx, os.Getenv("USER_SERVICE_HOST")+":"+os.Getenv("USER_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to connect to user service", logField.Error(err))
 		panic(err)
@@ -41,7 +42,7 @@ func main() {
 		panic(err)
 	}
 
-	liveConn, err := grpc.DialContext(ctx, "live.default.svc.cluster.local:3377", opts...)
+	liveConn, err := grpc.DialContext(ctx, os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", logField.Error(err))
 		panic(err)
@@ -51,7 +52,7 @@ func main() {
 		panic(err)
 	}
 
-	paymentConn, err := grpc.DialContext(ctx, "payment.default.svc.cluster.local:3377", opts...)
+	paymentConn, err := grpc.DialContext(ctx, os.Getenv("PAYMENT_SERVICE_HOST")+":"+os.Getenv("PAYMENT_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to connect to payment service", logField.Error(err))
 		panic(err)
@@ -61,7 +62,7 @@ func main() {
 		panic(err)
 	}
 
-	scraperConn, err := grpc.DialContext(ctx, "scraper.default.svc.cluster.local:3377", opts...)
+	scraperConn, err := grpc.DialContext(ctx, os.Getenv("SCRAPER_SERVICE_HOST")+":"+os.Getenv("SCRAPER_SERVICE_PORT"), opts...)
 	if err != nil {
 		log.Fatal("failed to connect to scraper service", logField.Error(err))
 		panic(err)

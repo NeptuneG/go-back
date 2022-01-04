@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	dbpkg "github.com/NeptuneG/go-back/pkg/db"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/NeptuneG/go-back/pkg/types"
@@ -19,11 +20,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgres://dev@db.default.svc.cluster.local/live_development?sslmode=disable"
-)
-
 type LiveService struct {
 	proto.UnimplementedLiveServiceServer
 	store  *db.Store
@@ -31,12 +27,7 @@ type LiveService struct {
 }
 
 func New() *LiveService {
-	dbConn, err := sql.Open(dbDriver, dbSource)
-
-	if err != nil {
-		log.Fatal("failed to open database connection", logField.Error(err))
-		panic(err)
-	}
+	dbConn := dbpkg.ConnectDatabase()
 	return &LiveService{
 		store: db.NewStore(dbConn),
 	}

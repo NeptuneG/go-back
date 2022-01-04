@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
+	dbpkg "github.com/NeptuneG/go-back/pkg/db"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/NeptuneG/go-back/pkg/types"
@@ -20,11 +21,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgres://dev@db.default.svc.cluster.local/user_development?sslmode=disable"
-)
-
 var (
 	count = 0
 )
@@ -36,11 +32,7 @@ type UserService struct {
 }
 
 func New() *UserService {
-	dbConn, err := sql.Open(dbDriver, dbSource)
-	if err != nil {
-		log.Fatal("failed to open database connection", logField.Error(err))
-		panic(err)
-	}
+	dbConn := dbpkg.ConnectDatabase()
 	return &UserService{store: db.NewStore(dbConn), dbConn: dbConn}
 }
 
