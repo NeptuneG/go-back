@@ -1,4 +1,4 @@
-FROM golang:1.17.3-alpine3.14
+FROM golang:1.17.3-alpine3.14 as dev
 
 ENV LANG="ja_JP.UTF-8"
 RUN set -x && \
@@ -17,8 +17,16 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -o /usr/bin/payment ./services/payment
+RUN go build -gcflags='all=-N -l' -o /usr/bin/payment ./services/payment
+RUN go build -o ./bin/payment ./services/payment
 
 WORKDIR /go/src/github.com/NeptuneG/go-back/services/payment
 
 CMD ["/usr/bin/payment"]
+
+FROM alpine:3.14
+RUN apk --no-cache add ca-certificates && addgroup -S app && adduser -S app -G app
+USER app
+WORKDIR /app
+COPY --from=dev /go/src/github.com/NeptuneG/go-back/bin/payment .
+ENTRYPOINT ["./payment"]
