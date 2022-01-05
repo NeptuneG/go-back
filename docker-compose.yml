@@ -11,7 +11,10 @@ services:
   gateway.app.svc.cluster.local:
     <<: *service
     container_name: gateway-service
-    image: neptuneg/gateway-service
+    build:
+      context: .
+      dockerfile: ./services/gateway/Dockerfile
+      target: dev
     ports:
       - "4000:4000"
       - "2347:2345"
@@ -23,7 +26,10 @@ services:
   user.app.svc.cluster.local:
     <<: *service
     container_name: user-service
-    image: neptuneg/user-service
+    build:
+      context: .
+      dockerfile: ./services/user/Dockerfile
+      target: dev
     ports:
       - "2346:2345"
     links:
@@ -33,7 +39,10 @@ services:
   live.app.svc.cluster.local:
     <<: *service
     container_name: live-service
-    image: neptuneg/live-service
+    build:
+      context: .
+      dockerfile: ./services/live/Dockerfile
+      target: dev
     ports:
       - "2348:2345"
     links:
@@ -43,7 +52,10 @@ services:
   payment.app.svc.cluster.local:
     <<: *service
     container_name: payment-service
-    image: neptuneg/payment-service
+    build:
+      context: .
+      dockerfile: ./services/payment/Dockerfile
+      target: dev
     ports:
       - "2350:2345"
     links:
@@ -54,7 +66,10 @@ services:
   scraper.app.svc.cluster.local:
     <<: *service
     container_name: scraper-service
-    image: neptuneg/scraper-service
+    build:
+      context: .
+      dockerfile: ./services/scraper/Dockerfile
+      target: dev
     ports:
       - "2349:2345"
     links:
@@ -88,7 +103,6 @@ services:
       - "7420:7420"
   faktory-workers:
     container_name: faktory-workers
-    image: neptuneg/faktory-workers
     build:
       context: ./services/faktory-workers
     volumes:
