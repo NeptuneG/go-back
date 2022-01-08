@@ -2,14 +2,12 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/NeptuneG/go-back/gen/go/services/user/proto"
-	dbpkg "github.com/NeptuneG/go-back/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
-	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/user/db/sqlc"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -17,8 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-
-	_ "github.com/lib/pq"
 )
 
 var (
@@ -27,21 +23,15 @@ var (
 
 type UserService struct {
 	proto.UnimplementedUserServiceServer
-	store  *db.Store
-	dbConn *sql.DB
+	store *db.Store
 }
 
 func New() *UserService {
-	dbConn := dbpkg.ConnectDatabase()
-	return &UserService{store: db.NewStore(dbConn), dbConn: dbConn}
+	return &UserService{store: db.NewStore()}
 }
 
 func (s *UserService) Close() {
 	if err := s.store.Close(); err != nil {
-		log.Fatal("failed to close database connection", logField.Error(err))
-		panic(err)
-	}
-	if err := s.dbConn.Close(); err != nil {
 		log.Fatal("failed to close database connection", logField.Error(err))
 		panic(err)
 	}

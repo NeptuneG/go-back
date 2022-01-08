@@ -3,9 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
-	"github.com/NeptuneG/go-back/pkg/types"
+	"github.com/NeptuneG/go-back/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/db/types"
 )
 
 type Store struct {
@@ -13,39 +13,22 @@ type Store struct {
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
+func NewStore() *Store {
+	dbConn := db.ConnectDatabase()
 	return &Store{
-		db:      db,
-		Queries: New(db),
+		db:      dbConn,
+		Queries: New(dbConn),
 	}
-}
-
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) (interface{}, error)) (interface{}, error) {
-	tx, err := store.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	q := New(tx)
-	result, err := fn(q)
-
-	if err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return nil, fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
-		}
-		return nil, err
-	}
-
-	return result, tx.Commit()
 }
 
 func (store *Store) CreateUserTx(ctx context.Context, param CreateUserParams) (*User, error) {
-	if result, err := store.execTx(ctx, func(q *Queries) (interface{}, error) {
-		user, err := q.CreateUser(ctx, param)
+	if result, err := db.ExecTx(ctx, func(tx *sql.Tx) (interface{}, error) {
+		queries := store.Queries.WithTx(tx)
+		user, err := queries.CreateUser(ctx, param)
 		if err != nil {
 			return nil, err
 		}
-		_, err = q.CreateUserPoints(ctx, CreateUserPointsParams{
+		_, err = queries.CreateUserPoints(ctx, CreateUserPointsParams{
 			UserID:      user.ID,
 			Points:      1000,
 			Description: types.NewNullString("Initial points"),

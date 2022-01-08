@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"math/rand"
 	"os"
@@ -12,7 +11,6 @@ import (
 	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	paymentProto "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	userProto "github.com/NeptuneG/go-back/gen/go/services/user/proto"
-	dbpkg "github.com/NeptuneG/go-back/pkg/db"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	db "github.com/NeptuneG/go-back/services/payment/db/sqlc"
@@ -20,8 +18,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	_ "github.com/lib/pq"
 )
 
 const (
@@ -62,11 +58,9 @@ type PaymentService struct {
 	userClient userProto.UserServiceClient
 	liveClient liveProto.LiveServiceClient
 	store      *db.Store
-	dbConn     *sql.DB
 }
 
 func New() *PaymentService {
-	dbConn := dbpkg.ConnectDatabase()
 	ctx := context.Background()
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
@@ -90,17 +84,12 @@ func New() *PaymentService {
 	return &PaymentService{
 		userClient: userProto.NewUserServiceClient(userConn),
 		liveClient: liveProto.NewLiveServiceClient(liveConn),
-		store:      db.NewStore(dbConn),
-		dbConn:     dbConn,
+		store:      db.NewStore(),
 	}
 }
 
 func (s *PaymentService) Close() {
 	if err := s.store.Close(); err != nil {
-		log.Fatal("failed to close database connection", logField.Error(err))
-		panic(err)
-	}
-	if err := s.dbConn.Close(); err != nil {
 		log.Fatal("failed to close database connection", logField.Error(err))
 		panic(err)
 	}
