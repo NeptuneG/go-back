@@ -2,44 +2,37 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
-	dbpkg "github.com/NeptuneG/go-back/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/cache"
+	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
-	"github.com/NeptuneG/go-back/pkg/types"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-
-	_ "github.com/lib/pq"
 )
 
 type LiveService struct {
 	proto.UnimplementedLiveServiceServer
-	store  *db.Store
-	dbConn *sql.DB
+	store *db.Store
 }
 
 func New() *LiveService {
-	dbConn := dbpkg.ConnectDatabase()
 	return &LiveService{
-		store: db.NewStore(dbConn),
+		store: db.NewStore(),
 	}
 }
 
 func (s *LiveService) Close() {
 	if err := s.store.Close(); err != nil {
 		log.Error("failed to close database connection", logField.Error(err))
-		panic(err)
-	}
-	if err := s.dbConn.Close(); err != nil {
-		log.Fatal("failed to close database connection", logField.Error(err))
 		panic(err)
 	}
 }
@@ -106,32 +99,48 @@ func (s *LiveService) CreateLiveEvent(ctx context.Context, req *proto.CreateLive
 	}, nil
 }
 
-var liveHousesBySlug map[string]db.LiveHouse
-
 func (s *LiveService) getLiveHouseBySlug(ctx context.Context, liveHouseSlug string) (*db.LiveHouse, error) {
 	if liveHouseSlug == "" {
 		return nil, errors.New("liveHouseSlug is empty")
 	}
 
-	if liveHousesBySlug == nil {
-		liveHousesBySlug = make(map[string]db.LiveHouse)
+	var liveHouse db.LiveHouse
+	if err := cache.Once(&cache.Item{
+		Ctx:   ctx,
+		Key:   fmt.Sprintf("live-house:%s", liveHouseSlug),
+		Value: &liveHouse,
+		TTL:   5 * time.Minute,
+		Do: func(item *cache.Item) (interface{}, error) {
+			liveHouse, err := s.store.GetLiveHouseBySlug(ctx, types.NewNullString(liveHouseSlug))
+			if err != nil {
+				log.Error("failed to get live house by slug", logField.Error(err), logField.String("liveHouseSlug", liveHouseSlug))
+				return nil, err
+			}
+			return liveHouse, nil
+		},
+	}); err != nil {
+		return nil, err
 	}
-	if liveHouse, ok := liveHousesBySlug[liveHouseSlug]; ok {
-		return &liveHouse, nil
-	} else {
-		liveHouse, err := s.store.GetLiveHouseBySlug(ctx, types.NewNullString(liveHouseSlug))
-		if err != nil {
-			return nil, err
-		}
-		liveHousesBySlug[liveHouseSlug] = liveHouse
-		return &liveHouse, nil
-	}
+	return &liveHouse, nil
 }
 
 func (s *LiveService) ListLiveHouses(ctx context.Context, req *proto.ListLiveHousesRequest) (*proto.ListLiveHousesResponse, error) {
-	liveHouses, err := s.store.GetAllLiveHousesDefault(ctx)
-	if err != nil {
-		return nil, err
+	var liveHouses []db.GetAllLiveHousesDefaultRow
+	if err := cache.Once(&cache.Item{
+		Ctx:   ctx,
+		Key:   "live-houses",
+		Value: &liveHouses,
+		TTL:   5 * time.Minute,
+		Do: func(item *cache.Item) (interface{}, error) {
+			liveHouses, err := s.store.GetAllLiveHousesDefault(ctx)
+			if err != nil {
+				log.Error("failed to get all live houses", logField.Error(err))
+				return nil, err
+			}
+			return liveHouses, nil
+		},
+	}); err != nil {
+		return nil, status.Error(codes.Internal, "failed to list live houses")
 	}
 	liveHousesResp := make([]*proto.LiveHouse, 0, len(liveHouses))
 	for _, liveHouse := range liveHouses {
@@ -148,9 +157,22 @@ func (s *LiveService) ListLiveHouses(ctx context.Context, req *proto.ListLiveHou
 }
 
 func (s *LiveService) ListLiveEvents(ctx context.Context, req *proto.ListLiveEventsRequest) (*proto.ListLiveEventsResponse, error) {
-	liveEvents, err := s.store.GetAllLiveEvents(ctx)
-	if err != nil {
-		return nil, err
+	var liveEvents []db.GetAllLiveEventsRow
+	if err := cache.Once(&cache.Item{
+		Ctx:   ctx,
+		Key:   "live-events",
+		Value: &liveEvents,
+		TTL:   5 * time.Minute,
+		Do: func(item *cache.Item) (interface{}, error) {
+			liveEvents, err := s.store.GetAllLiveEvents(ctx)
+			if err != nil {
+				log.Error("failed to get all live events", logField.Error(err))
+				return nil, err
+			}
+			return liveEvents, nil
+		},
+	}); err != nil {
+		return nil, status.Error(codes.Internal, "failed to list live events")
 	}
 	liveEventsResp := make([]*proto.LiveEvent, 0, len(liveEvents))
 	for _, liveEvent := range liveEvents {
@@ -188,8 +210,22 @@ func (s *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventR
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "failed to parse id")
 	}
-	liveEvent, err := s.store.GetLiveEventById(ctx, uuid)
-	if err != nil {
+	// TODO: BloomFilter to avoid hitting DB by unexisting id
+	var liveEvent db.GetLiveEventByIdRow
+	if err := cache.Once(&cache.Item{
+		Ctx:   ctx,
+		Key:   fmt.Sprintf("live-event:%s", req.Id),
+		Value: &liveEvent,
+		TTL:   5 * time.Minute,
+		Do: func(item *cache.Item) (interface{}, error) {
+			liveEvent, err := s.store.GetLiveEventById(ctx, uuid)
+			if err != nil {
+				log.Error("failed to get live event by id", logField.Error(err), logField.String("id", req.Id))
+				return nil, err
+			}
+			return liveEvent, nil
+		},
+	}); err != nil {
 		return nil, status.Error(codes.NotFound, "live event not found")
 	}
 	return &proto.GetLiveEventResponse{

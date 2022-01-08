@@ -21,15 +21,15 @@ packages:
 overrides:
   # https://docs.sqlc.dev/en/stable/reference/config.html
   # https://github.com/kyleconroy/sqlc/blob/main/internal/codegen/golang/postgresql_type.go#L12
-  - go_type: "github.com/NeptuneG/go-back/pkg/types.NullString"
+  - go_type: "github.com/NeptuneG/go-back/pkg/db/types.NullString"
     db_type: "text"
     nullable: true
-  - go_type: "github.com/NeptuneG/go-back/pkg/types.NullString"
+  - go_type: "github.com/NeptuneG/go-back/pkg/db/types.NullString"
     db_type: "pg_catalog.varchar"
     nullable: true
-  - go_type: "github.com/NeptuneG/go-back/pkg/types.NullTime"
+  - go_type: "github.com/NeptuneG/go-back/pkg/db/types.NullTime"
     db_type: "timestamptz"
     nullable: true
-  - go_type: "github.com/NeptuneG/go-back/pkg/types.NullUUID"
+  - go_type: "github.com/NeptuneG/go-back/pkg/db/types.NullUUID"
     db_type: "uuid"
     nullable: true

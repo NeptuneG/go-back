@@ -13,14 +13,14 @@ svc-generate-migrate:
 .PHONY: svc-db-migrate
 svc-db-migrate:
 	docker exec -it $(svc)-service migrate \
-	-database postgresql://dev@db.app.svc.cluster.local/$(svc)_development?sslmode=disable \
+	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
 	-path db/migrations \
 	-verbose up
 
 .PHONY: svc-db-rollback
 svc-db-rollback:
 	docker exec -it $(svc)-service migrate \
-	-database postgresql://dev@db.app.svc.cluster.local/$(svc)_development?sslmode=disable \
+	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
 	-path db/migrations \
 	-verbose down $(or $(STEP), 1)
 

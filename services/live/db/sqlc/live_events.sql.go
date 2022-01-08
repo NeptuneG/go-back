@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/NeptuneG/go-back/pkg/types"
+	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/google/uuid"
 )
 

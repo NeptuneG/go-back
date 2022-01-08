@@ -5,6 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/NeptuneG/go-back/pkg/cache"
+	"github.com/NeptuneG/go-back/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/log"
+	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/google/uuid"
 )
 
@@ -13,34 +17,17 @@ type Store struct {
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
+func NewStore() *Store {
+	dbConn := db.ConnectDatabase()
 	return &Store{
-		db:      db,
-		Queries: New(db),
+		db:      dbConn,
+		Queries: New(dbConn),
 	}
-}
-
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) (interface{}, error)) (interface{}, error) {
-	tx, err := store.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	q := New(tx)
-	result, err := fn(q)
-
-	if err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return nil, fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
-		}
-		return nil, err
-	}
-
-	return result, tx.Commit()
 }
 
 func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
-	if result, err := store.execTx(ctx, func(q *Queries) (interface{}, error) {
+	if result, err := db.ExecTx(ctx, func(tx *sql.Tx) (interface{}, error) {
+		q := store.Queries.WithTx(tx)
 		liveEvent, err := q.GetLiveEventById(ctx, liveEventID)
 		if err != nil {
 			return nil, err
@@ -55,6 +42,9 @@ func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*
 		}); err != nil {
 			return nil, err
 		}
+		if err := store.updateLiveEventCache(ctx, liveEvent); err != nil {
+			return nil, err
+		}
 		return &liveEvent, nil
 	}); err != nil {
 		return nil, err
@@ -64,7 +54,8 @@ func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*
 }
 
 func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
-	if result, err := store.execTx(ctx, func(q *Queries) (interface{}, error) {
+	if result, err := db.ExecTx(ctx, func(tx *sql.Tx) (interface{}, error) {
+		q := store.Queries.WithTx(tx)
 		liveEvent, err := q.GetLiveEventById(ctx, liveEventID)
 		if err != nil {
 			return nil, err
@@ -76,10 +67,27 @@ func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID u
 		}); err != nil {
 			return nil, err
 		}
+		if err := store.updateLiveEventCache(ctx, liveEvent); err != nil {
+			log.Error("failed to update live event cache", logField.Error(err))
+		}
 		return &liveEvent, err
 	}); err != nil {
 		return nil, err
 	} else {
 		return result.(*GetLiveEventByIdRow), nil
 	}
+}
+
+func (store *Store) updateLiveEventCache(ctx context.Context, liveEvent GetLiveEventByIdRow) error {
+	if err := cache.Set(&cache.Item{
+		Ctx:   ctx,
+		Key:   fmt.Sprintf("live-event:%s", liveEvent.ID.String()),
+		Value: liveEvent,
+	}); err != nil {
+		if err := cache.Delete(ctx, fmt.Sprintf("live-event:%s", liveEvent.ID.String())); err != nil {
+			return err
+		}
+		return err
+	}
+	return nil
 }

@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+
+	"github.com/NeptuneG/go-back/pkg/db"
 )
 
 type Store struct {
@@ -9,9 +11,10 @@ type Store struct {
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
+func NewStore() *Store {
+	dbConn := db.ConnectDatabase()
 	return &Store{
-		db:      db,
-		Queries: New(db),
+		db:      dbConn,
+		Queries: New(dbConn),
 	}
 }

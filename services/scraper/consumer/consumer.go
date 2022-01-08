@@ -7,9 +7,9 @@ import (
 	"time"
 
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
-	"github.com/NeptuneG/go-back/pkg/types"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

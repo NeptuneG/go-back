@@ -1,5 +1,8 @@
 version: "3.9"
 x-svc-setting: &service
+  volumes:
+    - .:/go/src/github.com/NeptuneG/go-back
+  entrypoint: ["air", "-c", ".air.toml"]
   security_opt:
     - seccomp:unconfined
   stdin_open: true
@@ -8,7 +11,7 @@ x-svc-setting: &service
     - ".env"
 
 services:
-  gateway.app.svc.cluster.local:
+  gateway-service:
     <<: *service
     container_name: gateway-service
     build:
@@ -19,11 +22,11 @@ services:
       - "4000:4000"
       - "2347:2345"
     links:
-      - user.app.svc.cluster.local
-      - live.app.svc.cluster.local
-      - scraper.app.svc.cluster.local
-      - payment.app.svc.cluster.local
-  user.app.svc.cluster.local:
+      - user-service
+      - live-service
+      - scraper-service
+      - payment-service
+  user-service:
     <<: *service
     container_name: user-service
     build:
@@ -33,10 +36,10 @@ services:
     ports:
       - "2346:2345"
     links:
-      - db.app.svc.cluster.local
+      - db
     environment:
       DB_NAME: user_development
-  live.app.svc.cluster.local:
+  live-service:
     <<: *service
     container_name: live-service
     build:
@@ -46,10 +49,10 @@ services:
     ports:
       - "2348:2345"
     links:
-      - db.app.svc.cluster.local
+      - db
     environment:
       DB_NAME: live_development
-  payment.app.svc.cluster.local:
+  payment-service:
     <<: *service
     container_name: payment-service
     build:
@@ -59,11 +62,11 @@ services:
     ports:
       - "2350:2345"
     links:
-      - db.app.svc.cluster.local
+      - db
     environment:
       DB_NAME: payment_development
       GRPC_GO_RETRY: on
-  scraper.app.svc.cluster.local:
+  scraper-service:
     <<: *service
     container_name: scraper-service
     build:
@@ -73,9 +76,9 @@ services:
     ports:
       - "2349:2345"
     links:
-      - faktory.app.svc.cluster.local
-      - redis-mq.app.svc.cluster.local
-  db.app.svc.cluster.local:
+      - faktory
+      - redis-mq
+  db:
     image: postgres:14.1-alpine3.14
     container_name: go-back-db
     ports:
@@ -86,18 +89,20 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - db-data:/var/lib/postgresql/data
-  redis-mq.app.svc.cluster.local:
+  redis-mq:
     container_name: redis-mq
     image: redis:6.2.6-alpine3.14
     ports:
       - "6380:6379"
     volumes:
       - redis-mq-data:/data
-  faktory.app.svc.cluster.local:
+  faktory:
     container_name: faktory
     image: contribsys/faktory:latest
     volumes:
       - faktory-data:/var/lib/faktory
+    env_file:
+      - ".env"
     ports:
       - "7419:7419"
       - "7420:7420"
@@ -107,9 +112,11 @@ services:
       context: ./services/faktory-workers
     volumes:
       - ./services/faktory-workers:/app
+    env_file:
+      - ".env"
     depends_on:
-      - faktory.app.svc.cluster.local
-      - redis-mq.app.svc.cluster.local
+      - faktory
+      - redis-mq
 volumes:
   redis-mq-data:
   faktory-data:
