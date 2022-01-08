@@ -39,18 +39,19 @@
 - [ ] slug
 - [ ] test
     - [GoConvey - Go testing in the browser](http://goconvey.co/)
-- [ ] logging
+- [x] logging
     - [uber-go/zap: Blazing fast, structured, leveled logging in Go.](https://github.com/uber-go/zap)
-- [ ] k8s
+- [x] k8s
+    - https://github.com/NeptuneG/go-back-manifests
 - [ ] pagination
 - [ ] service discovery
 - [ ] config center
 - [ ] health check
-- [ ] cache
+- [x] cache
 - [ ] rate limit
 - [ ] hot reload debug
     - air does not work well due to 2345 is occupied
-- [ ] timeout & retry
+- [x] timeout & retry
 - [ ] grpc responses
 
 ## Notes
