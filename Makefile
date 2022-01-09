@@ -1,3 +1,7 @@
+.PHONY: generate-svc
+generate-svc:
+	./.scaffold/script/scaffold.sh $(svc_name)
+
 .PHONY: svc-build-image
 svc-build-image:
 	docker build -t neptuneg/$(svc)-service:latest --file ./services/$(svc)/Dockerfile .

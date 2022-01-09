@@ -27,6 +27,10 @@
     ```bash
     make svc-db-rollback svc=#{service_name} STEP=n # default STEP is 1
     ```
+- generate codebase for a new service
+    ```bash
+    make generate-svc svc_name=#{service_name} # service_name must be snake_case
+    ```
 
 ## DB Diagram
 
