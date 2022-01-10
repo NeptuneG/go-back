@@ -15,7 +15,7 @@ then
     mkdir -p services/$SERVICE_UNDERSCORE_NAME/server
 
     cp -r .scaffold/template/service/db/* services/$SERVICE_UNDERSCORE_NAME/db
-    cp .scaffold/template/service/.air.toml services/$SERVICE_UNDERSCORE_NAME/air.toml
+    cp .scaffold/template/service/.air.toml services/$SERVICE_UNDERSCORE_NAME/.air.toml
     cp .scaffold/template/service/sqlc.yaml services/$SERVICE_UNDERSCORE_NAME/sqlc.yaml
     envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/proto/service.proto.template  > services/$SERVICE_UNDERSCORE_NAME/proto/$SERVICE_UNDERSCORE_NAME.proto
     envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/server/server.go.template > services/$SERVICE_UNDERSCORE_NAME/server/server.go
@@ -26,7 +26,7 @@ then
 
     # TODO: sed or awk to update Makefile and docker-compose.yml
     echo "Basic files for ${SERVICE_UNDERSCORE_NAME} are generated. Please add or update the followings:"
-    echo "  - docker-compose.yml"
+    echo "  - docker-compose.yml & .env"
     echo "  - Makefile"
     echo "  - db migrations then make svc-db-migrate svc=${SERVICE_UNDERSCORE_NAME}"
 else
