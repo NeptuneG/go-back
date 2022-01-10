@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"math/rand"
 	"os"
@@ -21,37 +22,11 @@ import (
 )
 
 const (
-	timeout     = time.Second * 5
-	retryPolicy = `{
-		"methodConfig": [{
-			"name": [
-				{
-					"service": "neptuneg.go_back.serivces.live.LiveService",
-					"method": "ReserveSeat"
-				},
-				{
-					"service": "neptuneg.go_back.serivces.live.LiveService",
-					"method": "RollbackSeatReservation"
-				},
-				{
-					"service": "neptuneg.go_back.serivces.user.UserService",
-					"method": "ConsumeUserPoints"
-				},
-				{
-					"service": "neptuneg.go_back.serivces.user.UserService",
-					"method": "RollbackConsumeUserPoints"
-				}
-			],
-			"retryPolicy": {
-				"MaxAttempts": 4,
-				"InitialBackoff": ".01s",
-				"MaxBackoff": ".01s",
-				"BackoffMultiplier": 1.0,
-				"RetryableStatusCodes": ["INTERNAL"]
-			}
-		}]
-	}`
+	timeout = time.Second * 5
 )
+
+//go:embed config/retry_policy.json
+var retryPolicy string
 
 type PaymentService struct {
 	paymentProto.UnimplementedPaymentServiceServer
