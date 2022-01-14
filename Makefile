@@ -44,6 +44,8 @@ db-create-all:
 	docker exec go-back-db createdb --username=dev --owner=dev live_test
 	docker exec go-back-db createdb --username=dev --owner=dev payment_development
 	docker exec go-back-db createdb --username=dev --owner=dev payment_test
+	docker exec go-back-db createdb --username=dev --owner=dev auth_development
+	docker exec go-back-db createdb --username=dev --owner=dev auth_test
 
 .PHONY: db-drop-all
 db-drop-all:
@@ -53,12 +55,15 @@ db-drop-all:
 	docker exec go-back-db dropdb --username=dev -f live_test
 	docker exec go-back-db dropdb --username=dev -f payment_development
 	docker exec go-back-db dropdb --username=dev -f payment_test
+	docker exec go-back-db dropdb --username=dev --owner=dev auth_development
+	docker exec go-back-db dropdb --username=dev --owner=dev auth_test
 
 .PHONY: db-migrate-all
 db-migrate-all:
 	make svc-db-migrate svc=user
 	make svc-db-migrate svc=live
 	make svc-db-migrate svc=payment
+	make svc-db-migrate svc=auth
 
 .PHONY: db-seed-all
 db-seed-all:

@@ -66,6 +66,19 @@ services:
     environment:
       DB_NAME: payment_development
       GRPC_GO_RETRY: on
+  auth-service:
+    <<: *service
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./services/auth/Dockerfile
+      target: dev
+    ports:
+      - "2351:2345"
+    links:
+      - db
+    environment:
+      DB_NAME: auth_development
   scraper-service:
     <<: *service
     container_name: scraper-service

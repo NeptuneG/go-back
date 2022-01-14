@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/NeptuneG/go-back/services/auth/proto";
+package neptuneg.go_back.serivces.auth;
+
+import "google/api/annotations.proto";
+
+service AuthService {
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/login"
+            body: "*"
+        };
+    }
+    rpc Register(RegisterRequest) returns (RegisterResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/register"
+            body: "*"
+        };
+    }
+}
+
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string token = 1;
+}
+
+message RegisterRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message RegisterResponse {
+    string token = 1;
+}

@@ -14,8 +14,8 @@ type Server struct {
 	port   int
 }
 
-func New(port int, register func(server *grpc.Server)) *Server {
-	srv := grpc.NewServer()
+func New(port int, register func(server *grpc.Server), opt ...grpc.ServerOption) *Server {
+	srv := grpc.NewServer(opt...)
 	register(srv)
 	return &Server{
 		server: srv,

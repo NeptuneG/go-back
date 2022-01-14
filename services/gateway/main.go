@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	auth "github.com/NeptuneG/go-back/gen/go/services/auth/proto"
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	payment "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	scraper "github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
@@ -30,6 +31,16 @@ func main() {
 	server := http.Server{
 		Addr:    ":4000",
 		Handler: mux,
+	}
+
+	authConn, err := grpc.DialContext(ctx, os.Getenv("AUTH_SERVICE_HOST")+":"+os.Getenv("AUTH_SERVICE_PORT"), opts...)
+	if err != nil {
+		log.Fatal("failed to dial auth service", logField.Error(err))
+		panic(err)
+	}
+	if err = auth.RegisterAuthServiceHandlerClient(ctx, mux, auth.NewAuthServiceClient(authConn)); err != nil {
+		log.Fatal("failed to register auth service handler", logField.Error(err))
+		panic(err)
 	}
 
 	userConn, err := grpc.DialContext(ctx, os.Getenv("USER_SERVICE_HOST")+":"+os.Getenv("USER_SERVICE_PORT"), opts...)
