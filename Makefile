@@ -18,19 +18,19 @@ svc-generate-migrate:
 svc-db-migrate:
 	docker exec -it $(svc)-service migrate \
 	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
-	-path db/migrations \
+	-path ../../migrations/$(svc) \
 	-verbose up
 
 .PHONY: svc-db-rollback
 svc-db-rollback:
 	docker exec -it $(svc)-service migrate \
 	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
-	-path db/migrations \
+	-path ../../migrations/$(svc) \
 	-verbose down $(or $(STEP), 1)
 
 .PHONY: svc-db-seed
 svc-db-seed:
-	cat services/$(svc)/db/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d $(svc)_development -c
+	cat seeds/$(svc)/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d $(svc)_development -c
 
 .PHONY: svc-sqlc-generate
 svc-sqlc-generate:
@@ -56,7 +56,6 @@ db-drop-all:
 
 .PHONY: db-migrate-all
 db-migrate-all:
-	make svc-db-migrate svc=auth
 	make svc-db-migrate svc=live
 	make svc-db-migrate svc=payment
 	make svc-db-migrate svc=auth
