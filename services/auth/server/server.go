@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/NeptuneG/go-back/gen/go/services/auth/proto"
+	proto "github.com/NeptuneG/go-back/api/proto/auth"
 	"github.com/NeptuneG/go-back/pkg/auth"
 	"github.com/NeptuneG/go-back/pkg/log"
 	db "github.com/NeptuneG/go-back/services/auth/db/sqlc"

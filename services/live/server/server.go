@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	proto "github.com/NeptuneG/go-back/api/proto/live"
 	"github.com/NeptuneG/go-back/pkg/cache"
 	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
+	live "github.com/NeptuneG/go-back/api/proto/live"
 	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
 	"github.com/go-redis/redis/v8"

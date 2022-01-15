@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/NeptuneG/go-back/gen/go/services/auth/proto"
+	proto "github.com/NeptuneG/go-back/api/proto/auth"
 	grpcServer "github.com/NeptuneG/go-back/pkg/grpc"
 	"github.com/NeptuneG/go-back/services/auth/server"
 	"google.golang.org/grpc"

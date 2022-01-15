@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+option go_package = "github.com/NeptuneG/go-back/api/proto/live";
+package neptuneg.go_back.serivces.live;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service LiveService {
+  rpc CreateLiveHouse(CreateLiveHouseRequest)
+      returns (CreateLiveHouseResponse) {
+    option (google.api.http) = {
+      post : "/v1/live_houses"
+      body : "*"
+    };
+  };
+
+  rpc ListLiveHouses(ListLiveHousesRequest) returns (ListLiveHousesResponse) {
+    option (google.api.http) = {
+      get : "/v1/live_houses"
+    };
+  };
+
+  rpc CreateLiveEvent(CreateLiveEventRequest)
+      returns (CreateLiveEventResponse) {
+    option (google.api.http) = {
+      post : "/v1/live_events"
+      body : "*"
+    };
+  };
+
+  rpc GetLiveEvent(GetLiveEventRequest) returns (GetLiveEventResponse) {
+    option (google.api.http) = {
+      get : "/v1/live_events/{id}"
+    };
+  };
+
+  rpc ListLiveEvents(ListLiveEventsRequest) returns (ListLiveEventsResponse) {
+    option (google.api.http) = {
+      get : "/v1/live_events"
+    };
+  };
+
+  rpc ReserveSeat(ReserveSeatRequest) returns (ReserveSeatResponse);
+
+  rpc RollbackSeatReservation(RollbackSeatReservationRequest) returns (google.protobuf.Empty);
+}
+
+message LiveHouse {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  string slug = 4;
+}
+
+message LiveEvent {
+  string id = 1;
+  LiveHouse live_house = 2;
+  string title = 3;
+  string url = 4;
+  string description = 5;
+  string price_info = 6;
+  google.protobuf.Timestamp stage_one_open_at = 7;
+  google.protobuf.Timestamp stage_one_start_at = 8;
+  google.protobuf.Timestamp stage_two_open_at = 9;
+  google.protobuf.Timestamp stage_two_start_at = 10;
+  int32 seats = 11;
+  int32 available_seats = 12;
+}
+
+
+message CreateLiveHouseRequest {
+  string name = 1;
+  string address = 2;
+  string slug = 3;
+}
+
+message CreateLiveHouseResponse { LiveHouse live_house = 1; }
+
+message ListLiveHousesRequest {}
+
+message ListLiveHousesResponse {
+  repeated LiveHouse live_houses = 1;
+}
+message CreateLiveEventRequest {
+  string live_house_slug = 1;
+  string title = 2;
+  string url = 3;
+  string description = 4;
+  string price_info = 5;
+  google.protobuf.Timestamp stage_one_open_at = 6;
+  google.protobuf.Timestamp stage_one_start_at = 7;
+  google.protobuf.Timestamp stage_two_open_at = 8;
+  google.protobuf.Timestamp stage_two_start_at = 9;
+  int32 seats = 10;
+  int32 available_seats = 11;
+}
+
+message CreateLiveEventResponse { LiveEvent live_event = 1; }
+
+message GetLiveEventRequest { string id = 1; }
+
+message GetLiveEventResponse { LiveEvent live_event = 1; }
+
+message ListLiveEventsRequest { string live_house_slug = 1; }
+
+message ListLiveEventsResponse {
+  repeated LiveEvent live_events = 1;
+}
+
+message ReserveSeatRequest { string live_event_id = 1; }
+
+message ReserveSeatResponse { LiveEvent live_event = 1; }
+
+message RollbackSeatReservationRequest { string live_event_id = 1; }

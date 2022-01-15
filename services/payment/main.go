@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/NeptuneG/go-back/gen/go/services/payment/proto"
+	proto "github.com/NeptuneG/go-back/api/proto/payment"
 	grpcServer "github.com/NeptuneG/go-back/pkg/grpc"
 	"github.com/NeptuneG/go-back/pkg/grpc/interceptors"
 	"github.com/NeptuneG/go-back/services/payment/server"

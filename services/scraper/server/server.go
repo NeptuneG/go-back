@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
-	"github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
+	liveProto "github.com/NeptuneG/go-back/api/proto/live"
+	proto "github.com/NeptuneG/go-back/api/proto/scraper"
 	"github.com/NeptuneG/go-back/pkg/log"
 	"github.com/NeptuneG/go-back/services/scraper/consumer"
 	faktory "github.com/contribsys/faktory/client"

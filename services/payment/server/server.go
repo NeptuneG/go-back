@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
-	paymentProto "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
+	liveProto "github.com/NeptuneG/go-back/api/proto/live"
+	paymentProto "github.com/NeptuneG/go-back/api/proto/payment"
 	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
 	db "github.com/NeptuneG/go-back/services/payment/db/sqlc"
