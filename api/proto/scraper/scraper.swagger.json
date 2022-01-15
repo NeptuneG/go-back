@@ -1,0 +1,100 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/proto/scraper/scraper.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ScrapeService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/scraper/live_event_jobs": {
+      "post": {
+        "operationId": "ScrapeService_CreateScrapeLiveEventsJob",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/scraperCreateScrapeLiveEventsJobResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/scraperCreateScrapeLiveEventsJobRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ScrapeService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "scraperCreateScrapeLiveEventsJobRequest": {
+      "type": "object",
+      "properties": {
+        "liveHouseSlug": {
+          "type": "string"
+        },
+        "yearMonth": {
+          "type": "string"
+        }
+      }
+    },
+    "scraperCreateScrapeLiveEventsJobResponse": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

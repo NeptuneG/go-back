@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/NeptuneG/go-back/services/${SERVICE_UNDERSCORE_NAME}/proto";
+option go_package = "github.com/NeptuneG/go-back/api/proto/${SERVICE_UNDERSCORE_NAME}";
 package neptuneg.go_back.serivces.${SERVICE_UNDERSCORE_NAME};
 
 import "google/api/annotations.proto";

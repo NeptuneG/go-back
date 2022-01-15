@@ -4,7 +4,7 @@ generate-svc:
 
 .PHONY: svc-build-image
 svc-build-image:
-	docker build -t neptuneg/$(svc)-service:latest --file ./services/$(svc)/Dockerfile .
+	docker build -t neptuneg/$(svc)-service:latest --file ./build/docker/$(svc)/Dockerfile .
 
 .PHONY: svc-push-image
 svc-push-image:
@@ -12,29 +12,29 @@ svc-push-image:
 
 .PHONY: svc-generate-migrate
 svc-generate-migrate:
-	docker exec $(svc)-service migrate create -dir db/migrations -ext sql $(NAME)
+	docker exec $(svc)-service migrate create -dir migrations/$(svc) -ext sql $(NAME)
 
 .PHONY: svc-db-migrate
 svc-db-migrate:
 	docker exec -it $(svc)-service migrate \
 	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
-	-path db/migrations \
+	-path ../../migrations/$(svc) \
 	-verbose up
 
 .PHONY: svc-db-rollback
 svc-db-rollback:
 	docker exec -it $(svc)-service migrate \
 	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
-	-path db/migrations \
+	-path ../../migrations/$(svc) \
 	-verbose down $(or $(STEP), 1)
 
 .PHONY: svc-db-seed
 svc-db-seed:
-	cat services/$(svc)/db/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d $(svc)_development -c
+	cat seeds/$(svc)/seeds.sql | xargs -0 docker exec go-back-db psql -U dev -d $(svc)_development -c
 
 .PHONY: svc-sqlc-generate
 svc-sqlc-generate:
-	cd services/$(svc) && sqlc generate
+	cd internal/$(svc) && sqlc generate
 
 .PHONY: db-create-all
 db-create-all:
@@ -56,7 +56,6 @@ db-drop-all:
 
 .PHONY: db-migrate-all
 db-migrate-all:
-	make svc-db-migrate svc=auth
 	make svc-db-migrate svc=live
 	make svc-db-migrate svc=payment
 	make svc-db-migrate svc=auth
@@ -78,7 +77,7 @@ build-images-all:
 	make svc-build-image svc=gateway
 	make svc-build-image svc=scraper
 	make svc-build-image svc=payment
-	docker build -t neptuneg/faktory-workers:latest --file ./services/faktory-workers/Dockerfile ./services/faktory-workers
+	docker build -t neptuneg/faktory-workers:latest --file ./build/docker/faktory-workers/Dockerfile ./cmd/faktory-workers
 
 .PHONY: push-images-all
 push-images-all:

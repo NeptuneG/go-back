@@ -17,16 +17,16 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/${SERVICE_UNDERSCORE_NAME} ./cmd/${SERVICE_UNDERSCORE_NAME}
-RUN go build -o ./bin/${SERVICE_UNDERSCORE_NAME} ./cmd/${SERVICE_UNDERSCORE_NAME}
+RUN go build -gcflags='all=-N -l' -o /usr/bin/live ./cmd/live
+RUN go build -o ./bin/live ./cmd/live
 
-WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/${SERVICE_UNDERSCORE_NAME}
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/live
 
-CMD ["/usr/bin/${SERVICE_UNDERSCORE_NAME}"]
+CMD ["/usr/bin/live"]
 
 FROM alpine:3.14
 RUN apk --no-cache add ca-certificates && addgroup -S app && adduser -S app -G app
 USER app
 WORKDIR /app
-COPY --from=dev /go/src/github.com/NeptuneG/go-back/bin/${SERVICE_UNDERSCORE_NAME} .
-ENTRYPOINT ["./${SERVICE_UNDERSCORE_NAME}"]
+COPY --from=dev /go/src/github.com/NeptuneG/go-back/bin/live .
+ENTRYPOINT ["./live"]

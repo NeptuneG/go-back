@@ -16,7 +16,7 @@ services:
     container_name: gateway-service
     build:
       context: .
-      dockerfile: ./services/gateway/Dockerfile
+      dockerfile: ./build/docker/gateway/Dockerfile
       target: dev
     ports:
       - "4000:4000"
@@ -31,7 +31,7 @@ services:
     container_name: live-service
     build:
       context: .
-      dockerfile: ./services/live/Dockerfile
+      dockerfile: ./build/docker/live/Dockerfile
       target: dev
     ports:
       - "2348:2345"
@@ -44,7 +44,7 @@ services:
     container_name: payment-service
     build:
       context: .
-      dockerfile: ./services/payment/Dockerfile
+      dockerfile: ./build/docker/payment/Dockerfile
       target: dev
     ports:
       - "2350:2345"
@@ -58,7 +58,7 @@ services:
     container_name: auth-service
     build:
       context: .
-      dockerfile: ./services/auth/Dockerfile
+      dockerfile: ./build/docker/auth/Dockerfile
       target: dev
     ports:
       - "2351:2345"
@@ -71,7 +71,7 @@ services:
     container_name: scraper-service
     build:
       context: .
-      dockerfile: ./services/scraper/Dockerfile
+      dockerfile: ./build/docker/scraper/Dockerfile
       target: dev
     ports:
       - "2349:2345"
@@ -108,10 +108,9 @@ services:
       - "7420:7420"
   faktory-workers:
     container_name: faktory-workers
-    build:
-      context: ./services/faktory-workers
+    image: neptuneg/faktory-workers:latest
     volumes:
-      - ./services/faktory-workers:/app
+      - ./cmd/faktory-workers:/app
     env_file:
       - ".env"
     depends_on:
