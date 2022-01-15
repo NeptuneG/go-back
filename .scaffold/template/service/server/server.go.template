@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/NeptuneG/go-back/gen/go/services/${SERVICE_UNDERSCORE_NAME}/proto"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	db "github.com/NeptuneG/go-back/services/${SERVICE_UNDERSCORE_NAME}/db/sqlc"
 )
 
@@ -18,7 +17,7 @@ func New() *${SERVICE_PASCALCASE_NAME}Service {
 
 func (s *${SERVICE_PASCALCASE_NAME}Service) Close() {
 	if err := s.store.Close(); err != nil {
-		log.Fatal("failed to close database connection", logField.Error(err))
+		log.Error("failed to close database connection", log.Field.Error(err))
 		panic(err)
 	}
 }

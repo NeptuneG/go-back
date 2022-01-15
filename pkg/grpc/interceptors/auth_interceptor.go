@@ -7,7 +7,6 @@ import (
 
 	"github.com/NeptuneG/go-back/pkg/auth"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -22,7 +21,7 @@ func UnaryDefaultAuthInterceptor(methods ...string) grpc.UnaryServerInterceptor 
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		log.Info("unary interceptor", logField.String("full_method", info.FullMethod))
+		log.Info("unary interceptor", log.Field.String("full_method", info.FullMethod))
 
 		if isToVerify(info.FullMethod, methods...) {
 			userID := reflect.Indirect(reflect.ValueOf(req)).FieldByName("UserId").String()

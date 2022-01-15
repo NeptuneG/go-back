@@ -14,7 +14,6 @@ import (
 	paymentProto "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	db "github.com/NeptuneG/go-back/services/payment/db/sqlc"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -46,7 +45,7 @@ func New() *PaymentService {
 
 	liveConn, err := grpc.DialContext(ctx, os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
 	if err != nil {
-		log.Fatal("failed to connect to live service", logField.Error(err))
+		log.Fatal("failed to connect to live service", log.Field.Error(err))
 		panic(err)
 	}
 
@@ -58,7 +57,7 @@ func New() *PaymentService {
 
 func (s *PaymentService) Close() {
 	if err := s.store.Close(); err != nil {
-		log.Fatal("failed to close database connection", logField.Error(err))
+		log.Fatal("failed to close database connection", log.Field.Error(err))
 		panic(err)
 	}
 }
@@ -73,12 +72,12 @@ func (s *PaymentService) CreateUserPoints(ctx context.Context, req *paymentProto
 		OrderID:     uuid.New(),
 	})
 	if err != nil {
-		log.Error("failed to create user points", logField.Error(err))
+		log.Error("failed to create user points", log.Field.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	userPoints, err := s.store.GetUserPoints(ctx, userID)
 	if err != nil {
-		log.Error("failed to get user points", logField.Error(err))
+		log.Error("failed to get user points", log.Field.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &paymentProto.CreateUserPointsResponse{
@@ -91,7 +90,7 @@ func (s *PaymentService) GetUserPoints(ctx context.Context, req *paymentProto.Ge
 	userID := uuid.MustParse(req.UserId)
 	userPoints, err := s.store.GetUserPoints(ctx, userID)
 	if err != nil {
-		log.Error("failed to get user points", logField.Error(err))
+		log.Error("failed to get user points", log.Field.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &paymentProto.GetUserPointsResponse{
@@ -111,10 +110,10 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 
 	liveEventOrder, err := s.initLiveEventOrder(ctx, req)
 	if err != nil {
-		log.Error("failed to init live event order", logField.Error(err))
+		log.Error("failed to init live event order", log.Field.Error(err))
 		return nil, status.Error(codes.Internal, "failed to init live event order")
 	}
-	log.Info("live event order created", logField.String("id", liveEventOrder.ID.String()), logField.Any("state", liveEventOrder.State))
+	log.Info("live event order created", log.Field.String("id", liveEventOrder.ID.String()), log.Field.Any("state", liveEventOrder.State))
 
 	var wg sync.WaitGroup
 	isSuccess := true
@@ -124,10 +123,10 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 		go func() {
 			defer wg.Done()
 			if err := s.consumeUserPoints(ctx, req, liveEvent, liveEventOrder.ID); err != nil {
-				log.Error("failed to consume user points", logField.Error(err))
+				log.Error("failed to consume user points", log.Field.Error(err))
 				isSuccess = false
 			} else {
-				log.Info("user points consumed", logField.String("user_id", req.UserId), logField.Int32("user_points", req.UserPoints))
+				log.Info("user points consumed", log.Field.String("user_id", req.UserId), log.Field.Int32("user_points", req.UserPoints))
 			}
 		}()
 	}
@@ -137,10 +136,10 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 		defer wg.Done()
 		creditCardPayment := req.Price - req.UserPoints
 		if err := s.consumeUserCreditCard(ctx, creditCardPayment); err != nil {
-			log.Error("failed to consume user credit card", logField.Error(err))
+			log.Error("failed to consume user credit card", log.Field.Error(err))
 			isSuccess = false
 		} else {
-			log.Info("user credit card consumed", logField.String("user_id", req.UserId), logField.Int32("credit_card_payment", creditCardPayment))
+			log.Info("user credit card consumed", log.Field.String("user_id", req.UserId), log.Field.Int32("credit_card_payment", creditCardPayment))
 		}
 	}()
 
@@ -148,18 +147,18 @@ func (s *PaymentService) CreateLiveEventOrder(ctx context.Context, req *paymentP
 	go func() {
 		defer wg.Done()
 		if err := s.reserveSeat(ctx, req.LiveEventId); err != nil {
-			log.Error("failed to reserve seat", logField.Error(err))
+			log.Error("failed to reserve seat", log.Field.Error(err))
 			isSuccess = false
 		} else {
-			log.Info("reserved seat", logField.String("live_event_id", req.LiveEventId))
+			log.Info("reserved seat", log.Field.String("live_event_id", req.LiveEventId))
 		}
 	}()
 
 	wg.Wait()
 	if err := s.completeliveEventOrder(ctx, liveEventOrder, isSuccess); err != nil {
-		log.Error("failed to complete live event order", logField.Error(err))
+		log.Error("failed to complete live event order", log.Field.Error(err))
 	}
-	log.Info("live event order completed", logField.String("id", liveEventOrder.ID.String()), logField.Any("state", liveEventOrder.State))
+	log.Info("live event order completed", log.Field.String("id", liveEventOrder.ID.String()), log.Field.Any("state", liveEventOrder.State))
 
 	if liveEventOrder.State == db.StateFailed {
 		s.rollbackLiveEventOrder(ctx, liveEventOrder)
@@ -175,7 +174,7 @@ func (s *PaymentService) getLiveEventOrderRelations(ctx context.Context, req *pa
 		Id: req.LiveEventId,
 	})
 	if err != nil {
-		log.Error("failed to get live event", logField.Error(err))
+		log.Error("failed to get live event", log.Field.Error(err))
 		return nil
 	}
 	return liveEventResp.LiveEvent
@@ -225,7 +224,7 @@ func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProt
 			OrderType:   "LiveEventOrder",
 			OrderID:     orderId,
 		})
-		log.Debug("ConsumeUserPoints responded", logField.Any("code", status.Code(err)))
+		log.Debug("ConsumeUserPoints responded", log.Field.Any("code", status.Code(err)))
 		done <- err
 	}()
 
@@ -242,7 +241,7 @@ func (s *PaymentService) consumeUserCreditCard(ctx context.Context, payment int3
 	go func() {
 		result := rand.Intn(10)
 		// result := 5
-		log.Debug("consumeUserCreditCard result", logField.Int("result", result))
+		log.Debug("consumeUserCreditCard result", log.Field.Int("result", result))
 		if result%10 == 5 {
 			done <- errors.New("credit card error")
 		} else {
@@ -264,7 +263,7 @@ func (s *PaymentService) reserveSeat(ctx context.Context, liveEventID string) er
 		_, err := s.liveClient.ReserveSeat(ctx, &liveProto.ReserveSeatRequest{
 			LiveEventId: liveEventID,
 		})
-		log.Debug("ReserveSeat responded", logField.Any("code", status.Code(err)))
+		log.Debug("ReserveSeat responded", log.Field.Any("code", status.Code(err)))
 		done <- err
 	}()
 
@@ -277,7 +276,7 @@ func (s *PaymentService) reserveSeat(ctx context.Context, liveEventID string) er
 }
 
 func (s *PaymentService) completeliveEventOrder(ctx context.Context, liveEventOrder *db.LiveEventOrder, isSuccess bool) error {
-	log.Info("begin completeliveEventOrder", logField.Bool("isSuccess", isSuccess))
+	log.Info("begin completeliveEventOrder", log.Field.Bool("isSuccess", isSuccess))
 	if isSuccess {
 		liveEventOrder.State = db.StatePaid
 	} else {
@@ -297,9 +296,9 @@ func (s *PaymentService) rollbackLiveEventOrder(ctx context.Context, liveEventOr
 		_, err := s.liveClient.RollbackSeatReservation(ctx, &liveProto.RollbackSeatReservationRequest{
 			LiveEventId: liveEventOrder.LiveEventID.String(),
 		})
-		log.Debug("RollbackSeatReservation responded", logField.Any("code", status.Code(err)))
+		log.Debug("RollbackSeatReservation responded", log.Field.Any("code", status.Code(err)))
 		if err != nil {
-			log.Fatal("failed to rollback seat reservation", logField.Error(err))
+			log.Fatal("failed to rollback seat reservation", log.Field.Error(err))
 			// notify for manual follow up
 		}
 	}()
@@ -308,9 +307,9 @@ func (s *PaymentService) rollbackLiveEventOrder(ctx context.Context, liveEventOr
 	go func() {
 		defer wg.Done()
 		err := s.store.DeleteUserPointsByOrderID(ctx, liveEventOrder.ID)
-		log.Debug("DeleteUserPointsByOrderID responded", logField.Any("code", status.Code(err)))
+		log.Debug("DeleteUserPointsByOrderID responded", log.Field.Any("code", status.Code(err)))
 		if err != nil {
-			log.Fatal("failed to rollback consume user points", logField.Error(err))
+			log.Fatal("failed to rollback consume user points", log.Field.Error(err))
 			// notify for manual follow up
 		}
 	}()
@@ -320,7 +319,7 @@ func (s *PaymentService) rollbackLiveEventOrder(ctx context.Context, liveEventOr
 		go func() {
 			defer wg.Done()
 			result := rand.Intn(10)
-			log.Debug("rollbackConsumeUserCreditCard result", logField.Int("result", result))
+			log.Debug("rollbackConsumeUserCreditCard result", log.Field.Int("result", result))
 			if result%10 == 5 {
 				log.Fatal("failed to rollback consume user credit card")
 			}

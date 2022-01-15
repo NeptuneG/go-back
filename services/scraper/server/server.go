@@ -8,7 +8,6 @@ import (
 	liveProto "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/NeptuneG/go-back/services/scraper/consumer"
 	faktory "github.com/contribsys/faktory/client"
 	"google.golang.org/grpc"
@@ -30,7 +29,7 @@ func New() *ScrapeService {
 	}
 	conn, err := grpc.DialContext(context.Background(), os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
 	if err != nil {
-		log.Fatal("failed to dial live service", logField.Error(err))
+		log.Fatal("failed to dial live service", log.Field.Error(err))
 		panic(err)
 	}
 

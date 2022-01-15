@@ -6,7 +6,6 @@ import (
 	"github.com/NeptuneG/go-back/gen/go/services/auth/proto"
 	"github.com/NeptuneG/go-back/pkg/auth"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	db "github.com/NeptuneG/go-back/services/auth/db/sqlc"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -24,7 +23,7 @@ func New() *AuthService {
 
 func (s *AuthService) Close() {
 	if err := s.store.Close(); err != nil {
-		log.Fatal("failed to close database connection", logField.Error(err))
+		log.Fatal("failed to close database connection", log.Field.Error(err))
 		panic(err)
 	}
 }
@@ -39,7 +38,7 @@ func (s *AuthService) Register(ctx context.Context, req *proto.RegisterRequest) 
 		EncryptedPassword: encrypted_password,
 	})
 	if err != nil {
-		log.Error("failed to create user", logField.Error(err))
+		log.Error("failed to create user", log.Field.Error(err))
 		return nil, status.Error(codes.Internal, "failed to create user")
 	}
 	token, err := auth.CreateToken(user.ID.String())

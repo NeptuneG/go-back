@@ -8,7 +8,6 @@ import (
 	"github.com/NeptuneG/go-back/pkg/cache"
 	"github.com/NeptuneG/go-back/pkg/db"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/google/uuid"
 )
 
@@ -68,7 +67,7 @@ func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID u
 			return nil, err
 		}
 		if err := store.updateLiveEventCache(ctx, liveEvent); err != nil {
-			log.Error("failed to update live event cache", logField.Error(err))
+			log.Error("failed to update live event cache", log.Field.Error(err))
 		}
 		return &liveEvent, err
 	}); err != nil {

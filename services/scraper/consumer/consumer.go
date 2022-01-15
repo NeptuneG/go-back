@@ -9,7 +9,6 @@ import (
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -56,11 +55,11 @@ func (consumer *ScrapedEventsConsumer) Start() {
 
 			message, err := raw.Result()
 			if err != nil {
-				log.Error("failed to pop message from queue", logField.Error(err))
+				log.Error("failed to pop message from queue", log.Field.Error(err))
 				continue
 			}
 			if err := json.Unmarshal([]byte(message[1]), &reqMsg); err != nil {
-				log.Error("failed to unmarshal message", logField.Error(err))
+				log.Error("failed to unmarshal message", log.Field.Error(err))
 				continue
 			}
 			if _, err := consumer.liveClient.CreateLiveEvent(ctx, &live.CreateLiveEventRequest{
@@ -76,7 +75,7 @@ func (consumer *ScrapedEventsConsumer) Start() {
 				Seats:           seats(reqMsg.Seats),
 				AvailableSeats:  availableSeats(reqMsg.AvailableSeats),
 			}); err != nil {
-				log.Error("failed to create live event", logField.Error(err))
+				log.Error("failed to create live event", log.Field.Error(err))
 				continue
 			}
 		}

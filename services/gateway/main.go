@@ -10,7 +10,6 @@ import (
 	payment "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	scraper "github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
@@ -35,24 +34,24 @@ func main() {
 	}
 
 	if err := auth.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, auth_service_host, opts); err != nil {
-		log.Error("Failed to register auth service", logField.Error(err))
+		log.Error("Failed to register auth service", log.Field.Error(err))
 		panic(err)
 	}
 	if err := live.RegisterLiveServiceHandlerFromEndpoint(ctx, mux, live_service_host, opts); err != nil {
-		log.Error("Failed to register live service", logField.Error(err))
+		log.Error("Failed to register live service", log.Field.Error(err))
 		panic(err)
 	}
 	if err := payment.RegisterPaymentServiceHandlerFromEndpoint(ctx, mux, payment_service_host, opts); err != nil {
-		log.Error("Failed to register payment service", logField.Error(err))
+		log.Error("Failed to register payment service", log.Field.Error(err))
 		panic(err)
 	}
 	if err := scraper.RegisterScrapeServiceHandlerFromEndpoint(ctx, mux, scraper_service_host, opts); err != nil {
-		log.Error("Failed to register scraper service", logField.Error(err))
+		log.Error("Failed to register scraper service", log.Field.Error(err))
 		panic(err)
 	}
 
 	if err := http.ListenAndServe(":4000", mux); err != nil {
-		log.Fatal("failed to start server", logField.Error(err))
+		log.Fatal("failed to start server", log.Field.Error(err))
 		panic(err)
 	}
 }

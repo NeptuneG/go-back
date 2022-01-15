@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
@@ -77,7 +76,7 @@ func verifyToken(tokenString string) (*UserClaims, error) {
 	}
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, keyFunc)
 	if err != nil {
-		log.Error("failed to parse token", logField.String("token", tokenString), logField.Error(err))
+		log.Error("failed to parse token", log.Field.String("token", tokenString), log.Field.Error(err))
 		return nil, err
 	}
 	claims, ok := token.Claims.(*UserClaims)
