@@ -19,9 +19,7 @@ func main() {
 	register := func(srv *grpc.Server) {
 		proto.RegisterPaymentServiceServer(srv, server)
 	}
-	authInterceptor := interceptors.UnaryDefaultAuthInterceptor(
-		"/neptuneg.go_back.serivces.payment.PaymentService/CreateLiveEventOrder",
-	)
+	authInterceptor := interceptors.UnaryDefaultAuthInterceptor("*")
 	gprcSrv := grpcServer.New(
 		port,
 		register,

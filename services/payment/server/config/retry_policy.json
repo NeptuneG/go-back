@@ -8,14 +8,6 @@
             {
                 "service": "neptuneg.go_back.serivces.live.LiveService",
                 "method": "RollbackSeatReservation"
-            },
-            {
-                "service": "neptuneg.go_back.serivces.user.UserService",
-                "method": "ConsumeUserPoints"
-            },
-            {
-                "service": "neptuneg.go_back.serivces.user.UserService",
-                "method": "RollbackConsumeUserPoints"
             }
         ],
         "retryPolicy": {

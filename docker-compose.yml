@@ -22,23 +22,10 @@ services:
       - "4000:4000"
       - "2347:2345"
     links:
-      - user-service
+      - auth-service
       - live-service
       - scraper-service
       - payment-service
-  user-service:
-    <<: *service
-    container_name: user-service
-    build:
-      context: .
-      dockerfile: ./services/user/Dockerfile
-      target: dev
-    ports:
-      - "2346:2345"
-    links:
-      - db
-    environment:
-      DB_NAME: user_development
   live-service:
     <<: *service
     container_name: live-service
@@ -65,7 +52,7 @@ services:
       - db
     environment:
       DB_NAME: payment_development
-      GRPC_GO_RETRY: on
+      GRPC_GO_RETRY: 'on'
   auth-service:
     <<: *service
     container_name: auth-service

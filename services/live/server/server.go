@@ -19,6 +19,10 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var (
+	count = 0
+)
+
 type LiveService struct {
 	proto.UnimplementedLiveServiceServer
 	store *db.Store
@@ -251,6 +255,20 @@ func (s *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventR
 }
 
 func (s *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
+	// force a retry
+	count++
+	log.Debug("mock failure for retry", logField.Int("count", count))
+	if count%3 != 0 {
+		return nil, status.Error(codes.Internal, "just failed")
+	}
+
+	// mock delay
+	if false {
+		log.Debug("mock delay")
+		time.Sleep(10 * time.Second)
+		log.Debug("mock delay done")
+	}
+
 	liveEventID, err := uuid.Parse(req.LiveEventId)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "failed to parse live event id")

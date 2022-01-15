@@ -3,8 +3,10 @@ CREATE TABLE "user_points" (
   "user_id" uuid NOT NULL,
   "points" integer NOT NULL,
   "description" varchar(255),
+  "order_type" varchar(255) NOT NULL,
+  "order_id" uuid NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-ALTER TABLE "user_points" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+CREATE UNIQUE INDEX ON "user_points" ("order_type", "order_id");

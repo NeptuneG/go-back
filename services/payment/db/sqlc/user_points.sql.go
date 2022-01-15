@@ -12,17 +12,18 @@ import (
 
 const createUserPoints = `-- name: CreateUserPoints :one
 INSERT INTO user_points (
-  user_id, points, description, order_id
+  user_id, points, description, order_type, order_id
 ) VALUES (
-  $1, $2, $3, $4
-) RETURNING id, user_id, points, description, created_at, updated_at, order_id
+  $1, $2, $3, $4, $5
+) RETURNING id, user_id, points, description, order_type, order_id, created_at, updated_at
 `
 
 type CreateUserPointsParams struct {
 	UserID      uuid.UUID        `json:"user_id"`
 	Points      int32            `json:"points"`
 	Description types.NullString `json:"description"`
-	OrderID     types.NullUUID   `json:"order_id"`
+	OrderType   string           `json:"order_type"`
+	OrderID     uuid.UUID        `json:"order_id"`
 }
 
 func (q *Queries) CreateUserPoints(ctx context.Context, arg CreateUserPointsParams) (UserPoint, error) {
@@ -30,6 +31,7 @@ func (q *Queries) CreateUserPoints(ctx context.Context, arg CreateUserPointsPara
 		arg.UserID,
 		arg.Points,
 		arg.Description,
+		arg.OrderType,
 		arg.OrderID,
 	)
 	var i UserPoint
@@ -38,9 +40,10 @@ func (q *Queries) CreateUserPoints(ctx context.Context, arg CreateUserPointsPara
 		&i.UserID,
 		&i.Points,
 		&i.Description,
+		&i.OrderType,
+		&i.OrderID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.OrderID,
 	)
 	return i, err
 }
@@ -49,18 +52,18 @@ const deleteUserPointsByOrderID = `-- name: DeleteUserPointsByOrderID :exec
 DELETE FROM user_points WHERE order_id = $1
 `
 
-func (q *Queries) DeleteUserPointsByOrderID(ctx context.Context, orderID types.NullUUID) error {
+func (q *Queries) DeleteUserPointsByOrderID(ctx context.Context, orderID uuid.UUID) error {
 	_, err := q.exec(ctx, q.deleteUserPointsByOrderIDStmt, deleteUserPointsByOrderID, orderID)
 	return err
 }
 
 const getUserPoints = `-- name: GetUserPoints :one
-SELECT SUM(points) FROM user_points WHERE user_id = $1
+SELECT COALESCE(SUM(points), 0) FROM user_points WHERE user_id = $1
 `
 
-func (q *Queries) GetUserPoints(ctx context.Context, userID uuid.UUID) (int64, error) {
+func (q *Queries) GetUserPoints(ctx context.Context, userID uuid.UUID) (interface{}, error) {
 	row := q.queryRow(ctx, q.getUserPointsStmt, getUserPoints, userID)
-	var sum int64
-	err := row.Scan(&sum)
-	return sum, err
+	var coalesce interface{}
+	err := row.Scan(&coalesce)
+	return coalesce, err
 }

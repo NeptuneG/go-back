@@ -9,11 +9,17 @@ import (
 	live "github.com/NeptuneG/go-back/gen/go/services/live/proto"
 	payment "github.com/NeptuneG/go-back/gen/go/services/payment/proto"
 	scraper "github.com/NeptuneG/go-back/gen/go/services/scraper/proto"
-	user "github.com/NeptuneG/go-back/gen/go/services/user/proto"
 	"github.com/NeptuneG/go-back/pkg/log"
 	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+)
+
+var (
+	auth_service_host    = os.Getenv("AUTH_SERVICE_HOST") + ":" + os.Getenv("AUTH_SERVICE_PORT")
+	live_service_host    = os.Getenv("LIVE_SERVICE_HOST") + ":" + os.Getenv("LIVE_SERVICE_PORT")
+	payment_service_host = os.Getenv("PAYMENT_SERVICE_HOST") + ":" + os.Getenv("PAYMENT_SERVICE_PORT")
+	scraper_service_host = os.Getenv("SCRAPER_SERVICE_HOST") + ":" + os.Getenv("SCRAPER_SERVICE_PORT")
 )
 
 func main() {
@@ -28,62 +34,24 @@ func main() {
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 	}
 
-	server := http.Server{
-		Addr:    ":4000",
-		Handler: mux,
-	}
-
-	authConn, err := grpc.DialContext(ctx, os.Getenv("AUTH_SERVICE_HOST")+":"+os.Getenv("AUTH_SERVICE_PORT"), opts...)
-	if err != nil {
-		log.Fatal("failed to dial auth service", logField.Error(err))
+	if err := auth.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, auth_service_host, opts); err != nil {
+		log.Error("Failed to register auth service", logField.Error(err))
 		panic(err)
 	}
-	if err = auth.RegisterAuthServiceHandlerClient(ctx, mux, auth.NewAuthServiceClient(authConn)); err != nil {
-		log.Fatal("failed to register auth service handler", logField.Error(err))
+	if err := live.RegisterLiveServiceHandlerFromEndpoint(ctx, mux, live_service_host, opts); err != nil {
+		log.Error("Failed to register live service", logField.Error(err))
 		panic(err)
 	}
-
-	userConn, err := grpc.DialContext(ctx, os.Getenv("USER_SERVICE_HOST")+":"+os.Getenv("USER_SERVICE_PORT"), opts...)
-	if err != nil {
-		log.Fatal("failed to connect to user service", logField.Error(err))
+	if err := payment.RegisterPaymentServiceHandlerFromEndpoint(ctx, mux, payment_service_host, opts); err != nil {
+		log.Error("Failed to register payment service", logField.Error(err))
 		panic(err)
 	}
-	if err = user.RegisterUserServiceHandlerClient(ctx, mux, user.NewUserServiceClient(userConn)); err != nil {
-		log.Fatal("failed to register user service handler", logField.Error(err))
+	if err := scraper.RegisterScrapeServiceHandlerFromEndpoint(ctx, mux, scraper_service_host, opts); err != nil {
+		log.Error("Failed to register scraper service", logField.Error(err))
 		panic(err)
 	}
 
-	liveConn, err := grpc.DialContext(ctx, os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
-	if err != nil {
-		log.Fatal("failed to connect to live service", logField.Error(err))
-		panic(err)
-	}
-	if err = live.RegisterLiveServiceHandlerClient(ctx, mux, live.NewLiveServiceClient(liveConn)); err != nil {
-		log.Fatal("failed to register live service handler", logField.Error(err))
-		panic(err)
-	}
-
-	paymentConn, err := grpc.DialContext(ctx, os.Getenv("PAYMENT_SERVICE_HOST")+":"+os.Getenv("PAYMENT_SERVICE_PORT"), opts...)
-	if err != nil {
-		log.Fatal("failed to connect to payment service", logField.Error(err))
-		panic(err)
-	}
-	if err = payment.RegisterPaymentServiceHandlerClient(ctx, mux, payment.NewPaymentServiceClient(paymentConn)); err != nil {
-		log.Fatal("failed to register payment service handler", logField.Error(err))
-		panic(err)
-	}
-
-	scraperConn, err := grpc.DialContext(ctx, os.Getenv("SCRAPER_SERVICE_HOST")+":"+os.Getenv("SCRAPER_SERVICE_PORT"), opts...)
-	if err != nil {
-		log.Fatal("failed to connect to scraper service", logField.Error(err))
-		panic(err)
-	}
-	if err = scraper.RegisterScrapeServiceHandlerClient(ctx, mux, scraper.NewScrapeServiceClient(scraperConn)); err != nil {
-		log.Fatal("failed to register scraper service handler", logField.Error(err))
-		panic(err)
-	}
-
-	if err := server.ListenAndServe(); err != nil {
+	if err := http.ListenAndServe(":4000", mux); err != nil {
 		log.Fatal("failed to start server", logField.Error(err))
 		panic(err)
 	}

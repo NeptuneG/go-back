@@ -19,6 +19,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PaymentServiceClient interface {
 	CreateLiveEventOrder(ctx context.Context, in *CreateLiveEventOrderRequest, opts ...grpc.CallOption) (*CreateLiveEventOrderResponse, error)
+	CreateUserPoints(ctx context.Context, in *CreateUserPointsRequest, opts ...grpc.CallOption) (*CreateUserPointsResponse, error)
+	GetUserPoints(ctx context.Context, in *GetUserPointsRequest, opts ...grpc.CallOption) (*GetUserPointsResponse, error)
 }
 
 type paymentServiceClient struct {
@@ -38,11 +40,31 @@ func (c *paymentServiceClient) CreateLiveEventOrder(ctx context.Context, in *Cre
 	return out, nil
 }
 
+func (c *paymentServiceClient) CreateUserPoints(ctx context.Context, in *CreateUserPointsRequest, opts ...grpc.CallOption) (*CreateUserPointsResponse, error) {
+	out := new(CreateUserPointsResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.payment.PaymentService/CreateUserPoints", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) GetUserPoints(ctx context.Context, in *GetUserPointsRequest, opts ...grpc.CallOption) (*GetUserPointsResponse, error) {
+	out := new(GetUserPointsResponse)
+	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.payment.PaymentService/GetUserPoints", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PaymentServiceServer is the server API for PaymentService service.
 // All implementations must embed UnimplementedPaymentServiceServer
 // for forward compatibility
 type PaymentServiceServer interface {
 	CreateLiveEventOrder(context.Context, *CreateLiveEventOrderRequest) (*CreateLiveEventOrderResponse, error)
+	CreateUserPoints(context.Context, *CreateUserPointsRequest) (*CreateUserPointsResponse, error)
+	GetUserPoints(context.Context, *GetUserPointsRequest) (*GetUserPointsResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
 
@@ -52,6 +74,12 @@ type UnimplementedPaymentServiceServer struct {
 
 func (UnimplementedPaymentServiceServer) CreateLiveEventOrder(context.Context, *CreateLiveEventOrderRequest) (*CreateLiveEventOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLiveEventOrder not implemented")
+}
+func (UnimplementedPaymentServiceServer) CreateUserPoints(context.Context, *CreateUserPointsRequest) (*CreateUserPointsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserPoints not implemented")
+}
+func (UnimplementedPaymentServiceServer) GetUserPoints(context.Context, *GetUserPointsRequest) (*GetUserPointsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserPoints not implemented")
 }
 func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
 
@@ -84,6 +112,42 @@ func _PaymentService_CreateLiveEventOrder_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PaymentService_CreateUserPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserPointsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).CreateUserPoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.payment.PaymentService/CreateUserPoints",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).CreateUserPoints(ctx, req.(*CreateUserPointsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_GetUserPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserPointsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).GetUserPoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/neptuneg.go_back.serivces.payment.PaymentService/GetUserPoints",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).GetUserPoints(ctx, req.(*GetUserPointsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PaymentService_ServiceDesc is the grpc.ServiceDesc for PaymentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +158,14 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateLiveEventOrder",
 			Handler:    _PaymentService_CreateLiveEventOrder_Handler,
+		},
+		{
+			MethodName: "CreateUserPoints",
+			Handler:    _PaymentService_CreateUserPoints_Handler,
+		},
+		{
+			MethodName: "GetUserPoints",
+			Handler:    _PaymentService_GetUserPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

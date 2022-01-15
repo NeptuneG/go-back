@@ -47,6 +47,66 @@
           "PaymentService"
         ]
       }
+    },
+    "/v1/payments/user_points": {
+      "get": {
+        "operationId": "PaymentService_GetUserPoints",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentGetUserPointsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      },
+      "post": {
+        "operationId": "PaymentService_CreateUserPoints",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentCreateUserPointsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/paymentCreateUserPointsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -74,6 +134,42 @@
       "properties": {
         "state": {
           "type": "string"
+        }
+      }
+    },
+    "paymentCreateUserPointsRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "userPoints": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "paymentCreateUserPointsResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "userPoints": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "paymentGetUserPointsResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "userPoints": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },

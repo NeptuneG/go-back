@@ -13,6 +13,21 @@ service PaymentService {
       body : "*"
     };
   };
+
+  rpc CreateUserPoints(CreateUserPointsRequest)
+      returns (CreateUserPointsResponse) {
+    option (google.api.http) = {
+      post : "/v1/payments/user_points"
+      body : "*"
+    };
+  };
+
+  rpc GetUserPoints(GetUserPointsRequest)
+      returns (GetUserPointsResponse) {
+    option (google.api.http) = {
+      get : "/v1/payments/user_points"
+    };
+  };
 }
 
 message CreateLiveEventOrderRequest {
@@ -23,3 +38,20 @@ message CreateLiveEventOrderRequest {
 }
 
 message CreateLiveEventOrderResponse { string state = 1; }
+
+message CreateUserPointsRequest {
+  string user_id = 1;
+  int32 user_points = 2;
+}
+
+message CreateUserPointsResponse {
+  string user_id = 1;
+  int64 user_points = 2;
+}
+
+message GetUserPointsRequest { string user_id = 1; }
+
+message GetUserPointsResponse {
+  string user_id = 1;
+  int64 user_points = 2;
+}

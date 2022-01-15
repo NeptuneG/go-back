@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/google/uuid"
 )
 
@@ -39,4 +40,15 @@ type LiveEventOrder struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	State       State     `json:"state"`
+}
+
+type UserPoint struct {
+	ID          uuid.UUID        `json:"id"`
+	UserID      uuid.UUID        `json:"user_id"`
+	Points      int32            `json:"points"`
+	Description types.NullString `json:"description"`
+	OrderType   string           `json:"order_type"`
+	OrderID     uuid.UUID        `json:"order_id"`
+	CreatedAt   time.Time        `json:"created_at"`
+	UpdatedAt   time.Time        `json:"updated_at"`
 }
