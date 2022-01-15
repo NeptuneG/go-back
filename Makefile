@@ -4,7 +4,7 @@ generate-svc:
 
 .PHONY: svc-build-image
 svc-build-image:
-	docker build -t neptuneg/$(svc)-service:latest --file ./services/$(svc)/Dockerfile .
+	docker build -t neptuneg/$(svc)-service:latest --file ./build/docker/$(svc)/Dockerfile .
 
 .PHONY: svc-push-image
 svc-push-image:
@@ -78,7 +78,7 @@ build-images-all:
 	make svc-build-image svc=gateway
 	make svc-build-image svc=scraper
 	make svc-build-image svc=payment
-	docker build -t neptuneg/faktory-workers:latest --file ./services/faktory-workers/Dockerfile ./services/faktory-workers
+	docker build -t neptuneg/faktory-workers:latest --file ./build/docker/faktory-workers/Dockerfile ./services/faktory-workers
 
 .PHONY: push-images-all
 push-images-all:
