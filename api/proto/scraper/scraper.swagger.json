@@ -15,40 +15,7 @@
   "produces": [
     "application/json"
   ],
-  "paths": {
-    "/v1/scraper/live_event_jobs": {
-      "post": {
-        "operationId": "ScrapeService_CreateScrapeLiveEventsJob",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/scraperCreateScrapeLiveEventsJobResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/scraperCreateScrapeLiveEventsJobRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ScrapeService"
-        ]
-      }
-    }
-  },
+  "paths": {},
   "definitions": {
     "protobufAny": {
       "type": "object",
@@ -74,17 +41,6 @@
           "items": {
             "$ref": "#/definitions/protobufAny"
           }
-        }
-      }
-    },
-    "scraperCreateScrapeLiveEventsJobRequest": {
-      "type": "object",
-      "properties": {
-        "liveHouseSlug": {
-          "type": "string"
-        },
-        "yearMonth": {
-          "type": "string"
         }
       }
     },

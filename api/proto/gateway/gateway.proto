@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option go_package = "github.com/NeptuneG/go-back/api/proto/gateway";
+package api.proto.gateway;
+
+import "google/api/annotations.proto";
+
+import "api/proto/auth/auth.proto";
+import "api/proto/live/live.proto";
+import "api/proto/payment/payment.proto";
+import "api/proto/scraper/scraper.proto";
+
+service GatewayService {
+  rpc Register(auth.RegisterRequest) returns (auth.RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/register"
+      body: "*"
+    };
+  };
+  rpc Login(auth.LoginRequest) returns (auth.LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/login"
+      body: "*"
+    };
+  };
+  rpc GetUserPoints(payment.GetUserPointsRequest)
+      returns (payment.GetUserPointsResponse) {
+    option (google.api.http) = {
+      get: "/v1/user/points"
+    };
+  };
+  rpc CreateUserPoints(payment.CreateUserPointsRequest)
+      returns (payment.CreateUserPointsResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/points"
+      body: "*"
+    };
+  };
+  rpc ListLiveHouses(live.ListLiveHousesRequest) returns (live.ListLiveHousesResponse) {
+    option (google.api.http) = {
+      get: "/v1/live_houses"
+    };
+  };
+  rpc ListLiveEvents(live.ListLiveEventsRequest) returns (live.ListLiveEventsResponse) {
+    option (google.api.http) = {
+      get: "/v1/live_events"
+    };
+  };
+  rpc CreateLiveEventOrder(payment.CreateLiveEventOrderRequest)
+      returns (payment.CreateLiveEventOrderResponse) {
+    option (google.api.http) = {
+      post: "/v1/payments/live_events"
+      body: "*"
+    };
+  };
+  rpc CreateScrapeLiveEventsJob(scraper.CreateScrapeLiveEventsJobRequest)
+      returns (scraper.CreateScrapeLiveEventsJobResponse) {
+    option (google.api.http) = {
+      post : "/v1/scrape_live_event_jobs"
+      body : "*"
+    };
+  };
+}

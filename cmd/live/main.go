@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	port = 3377
+	port = ":3377"
 )
 
 func main() {

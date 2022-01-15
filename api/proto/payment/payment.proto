@@ -3,31 +3,14 @@ syntax = "proto3";
 option go_package = "github.com/NeptuneG/go-back/api/proto/payment";
 package api.proto.payment;
 
-import "google/api/annotations.proto";
-
 service PaymentService {
   rpc CreateLiveEventOrder(CreateLiveEventOrderRequest)
-      returns (CreateLiveEventOrderResponse) {
-    option (google.api.http) = {
-      post : "/v1/payments/live_events"
-      body : "*"
-    };
-  };
+      returns (CreateLiveEventOrderResponse);
 
   rpc CreateUserPoints(CreateUserPointsRequest)
-      returns (CreateUserPointsResponse) {
-    option (google.api.http) = {
-      post : "/v1/payments/user_points"
-      body : "*"
-    };
-  };
+      returns (CreateUserPointsResponse);
 
-  rpc GetUserPoints(GetUserPointsRequest)
-      returns (GetUserPointsResponse) {
-    option (google.api.http) = {
-      get : "/v1/payments/user_points"
-    };
-  };
+  rpc GetUserPoints(GetUserPointsRequest) returns (GetUserPointsResponse);
 }
 
 message CreateLiveEventOrderRequest {
