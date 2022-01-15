@@ -1,9 +1,9 @@
 package main
 
 import (
-	proto "github.com/NeptuneG/go-back/api/proto/${SERVICE_UNDERSCORE_NAME}"
-	"github.com/NeptuneG/go-back/internal/${SERVICE_UNDERSCORE_NAME}"
+	proto "github.com/NeptuneG/go-back/api/proto/scraper"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
+	"github.com/NeptuneG/go-back/internal/scraper"
 	"google.golang.org/grpc"
 )
 
@@ -12,11 +12,11 @@ const (
 )
 
 func main() {
-	server := ${SERVICE_UNDERSCORE_NAME}.New()
+	server := scraper.New()
 	defer server.Close()
 
 	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {
-		proto.Register${SERVICE_PASCALCASE_NAME}ServiceServer(srv, server)
+		proto.RegisterScrapeServiceServer(srv, server)
 	})
 
 	gprcSrv.Start()

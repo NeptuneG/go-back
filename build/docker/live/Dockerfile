@@ -17,10 +17,10 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/live ./services/live
-RUN go build -o ./bin/live ./services/live
+RUN go build -gcflags='all=-N -l' -o /usr/bin/live ./cmd/live
+RUN go build -o ./bin/live ./cmd/live
 
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/live
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/live
 
 CMD ["/usr/bin/live"]
 

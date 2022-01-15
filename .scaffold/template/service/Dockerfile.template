@@ -17,12 +17,10 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/${SERVICE_UNDERSCORE_NAME} ./services/${SERVICE_UNDERSCORE_NAME}
-RUN go build -o ./bin/${SERVICE_UNDERSCORE_NAME} ./services/${SERVICE_UNDERSCORE_NAME}
+RUN go build -gcflags='all=-N -l' -o /usr/bin/${SERVICE_UNDERSCORE_NAME} ./cmd/${SERVICE_UNDERSCORE_NAME}
+RUN go build -o ./bin/${SERVICE_UNDERSCORE_NAME} ./cmd/${SERVICE_UNDERSCORE_NAME}
 
-ENV SERVICENAME=${SERVICE_PASCALCASE_NAME}
-
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/${SERVICE_UNDERSCORE_NAME}
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/${SERVICE_UNDERSCORE_NAME}
 
 CMD ["/usr/bin/${SERVICE_UNDERSCORE_NAME}"]
 

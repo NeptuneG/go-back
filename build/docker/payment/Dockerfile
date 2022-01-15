@@ -17,10 +17,10 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/payment ./services/payment
-RUN go build -o ./bin/payment ./services/payment
+RUN go build -gcflags='all=-N -l' -o /usr/bin/payment ./cmd/payment
+RUN go build -o ./bin/payment ./cmd/payment
 
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/payment
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/payment
 
 CMD ["/usr/bin/payment"]
 

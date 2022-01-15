@@ -1,9 +1,9 @@
-package server
+package ${SERVICE_UNDERSCORE_NAME}
 
 import (
-	"github.com/NeptuneG/go-back/gen/go/services/${SERVICE_UNDERSCORE_NAME}/proto"
-	"github.com/NeptuneG/go-back/pkg/log"
-	db "github.com/NeptuneG/go-back/services/${SERVICE_UNDERSCORE_NAME}/db/sqlc"
+	proto "github.com/NeptuneG/go-back/api/proto/${SERVICE_UNDERSCORE_NAME}"
+	"github.com/NeptuneG/go-back/internal/pkg/log"
+	db "github.com/NeptuneG/go-back/internal/${SERVICE_UNDERSCORE_NAME}/db/sqlc"
 )
 
 type ${SERVICE_PASCALCASE_NAME}Service struct {

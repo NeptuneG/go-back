@@ -17,12 +17,10 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/auth ./services/auth
-RUN go build -o ./bin/auth ./services/auth
+RUN go build -gcflags='all=-N -l' -o /usr/bin/auth ./cmd/auth
+RUN go build -o ./bin/auth ./cmd/auth
 
-ENV SERVICENAME=Auth
-
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/auth
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/auth
 
 CMD ["/usr/bin/auth"]
 

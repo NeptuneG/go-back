@@ -110,7 +110,7 @@ services:
     container_name: faktory-workers
     image: neptuneg/faktory-workers:latest
     volumes:
-      - ./services/faktory-workers:/app
+      - ./cmd/faktory-workers:/app
     env_file:
       - ".env"
     depends_on:

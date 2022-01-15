@@ -12,7 +12,7 @@ svc-push-image:
 
 .PHONY: svc-generate-migrate
 svc-generate-migrate:
-	docker exec $(svc)-service migrate create -dir db/migrations -ext sql $(NAME)
+	docker exec $(svc)-service migrate create -dir migrations/$(svc) -ext sql $(NAME)
 
 .PHONY: svc-db-migrate
 svc-db-migrate:
@@ -34,7 +34,7 @@ svc-db-seed:
 
 .PHONY: svc-sqlc-generate
 svc-sqlc-generate:
-	cd services/$(svc) && sqlc generate
+	cd internal/$(svc) && sqlc generate
 
 .PHONY: db-create-all
 db-create-all:
@@ -77,7 +77,7 @@ build-images-all:
 	make svc-build-image svc=gateway
 	make svc-build-image svc=scraper
 	make svc-build-image svc=payment
-	docker build -t neptuneg/faktory-workers:latest --file ./build/docker/faktory-workers/Dockerfile ./services/faktory-workers
+	docker build -t neptuneg/faktory-workers:latest --file ./build/docker/faktory-workers/Dockerfile ./cmd/faktory-workers
 
 .PHONY: push-images-all
 push-images-all:

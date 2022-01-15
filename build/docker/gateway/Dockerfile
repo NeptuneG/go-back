@@ -17,16 +17,16 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/gateway ./services/gateway
-RUN go build -o ./bin/gateway ./services/gateway
+RUN go build -gcflags='all=-N -l' -o /usr/bin/gateway ./cmd/gateway
+RUN go build -o ./bin/gateway ./cmd/gateway
 
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/gateway
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/gateway
 
 CMD ["/usr/bin/gateway"]
 
 FROM alpine:3.14
 RUN apk --no-cache add ca-certificates && addgroup -S app && adduser -S app -G app
 USER app
-WORKDIR /app 
+WORKDIR /app
 COPY --from=dev /go/src/github.com/NeptuneG/go-back/bin/gateway .
 ENTRYPOINT ["./gateway"]

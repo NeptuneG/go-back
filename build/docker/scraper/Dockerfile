@@ -17,16 +17,16 @@ COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
-RUN go build -gcflags='all=-N -l' -o /usr/bin/scraper ./services/scraper
-RUN go build -o ./bin/scraper ./services/scraper
+RUN go build -gcflags='all=-N -l' -o /usr/bin/scraper ./cmd/scraper
+RUN go build -o ./bin/scraper ./cmd/scraper
 
-WORKDIR /go/src/github.com/NeptuneG/go-back/services/scraper
+WORKDIR /go/src/github.com/NeptuneG/go-back/cmd/scraper
 
 CMD ["/usr/bin/scraper"]
 
 FROM alpine:3.14
 RUN apk --no-cache add ca-certificates && addgroup -S app && adduser -S app -G app
 USER app
-WORKDIR /app 
+WORKDIR /app
 COPY --from=dev /go/src/github.com/NeptuneG/go-back/bin/scraper .
 ENTRYPOINT ["./scraper"]
