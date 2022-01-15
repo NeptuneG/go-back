@@ -35,7 +35,7 @@ func NewScrapeServiceClient(cc grpc.ClientConnInterface) ScrapeServiceClient {
 
 func (c *scrapeServiceClient) CreateScrapeLiveEventsJob(ctx context.Context, in *CreateScrapeLiveEventsJobRequest, opts ...grpc.CallOption) (*CreateScrapeLiveEventsJobResponse, error) {
 	out := new(CreateScrapeLiveEventsJobResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.scraper.ScrapeService/CreateScrapeLiveEventsJob", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.scraper.ScrapeService/CreateScrapeLiveEventsJob", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _ScrapeService_CreateScrapeLiveEventsJob_Handler(srv interface{}, ctx conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.scraper.ScrapeService/CreateScrapeLiveEventsJob",
+		FullMethod: "/api.proto.scraper.ScrapeService/CreateScrapeLiveEventsJob",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ScrapeServiceServer).CreateScrapeLiveEventsJob(ctx, req.(*CreateScrapeLiveEventsJobRequest))
@@ -92,7 +92,7 @@ func _ScrapeService_CreateScrapeLiveEventsJob_Handler(srv interface{}, ctx conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ScrapeService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "neptuneg.go_back.serivces.scraper.ScrapeService",
+	ServiceName: "api.proto.scraper.ScrapeService",
 	HandlerType: (*ScrapeServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

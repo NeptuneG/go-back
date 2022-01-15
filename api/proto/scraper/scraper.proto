@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option go_package = "github.com/NeptuneG/go-back/api/proto/scraper";
-package neptuneg.go_back.serivces.scraper;
+package api.proto.scraper;
 
 import "google/api/annotations.proto";
 

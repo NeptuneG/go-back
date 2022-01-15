@@ -147,7 +147,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.payment.PaymentService/CreateLiveEventOrder", runtime.WithHTTPPathPattern("/v1/payments/live_events"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.payment.PaymentService/CreateLiveEventOrder", runtime.WithHTTPPathPattern("/v1/payments/live_events"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -170,7 +170,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.payment.PaymentService/CreateUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.payment.PaymentService/CreateUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -193,7 +193,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.payment.PaymentService/GetUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.payment.PaymentService/GetUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -255,7 +255,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.payment.PaymentService/CreateLiveEventOrder", runtime.WithHTTPPathPattern("/v1/payments/live_events"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.payment.PaymentService/CreateLiveEventOrder", runtime.WithHTTPPathPattern("/v1/payments/live_events"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -275,7 +275,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.payment.PaymentService/CreateUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.payment.PaymentService/CreateUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -295,7 +295,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.payment.PaymentService/GetUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.payment.PaymentService/GetUserPoints", runtime.WithHTTPPathPattern("/v1/payments/user_points"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

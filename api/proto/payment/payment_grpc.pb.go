@@ -37,7 +37,7 @@ func NewPaymentServiceClient(cc grpc.ClientConnInterface) PaymentServiceClient {
 
 func (c *paymentServiceClient) CreateLiveEventOrder(ctx context.Context, in *CreateLiveEventOrderRequest, opts ...grpc.CallOption) (*CreateLiveEventOrderResponse, error) {
 	out := new(CreateLiveEventOrderResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.payment.PaymentService/CreateLiveEventOrder", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/CreateLiveEventOrder", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *paymentServiceClient) CreateLiveEventOrder(ctx context.Context, in *Cre
 
 func (c *paymentServiceClient) CreateUserPoints(ctx context.Context, in *CreateUserPointsRequest, opts ...grpc.CallOption) (*CreateUserPointsResponse, error) {
 	out := new(CreateUserPointsResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.payment.PaymentService/CreateUserPoints", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/CreateUserPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *paymentServiceClient) CreateUserPoints(ctx context.Context, in *CreateU
 
 func (c *paymentServiceClient) GetUserPoints(ctx context.Context, in *GetUserPointsRequest, opts ...grpc.CallOption) (*GetUserPointsResponse, error) {
 	out := new(GetUserPointsResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.payment.PaymentService/GetUserPoints", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/GetUserPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func _PaymentService_CreateLiveEventOrder_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.payment.PaymentService/CreateLiveEventOrder",
+		FullMethod: "/api.proto.payment.PaymentService/CreateLiveEventOrder",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PaymentServiceServer).CreateLiveEventOrder(ctx, req.(*CreateLiveEventOrderRequest))
@@ -126,7 +126,7 @@ func _PaymentService_CreateUserPoints_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.payment.PaymentService/CreateUserPoints",
+		FullMethod: "/api.proto.payment.PaymentService/CreateUserPoints",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PaymentServiceServer).CreateUserPoints(ctx, req.(*CreateUserPointsRequest))
@@ -144,7 +144,7 @@ func _PaymentService_GetUserPoints_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.payment.PaymentService/GetUserPoints",
+		FullMethod: "/api.proto.payment.PaymentService/GetUserPoints",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PaymentServiceServer).GetUserPoints(ctx, req.(*GetUserPointsRequest))
@@ -156,7 +156,7 @@ func _PaymentService_GetUserPoints_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PaymentService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "neptuneg.go_back.serivces.payment.PaymentService",
+	ServiceName: "api.proto.payment.PaymentService",
 	HandlerType: (*PaymentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

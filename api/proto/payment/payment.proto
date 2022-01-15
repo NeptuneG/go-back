@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option go_package = "github.com/NeptuneG/go-back/api/proto/payment";
-package neptuneg.go_back.serivces.payment;
+package api.proto.payment;
 
 import "google/api/annotations.proto";
 

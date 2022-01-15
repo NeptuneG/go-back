@@ -217,7 +217,7 @@ func RegisterLiveServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/CreateLiveHouse", runtime.WithHTTPPathPattern("/v1/live_houses"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.live.LiveService/CreateLiveHouse", runtime.WithHTTPPathPattern("/v1/live_houses"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -240,7 +240,7 @@ func RegisterLiveServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/ListLiveHouses", runtime.WithHTTPPathPattern("/v1/live_houses"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.live.LiveService/ListLiveHouses", runtime.WithHTTPPathPattern("/v1/live_houses"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -263,7 +263,7 @@ func RegisterLiveServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/CreateLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.live.LiveService/CreateLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -286,7 +286,7 @@ func RegisterLiveServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events/{id}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.live.LiveService/GetLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -309,7 +309,7 @@ func RegisterLiveServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents", runtime.WithHTTPPathPattern("/v1/live_events"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.live.LiveService/ListLiveEvents", runtime.WithHTTPPathPattern("/v1/live_events"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -371,7 +371,7 @@ func RegisterLiveServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/CreateLiveHouse", runtime.WithHTTPPathPattern("/v1/live_houses"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.live.LiveService/CreateLiveHouse", runtime.WithHTTPPathPattern("/v1/live_houses"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -391,7 +391,7 @@ func RegisterLiveServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/ListLiveHouses", runtime.WithHTTPPathPattern("/v1/live_houses"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.live.LiveService/ListLiveHouses", runtime.WithHTTPPathPattern("/v1/live_houses"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -411,7 +411,7 @@ func RegisterLiveServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/CreateLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.live.LiveService/CreateLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -431,7 +431,7 @@ func RegisterLiveServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events/{id}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.live.LiveService/GetLiveEvent", runtime.WithHTTPPathPattern("/v1/live_events/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -451,7 +451,7 @@ func RegisterLiveServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents", runtime.WithHTTPPathPattern("/v1/live_events"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.live.LiveService/ListLiveEvents", runtime.WithHTTPPathPattern("/v1/live_events"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

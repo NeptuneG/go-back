@@ -77,7 +77,7 @@ func RegisterScrapeServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/neptuneg.go_back.serivces.scraper.ScrapeService/CreateScrapeLiveEventsJob", runtime.WithHTTPPathPattern("/v1/scraper/live_event_jobs"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/api.proto.scraper.ScrapeService/CreateScrapeLiveEventsJob", runtime.WithHTTPPathPattern("/v1/scraper/live_event_jobs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -139,7 +139,7 @@ func RegisterScrapeServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/neptuneg.go_back.serivces.scraper.ScrapeService/CreateScrapeLiveEventsJob", runtime.WithHTTPPathPattern("/v1/scraper/live_event_jobs"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/api.proto.scraper.ScrapeService/CreateScrapeLiveEventsJob", runtime.WithHTTPPathPattern("/v1/scraper/live_event_jobs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

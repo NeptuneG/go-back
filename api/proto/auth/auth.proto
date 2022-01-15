@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option go_package = "github.com/NeptuneG/go-back/api/proto/auth";
-package neptuneg.go_back.serivces.auth;
+package api.proto.auth;
 
 import "google/api/annotations.proto";
 
