@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/contribsys/faktory v1.6.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/cache/v8 v8.4.3
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0

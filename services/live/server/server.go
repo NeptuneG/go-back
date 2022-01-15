@@ -10,13 +10,16 @@ import (
 	"github.com/NeptuneG/go-back/pkg/cache"
 	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	db "github.com/NeptuneG/go-back/services/live/db/sqlc"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+)
+
+var (
+	count = 0
 )
 
 type LiveService struct {
@@ -32,7 +35,7 @@ func New() *LiveService {
 
 func (s *LiveService) Close() {
 	if err := s.store.Close(); err != nil {
-		log.Error("failed to close database connection", logField.Error(err))
+		log.Error("failed to close database connection", log.Field.Error(err))
 		panic(err)
 	}
 }
@@ -113,7 +116,7 @@ func (s *LiveService) getLiveHouseBySlug(ctx context.Context, liveHouseSlug stri
 		Do: func(item *cache.Item) (interface{}, error) {
 			liveHouse, err := s.store.GetLiveHouseBySlug(ctx, types.NewNullString(liveHouseSlug))
 			if err != nil {
-				log.Error("failed to get live house by slug", logField.Error(err), logField.String("liveHouseSlug", liveHouseSlug))
+				log.Error("failed to get live house by slug", log.Field.Error(err), log.Field.String("liveHouseSlug", liveHouseSlug))
 				return nil, err
 			}
 			return liveHouse, nil
@@ -134,7 +137,7 @@ func (s *LiveService) ListLiveHouses(ctx context.Context, req *proto.ListLiveHou
 		Do: func(item *cache.Item) (interface{}, error) {
 			liveHouses, err := s.store.GetAllLiveHousesDefault(ctx)
 			if err != nil {
-				log.Error("failed to get all live houses", logField.Error(err))
+				log.Error("failed to get all live houses", log.Field.Error(err))
 				return nil, err
 			}
 			return liveHouses, nil
@@ -166,7 +169,7 @@ func (s *LiveService) ListLiveEvents(ctx context.Context, req *proto.ListLiveEve
 		Do: func(item *cache.Item) (interface{}, error) {
 			liveEvents, err := s.store.GetAllLiveEvents(ctx)
 			if err != nil {
-				log.Error("failed to get all live events", logField.Error(err))
+				log.Error("failed to get all live events", log.Field.Error(err))
 				return nil, err
 			}
 			return liveEvents, nil
@@ -220,7 +223,7 @@ func (s *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventR
 		Do: func(item *cache.Item) (interface{}, error) {
 			liveEvent, err := s.store.GetLiveEventById(ctx, uuid)
 			if err != nil {
-				log.Error("failed to get live event by id", logField.Error(err), logField.String("id", req.Id))
+				log.Error("failed to get live event by id", log.Field.Error(err), log.Field.String("id", req.Id))
 				return nil, err
 			}
 			return liveEvent, nil
@@ -251,6 +254,20 @@ func (s *LiveService) GetLiveEvent(ctx context.Context, req *proto.GetLiveEventR
 }
 
 func (s *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatRequest) (*proto.ReserveSeatResponse, error) {
+	// force a retry
+	count++
+	log.Debug("mock failure for retry", log.Field.Int("count", count))
+	if count%3 != 0 {
+		return nil, status.Error(codes.Internal, "just failed")
+	}
+
+	// mock delay
+	if false {
+		log.Debug("mock delay")
+		time.Sleep(10 * time.Second)
+		log.Debug("mock delay done")
+	}
+
 	liveEventID, err := uuid.Parse(req.LiveEventId)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "failed to parse live event id")
@@ -259,8 +276,8 @@ func (s *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatReq
 		return nil, status.Error(codes.Internal, "failed to reserve seat")
 	} else {
 		log.Info("reserved seat",
-			logField.String("live_event_id", liveEvent.ID.String()),
-			logField.Int32("live_event_available_seats", liveEvent.AvailableSeats),
+			log.Field.String("live_event_id", liveEvent.ID.String()),
+			log.Field.Int32("live_event_available_seats", liveEvent.AvailableSeats),
 		)
 		return &proto.ReserveSeatResponse{
 			LiveEvent: &proto.LiveEvent{
@@ -294,8 +311,8 @@ func (s *LiveService) RollbackSeatReservation(ctx context.Context, req *proto.Ro
 		return nil, status.Error(codes.Internal, "failed to rollback seat reservation")
 	} else {
 		log.Info("rollbacked seat reservation",
-			logField.String("live_event_id", liveEvent.ID.String()),
-			logField.Int32("live_event_available_seats", liveEvent.AvailableSeats),
+			log.Field.String("live_event_id", liveEvent.ID.String()),
+			log.Field.Int32("live_event_available_seats", liveEvent.AvailableSeats),
 		)
 		return &emptypb.Empty{}, nil
 	}

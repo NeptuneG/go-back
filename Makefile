@@ -38,27 +38,28 @@ svc-sqlc-generate:
 
 .PHONY: db-create-all
 db-create-all:
-	docker exec go-back-db createdb --username=dev --owner=dev user_development
-	docker exec go-back-db createdb --username=dev --owner=dev user_test
 	docker exec go-back-db createdb --username=dev --owner=dev live_development
 	docker exec go-back-db createdb --username=dev --owner=dev live_test
 	docker exec go-back-db createdb --username=dev --owner=dev payment_development
 	docker exec go-back-db createdb --username=dev --owner=dev payment_test
+	docker exec go-back-db createdb --username=dev --owner=dev auth_development
+	docker exec go-back-db createdb --username=dev --owner=dev auth_test
 
 .PHONY: db-drop-all
 db-drop-all:
-	docker exec go-back-db dropdb --username=dev -f user_development
-	docker exec go-back-db dropdb --username=dev -f user_test
 	docker exec go-back-db dropdb --username=dev -f live_development
 	docker exec go-back-db dropdb --username=dev -f live_test
 	docker exec go-back-db dropdb --username=dev -f payment_development
 	docker exec go-back-db dropdb --username=dev -f payment_test
+	docker exec go-back-db dropdb --username=dev -f auth_development
+	docker exec go-back-db dropdb --username=dev -f auth_test
 
 .PHONY: db-migrate-all
 db-migrate-all:
-	make svc-db-migrate svc=user
+	make svc-db-migrate svc=auth
 	make svc-db-migrate svc=live
 	make svc-db-migrate svc=payment
+	make svc-db-migrate svc=auth
 
 .PHONY: db-seed-all
 db-seed-all:
@@ -66,13 +67,13 @@ db-seed-all:
 
 .PHONY: sqlc-generate-all
 sqlc-generate-all:
-	make svc-sqlc-generate svc=user
+	make svc-sqlc-generate svc=auth
 	make svc-sqlc-generate svc=live
 	make svc-sqlc-generate svc=payment
 
 .PHONY: build-images-all
 build-images-all:
-	make svc-build-image svc=user
+	make svc-build-image svc=auth
 	make svc-build-image svc=live
 	make svc-build-image svc=gateway
 	make svc-build-image svc=scraper
@@ -81,7 +82,7 @@ build-images-all:
 
 .PHONY: push-images-all
 push-images-all:
-	make svc-push-image svc=user
+	make svc-push-image svc=auth
 	make svc-push-image svc=live
 	make svc-push-image svc=gateway
 	make svc-push-image svc=scraper

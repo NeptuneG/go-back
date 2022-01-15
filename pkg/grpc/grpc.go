@@ -5,7 +5,6 @@ import (
 	"net"
 
 	"github.com/NeptuneG/go-back/pkg/log"
-	logField "github.com/NeptuneG/go-back/pkg/log/field"
 	"google.golang.org/grpc"
 )
 
@@ -14,8 +13,8 @@ type Server struct {
 	port   int
 }
 
-func New(port int, register func(server *grpc.Server)) *Server {
-	srv := grpc.NewServer()
+func New(port int, register func(server *grpc.Server), opt ...grpc.ServerOption) *Server {
+	srv := grpc.NewServer(opt...)
 	register(srv)
 	return &Server{
 		server: srv,
@@ -26,13 +25,13 @@ func New(port int, register func(server *grpc.Server)) *Server {
 func (s *Server) Start() {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
 	if err != nil {
-		log.Fatal("failed to listen", logField.Error(err))
+		log.Fatal("failed to listen", log.Field.Error(err))
 		panic(err)
 	}
 
 	err = s.server.Serve(listener)
 	if err != nil {
-		log.Fatal("failed to serve", logField.Error(err))
+		log.Fatal("failed to serve", log.Field.Error(err))
 		panic(err)
 	}
 }

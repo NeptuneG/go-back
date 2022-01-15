@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "services/payment/proto/payment.proto",
+    "title": "services/auth/proto/auth.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "PaymentService"
+      "name": "AuthService"
     }
   ],
   "consumes": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/payments/live_events": {
+    "/v1/auth/login": {
       "post": {
-        "operationId": "PaymentService_CreateLiveEventOrder",
+        "operationId": "AuthService_Login",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/paymentCreateLiveEventOrderResponse"
+              "$ref": "#/definitions/authLoginResponse"
             }
           },
           "default": {
@@ -39,51 +39,23 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/paymentCreateLiveEventOrderRequest"
+              "$ref": "#/definitions/authLoginRequest"
             }
           }
         ],
         "tags": [
-          "PaymentService"
+          "AuthService"
         ]
       }
     },
-    "/v1/payments/user_points": {
-      "get": {
-        "operationId": "PaymentService_GetUserPoints",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/paymentGetUserPointsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "PaymentService"
-        ]
-      },
+    "/v1/auth/register": {
       "post": {
-        "operationId": "PaymentService_CreateUserPoints",
+        "operationId": "AuthService_Register",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/paymentCreateUserPointsResponse"
+              "$ref": "#/definitions/authRegisterResponse"
             }
           },
           "default": {
@@ -99,77 +71,52 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/paymentCreateUserPointsRequest"
+              "$ref": "#/definitions/authRegisterRequest"
             }
           }
         ],
         "tags": [
-          "PaymentService"
+          "AuthService"
         ]
       }
     }
   },
   "definitions": {
-    "paymentCreateLiveEventOrderRequest": {
+    "authLoginRequest": {
       "type": "object",
       "properties": {
-        "userId": {
+        "email": {
           "type": "string"
         },
-        "liveEventId": {
-          "type": "string"
-        },
-        "price": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "userPoints": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "paymentCreateLiveEventOrderResponse": {
-      "type": "object",
-      "properties": {
-        "state": {
+        "password": {
           "type": "string"
         }
       }
     },
-    "paymentCreateUserPointsRequest": {
+    "authLoginResponse": {
       "type": "object",
       "properties": {
-        "userId": {
+        "token": {
           "type": "string"
-        },
-        "userPoints": {
-          "type": "integer",
-          "format": "int32"
         }
       }
     },
-    "paymentCreateUserPointsResponse": {
+    "authRegisterRequest": {
       "type": "object",
       "properties": {
-        "userId": {
+        "email": {
           "type": "string"
         },
-        "userPoints": {
-          "type": "string",
-          "format": "int64"
+        "password": {
+          "type": "string"
         }
       }
     },
-    "paymentGetUserPointsResponse": {
+    "authRegisterResponse": {
       "type": "object",
       "properties": {
-        "userId": {
+        "token": {
           "type": "string"
-        },
-        "userPoints": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },

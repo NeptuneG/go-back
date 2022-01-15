@@ -19,30 +19,28 @@ const (
 	DebugLevel  Level = zap.DebugLevel
 )
 
-type Field = zap.Field
-
-func (l *Logger) Debug(msg string, fields ...Field) {
+func (l *Logger) Debug(msg string, fields ...zap.Field) {
 	l.zapLogger.Debug(msg, fields...)
 }
 
-func (l *Logger) Info(msg string, fields ...Field) {
+func (l *Logger) Info(msg string, fields ...zap.Field) {
 	l.zapLogger.Info(msg, fields...)
 }
 
-func (l *Logger) Warn(msg string, fields ...Field) {
+func (l *Logger) Warn(msg string, fields ...zap.Field) {
 	l.zapLogger.Warn(msg, fields...)
 }
 
-func (l *Logger) Error(msg string, fields ...Field) {
+func (l *Logger) Error(msg string, fields ...zap.Field) {
 	l.zapLogger.Error(msg, fields...)
 }
-func (l *Logger) DPanic(msg string, fields ...Field) {
+func (l *Logger) DPanic(msg string, fields ...zap.Field) {
 	l.zapLogger.DPanic(msg, fields...)
 }
-func (l *Logger) Panic(msg string, fields ...Field) {
+func (l *Logger) Panic(msg string, fields ...zap.Field) {
 	l.zapLogger.Panic(msg, fields...)
 }
-func (l *Logger) Fatal(msg string, fields ...Field) {
+func (l *Logger) Fatal(msg string, fields ...zap.Field) {
 	l.zapLogger.Fatal(msg, fields...)
 }
 
