@@ -7,7 +7,7 @@ import (
 
 	"github.com/NeptuneG/go-back/internal/pkg/log"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
 
