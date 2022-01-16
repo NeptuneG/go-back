@@ -18,9 +18,9 @@ then
 
     cp -r .scaffold/template/migrations/* migrations/$SERVICE_UNDERSCORE_NAME
     cp -r .scaffold/template/service/db/* internal/$SERVICE_UNDERSCORE_NAME/db
-    cp .scaffold/template/service/.air.toml cmd/$SERVICE_UNDERSCORE_NAME/.air.toml
-    envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/sqlc.yaml.template  > internal/$SERVICE_UNDERSCORE_NAME/sqlc.yaml
-    envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/proto/service.proto.template  > api/proto/$SERVICE_UNDERSCORE_NAME/$SERVICE_UNDERSCORE_NAME.proto
+    envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/.air.toml.template > cmd/$SERVICE_UNDERSCORE_NAME/.air.toml
+    envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/sqlc.yaml.template > internal/$SERVICE_UNDERSCORE_NAME/sqlc.yaml
+    envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/proto/service.proto.template > api/proto/$SERVICE_UNDERSCORE_NAME/$SERVICE_UNDERSCORE_NAME.proto
     envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/server/server.go.template > internal/$SERVICE_UNDERSCORE_NAME/server/server.go
     envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/Dockerfile.template > build/docker/$SERVICE_UNDERSCORE_NAME/Dockerfile
     envsubst '\${SERVICE_UNDERSCORE_NAME} \${SERVICE_PASCALCASE_NAME}' < .scaffold/template/service/main.go.template > cmd/$SERVICE_UNDERSCORE_NAME/main.go

@@ -12,6 +12,7 @@ import (
 type Item = cache.Item
 
 var (
+	redisHost      = os.Getenv("REDIS_CACHE_SERVICE_HOST") + ":" + os.Getenv("REDIS_CACHE_SERVICE_PORT")
 	redisCacheOnce sync.Once
 	redisCache     *cache.Cache
 	Once           = RedisCache().Once
@@ -25,7 +26,7 @@ func RedisCache() *cache.Cache {
 		redisCache = cache.New(&cache.Options{
 			Redis: redis.NewRing(&redis.RingOptions{
 				Addrs: map[string]string{
-					"redis": os.Getenv("REDIS_CACHE_SERVICE_HOST") + ":" + os.Getenv("REDIS_CACHE_SERVICE_PORT"),
+					"redis": redisHost,
 				},
 			}),
 			LocalCache: cache.NewTinyLFU(1000, time.Minute),

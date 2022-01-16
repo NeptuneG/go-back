@@ -6,12 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"os"
 	"sync"
 	"time"
 
 	liveProto "github.com/NeptuneG/go-back/api/proto/live"
 	paymentProto "github.com/NeptuneG/go-back/api/proto/payment"
+	liveSvc "github.com/NeptuneG/go-back/internal/live"
 	db "github.com/NeptuneG/go-back/internal/payment/db/sqlc"
 	"github.com/NeptuneG/go-back/internal/pkg/db/types"
 	"github.com/NeptuneG/go-back/internal/pkg/log"
@@ -35,7 +35,6 @@ type PaymentService struct {
 }
 
 func New() *PaymentService {
-	ctx := context.Background()
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
 		grpc.WithBlock(),
@@ -43,14 +42,14 @@ func New() *PaymentService {
 		grpc.WithDefaultServiceConfig(retryPolicy),
 	}
 
-	liveConn, err := grpc.DialContext(ctx, os.Getenv("LIVE_SERVICE_HOST")+":"+os.Getenv("LIVE_SERVICE_PORT"), opts...)
+	liveClient, err := liveSvc.NewClient(opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", log.Field.Error(err))
 		panic(err)
 	}
 
 	return &PaymentService{
-		liveClient: liveProto.NewLiveServiceClient(liveConn),
+		liveClient: liveClient,
 		store:      db.NewStore(),
 	}
 }

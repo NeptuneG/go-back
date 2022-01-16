@@ -1,18 +1,11 @@
 syntax = "proto3";
 
 option go_package = "github.com/NeptuneG/go-back/api/proto/scraper";
-package neptuneg.go_back.serivces.scraper;
-
-import "google/api/annotations.proto";
+package api.proto.scraper;
 
 service ScrapeService {
   rpc CreateScrapeLiveEventsJob(CreateScrapeLiveEventsJobRequest)
-      returns (CreateScrapeLiveEventsJobResponse) {
-    option (google.api.http) = {
-      post : "/v1/scraper/live_event_jobs"
-      body : "*"
-    };
-  };
+      returns (CreateScrapeLiveEventsJobResponse);
 }
 
 message CreateScrapeLiveEventsJobRequest {

@@ -1,7 +1,6 @@
 package grpc
 
 import (
-	"fmt"
 	"net"
 
 	"github.com/NeptuneG/go-back/internal/pkg/log"
@@ -10,10 +9,10 @@ import (
 
 type Server struct {
 	server *grpc.Server
-	port   int
+	port   string
 }
 
-func New(port int, register func(server *grpc.Server), opt ...grpc.ServerOption) *Server {
+func New(port string, register func(server *grpc.Server), opt ...grpc.ServerOption) *Server {
 	srv := grpc.NewServer(opt...)
 	register(srv)
 	return &Server{
@@ -23,7 +22,7 @@ func New(port int, register func(server *grpc.Server), opt ...grpc.ServerOption)
 }
 
 func (s *Server) Start() {
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
+	listener, err := net.Listen("tcp", s.port)
 	if err != nil {
 		log.Fatal("failed to listen", log.Field.Error(err))
 		panic(err)

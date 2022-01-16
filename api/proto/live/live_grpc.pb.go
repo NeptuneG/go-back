@@ -42,7 +42,7 @@ func NewLiveServiceClient(cc grpc.ClientConnInterface) LiveServiceClient {
 
 func (c *liveServiceClient) CreateLiveHouse(ctx context.Context, in *CreateLiveHouseRequest, opts ...grpc.CallOption) (*CreateLiveHouseResponse, error) {
 	out := new(CreateLiveHouseResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/CreateLiveHouse", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/CreateLiveHouse", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *liveServiceClient) CreateLiveHouse(ctx context.Context, in *CreateLiveH
 
 func (c *liveServiceClient) ListLiveHouses(ctx context.Context, in *ListLiveHousesRequest, opts ...grpc.CallOption) (*ListLiveHousesResponse, error) {
 	out := new(ListLiveHousesResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ListLiveHouses", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/ListLiveHouses", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *liveServiceClient) ListLiveHouses(ctx context.Context, in *ListLiveHous
 
 func (c *liveServiceClient) CreateLiveEvent(ctx context.Context, in *CreateLiveEventRequest, opts ...grpc.CallOption) (*CreateLiveEventResponse, error) {
 	out := new(CreateLiveEventResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/CreateLiveEvent", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/CreateLiveEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *liveServiceClient) CreateLiveEvent(ctx context.Context, in *CreateLiveE
 
 func (c *liveServiceClient) GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error) {
 	out := new(GetLiveEventResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/GetLiveEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (c *liveServiceClient) GetLiveEvent(ctx context.Context, in *GetLiveEventRe
 
 func (c *liveServiceClient) ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error) {
 	out := new(ListLiveEventsResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/ListLiveEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *liveServiceClient) ListLiveEvents(ctx context.Context, in *ListLiveEven
 
 func (c *liveServiceClient) ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error) {
 	out := new(ReserveSeatResponse)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/ReserveSeat", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/ReserveSeat", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *liveServiceClient) ReserveSeat(ctx context.Context, in *ReserveSeatRequ
 
 func (c *liveServiceClient) RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/RollbackSeatReservation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func _LiveService_CreateLiveHouse_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/CreateLiveHouse",
+		FullMethod: "/api.proto.live.LiveService/CreateLiveHouse",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).CreateLiveHouse(ctx, req.(*CreateLiveHouseRequest))
@@ -183,7 +183,7 @@ func _LiveService_ListLiveHouses_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/ListLiveHouses",
+		FullMethod: "/api.proto.live.LiveService/ListLiveHouses",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).ListLiveHouses(ctx, req.(*ListLiveHousesRequest))
@@ -201,7 +201,7 @@ func _LiveService_CreateLiveEvent_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/CreateLiveEvent",
+		FullMethod: "/api.proto.live.LiveService/CreateLiveEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).CreateLiveEvent(ctx, req.(*CreateLiveEventRequest))
@@ -219,7 +219,7 @@ func _LiveService_GetLiveEvent_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/GetLiveEvent",
+		FullMethod: "/api.proto.live.LiveService/GetLiveEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).GetLiveEvent(ctx, req.(*GetLiveEventRequest))
@@ -237,7 +237,7 @@ func _LiveService_ListLiveEvents_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/ListLiveEvents",
+		FullMethod: "/api.proto.live.LiveService/ListLiveEvents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).ListLiveEvents(ctx, req.(*ListLiveEventsRequest))
@@ -255,7 +255,7 @@ func _LiveService_ReserveSeat_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/ReserveSeat",
+		FullMethod: "/api.proto.live.LiveService/ReserveSeat",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).ReserveSeat(ctx, req.(*ReserveSeatRequest))
@@ -273,7 +273,7 @@ func _LiveService_RollbackSeatReservation_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/neptuneg.go_back.serivces.live.LiveService/RollbackSeatReservation",
+		FullMethod: "/api.proto.live.LiveService/RollbackSeatReservation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, req.(*RollbackSeatReservationRequest))
@@ -285,7 +285,7 @@ func _LiveService_RollbackSeatReservation_Handler(srv interface{}, ctx context.C
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var LiveService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "neptuneg.go_back.serivces.live.LiveService",
+	ServiceName: "api.proto.live.LiveService",
 	HandlerType: (*LiveServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -21,7 +21,7 @@ services:
     ports:
       - "4000:4000"
       - "2347:2345"
-    links:
+    depends_on:
       - auth-service
       - live-service
       - scraper-service
@@ -35,7 +35,7 @@ services:
       target: dev
     ports:
       - "2348:2345"
-    links:
+    depends_on:
       - db
     environment:
       DB_NAME: live_development
@@ -48,7 +48,7 @@ services:
       target: dev
     ports:
       - "2350:2345"
-    links:
+    depends_on:
       - db
     environment:
       DB_NAME: payment_development
@@ -62,7 +62,7 @@ services:
       target: dev
     ports:
       - "2351:2345"
-    links:
+    depends_on:
       - db
     environment:
       DB_NAME: auth_development
@@ -75,7 +75,8 @@ services:
       target: dev
     ports:
       - "2349:2345"
-    links:
+    depends_on:
+      - live-service
       - faktory
       - redis-mq
   db:

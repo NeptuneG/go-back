@@ -18,9 +18,7 @@ const (
 )
 
 var (
-	secret          = os.Getenv("JWT_SECRET")
-	ErrInvalidToken = errors.New("invalid token")
-	ErrNoPermission = errors.New("no permission")
+	secret = os.Getenv("JWT_SECRET")
 )
 
 type UserClaims struct {
@@ -52,19 +50,7 @@ func CreateToken(userID string) (string, error) {
 	return tokenString, nil
 }
 
-func Authorize(tokenString string, userID string) error {
-	claims, err := verifyToken(tokenString)
-	if err != nil {
-		return ErrInvalidToken
-	}
-	if claims.UserID != userID {
-		return ErrNoPermission
-	}
-
-	return nil
-}
-
-func verifyToken(tokenString string) (*UserClaims, error) {
+func Authenticate(tokenString string) (*UserClaims, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -86,4 +72,12 @@ func verifyToken(tokenString string) (*UserClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func AuthorizeByUserID(claims *UserClaims, userID string) error {
+	if claims.UserID != userID {
+		return errors.New("no permission")
+	}
+
+	return nil
 }
