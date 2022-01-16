@@ -12,15 +12,18 @@ import (
 	liveSvc "github.com/NeptuneG/go-back/internal/live"
 	paymentSvc "github.com/NeptuneG/go-back/internal/payment"
 	scraperSvc "github.com/NeptuneG/go-back/internal/scraper"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-var prefix = "/" + gateway.GatewayService_ServiceDesc.ServiceName + "/"
-
-var AuthRequiredMethods = []string{
-	prefix + "GetUserPoints",
-	prefix + "CreateUserPoints",
-	prefix + "CreateLiveEventOrder",
-}
+var (
+	prefix              = "/" + gateway.GatewayService_ServiceDesc.ServiceName + "/"
+	AuthRequiredMethods = []string{
+		prefix + "GetUserPoints",
+		prefix + "CreateUserPoints",
+		prefix + "CreateLiveEventOrder",
+	}
+)
 
 type GatewayServer struct {
 	gateway.UnimplementedGatewayServiceServer
@@ -35,29 +38,35 @@ func New() *GatewayServer {
 	liveClient := make(chan live.LiveServiceClient)
 	paymentClient := make(chan payment.PaymentServiceClient)
 	scraperClient := make(chan scraper.ScrapeServiceClient)
+	dialOptions := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
+	}
+
 	go func() {
-		client, err := authSvc.NewClient()
+		client, err := authSvc.NewClient(dialOptions...)
 		if err != nil {
 			panic(err)
 		}
 		authClient <- client
 	}()
 	go func() {
-		client, err := liveSvc.NewClient()
+		client, err := liveSvc.NewClient(dialOptions...)
 		if err != nil {
 			panic(err)
 		}
 		liveClient <- client
 	}()
 	go func() {
-		client, err := paymentSvc.NewClient()
+		client, err := paymentSvc.NewClient(dialOptions...)
 		if err != nil {
 			panic(err)
 		}
 		paymentClient <- client
 	}()
 	go func() {
-		client, err := scraperSvc.NewClient()
+		client, err := scraperSvc.NewClient(dialOptions...)
 		if err != nil {
 			panic(err)
 		}
@@ -89,6 +98,10 @@ func (s *GatewayServer) CreateUserPoints(ctx context.Context, req *payment.Creat
 
 func (s *GatewayServer) ListLiveHouses(ctx context.Context, req *live.ListLiveHousesRequest) (*live.ListLiveHousesResponse, error) {
 	return s.liveClient.ListLiveHouses(ctx, req)
+}
+
+func (s *GatewayServer) ListLiveEvents(ctx context.Context, req *live.ListLiveEventsRequest) (*live.ListLiveEventsResponse, error) {
+	return s.liveClient.ListLiveEvents(ctx, req)
 }
 
 func (s *GatewayServer) CreateLiveEventOrder(ctx context.Context, req *payment.CreateLiveEventOrderRequest) (*payment.CreateLiveEventOrderResponse, error) {

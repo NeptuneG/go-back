@@ -7,16 +7,15 @@ import (
 
 	"github.com/NeptuneG/go-back/api/proto/scraper"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var scraper_service_host = os.Getenv("SCRAPER_SERVICE_HOST") + ":" + os.Getenv("SCRAPER_SERVICE_PORT")
 
-func NewClient() (scraper.ScrapeServiceClient, error) {
+func NewClient(dialOptions ...grpc.DialOption) (scraper.ScrapeServiceClient, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	conn, err := grpc.DialContext(ctx, scraper_service_host, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	conn, err := grpc.DialContext(ctx, scraper_service_host, dialOptions...)
 	if err != nil {
 		return nil, err
 	}

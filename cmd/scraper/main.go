@@ -4,6 +4,7 @@ import (
 	proto "github.com/NeptuneG/go-back/api/proto/scraper"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
 	"github.com/NeptuneG/go-back/internal/scraper"
+	"github.com/NeptuneG/go-back/internal/scraper/consumer"
 	"google.golang.org/grpc"
 )
 
@@ -12,6 +13,11 @@ const (
 )
 
 func main() {
+	go func() {
+		consumer := consumer.New()
+		consumer.Start()
+	}()
+
 	server := scraper.New()
 	defer server.Close()
 

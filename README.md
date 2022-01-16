@@ -72,6 +72,8 @@
     - no ack?
 - `protoc --proto_path=proto proto/*.proto --go_out=plugins=grpc:proto`
     - [bufbuild/buf: A new way of working with Protocol Buffers.](https://github.com/bufbuild/buf)
+- context deadline exceeded
+    - [Why am I seeing `context deadline exceeded` errors – HashiCorp Help Center](https://support.hashicorp.com/hc/en-us/articles/4404634420755-Why-am-I-seeing-context-deadline-exceeded-errors)
 
 ## 🤯🤯🤯
 
