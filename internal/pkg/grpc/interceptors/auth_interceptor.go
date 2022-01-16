@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/NeptuneG/go-back/internal/pkg/auth"
 
@@ -14,26 +15,19 @@ import (
 )
 
 func UnaryDefaultAuthInterceptor(methods ...string) grpc.UnaryServerInterceptor {
-	return func(
-		ctx context.Context,
-		req interface{},
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (interface{}, error) {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		if isToVerify(info.FullMethod, methods...) {
-			userID := reflect.Indirect(reflect.ValueOf(req)).FieldByName("UserId").String()
 			token, err := getToken(ctx)
 			if err != nil {
 				return nil, status.Error(codes.Unauthenticated, err.Error())
 			}
-			if err := auth.Authorize(token, userID); err != nil {
-				if err == auth.ErrInvalidToken {
-					return nil, status.Error(codes.Unauthenticated, "invalid token")
-				} else if err == auth.ErrNoPermission {
-					return nil, status.Error(codes.PermissionDenied, "no permission")
-				} else {
-					return nil, status.Error(codes.Internal, "internal error")
-				}
+			userCliams, err := auth.Authenticate(token)
+			if err != nil {
+				return nil, status.Error(codes.Unauthenticated, err.Error())
+			}
+			userID := reflect.Indirect(reflect.ValueOf(req)).FieldByName("UserId").String()
+			if err := auth.AuthorizeByUserID(userCliams, userID); err != nil {
+				return nil, status.Error(codes.PermissionDenied, err.Error())
 			}
 		}
 
@@ -56,11 +50,15 @@ func isToVerify(fullMethod string, methods ...string) bool {
 func getToken(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", errors.New("authorization token is not provided")
+		return "", errors.New("metadata not found")
 	}
 	values := md["authorization"]
 	if len(values) == 0 {
 		return "", errors.New("authorization token is not provided")
 	}
-	return values[0], nil
+	authorization := strings.SplitN(values[0], " ", 2)
+	if len(authorization) != 2 || !strings.EqualFold(authorization[0], "Bearer") {
+		return "", errors.New("bad authorization string")
+	}
+	return authorization[1], nil
 }
