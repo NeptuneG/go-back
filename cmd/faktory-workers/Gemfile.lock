@@ -3,9 +3,13 @@ GEM
   specs:
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
+    anyway_config (2.2.3)
+      ruby-next-core (>= 0.14.0)
+    concurrent-ruby (1.1.9)
     connection_pool (2.2.5)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    dry-initializer (3.1.1)
     faktory_worker_ruby (1.1.1)
       connection_pool (~> 2.2, >= 2.2.2)
     faraday (1.8.0)
@@ -54,13 +58,28 @@ GEM
     nokogiri (1.12.5-x86_64-linux)
       racc (~> 1.4)
     parallel (1.21.0)
+    prometheus-client (2.1.0)
     public_suffix (4.0.6)
     racc (1.6.0)
+    rack (2.2.3)
     redis (4.5.1)
+    ruby-next-core (0.14.0)
     ruby2_keywords (0.0.5)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8)
+    webrick (1.7.0)
+    yabeda (0.11.0)
+      anyway_config (>= 1.0, < 3)
+      concurrent-ruby
+      dry-initializer
+    yabeda-faktory (0.1.0)
+      faktory_worker_ruby (~> 1.0)
+      yabeda (~> 0.2)
+    yabeda-prometheus (0.8.0)
+      prometheus-client (>= 0.10, < 3.0)
+      rack
+      yabeda (~> 0.10)
 
 PLATFORMS
   x86_64-linux-musl
@@ -70,6 +89,10 @@ DEPENDENCIES
   metainspector (~> 5.11)
   parallel (~> 1.20)
   redis (~> 4.0)
+  webrick (~> 1.7)
+  yabeda
+  yabeda-faktory
+  yabeda-prometheus
 
 RUBY VERSION
    ruby 3.0.3p157
