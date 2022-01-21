@@ -10,14 +10,17 @@ import (
 )
 
 const (
-	port = ":3377"
+	grpcPort    = ":3377"
+	metricsPort = ":9887"
 )
 
 func main() {
 	server := live.New(context.Background())
 	defer server.Close()
 
-	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {
+	go func() { grpcServer.ListenAndServeMetrics(metricsPort) }()
+
+	gprcSrv := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterLiveServiceServer(srv, server)
 	})
 

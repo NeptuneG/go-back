@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	port = ":3377"
+	grpcPort    = ":3377"
+	metricsPort = ":9887"
 )
 
 func main() {
@@ -19,15 +20,13 @@ func main() {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	go func() {
-		consumer := consumer.New(ctx)
-		consumer.Start()
-	}()
+	go func() { grpcServer.ListenAndServeMetrics(metricsPort) }()
+	go func() { consumer.New(ctx).Start() }()
 
 	server := scraper.New(ctx)
 	defer server.Close()
 
-	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {
+	gprcSrv := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterScrapeServiceServer(srv, server)
 	})
 
