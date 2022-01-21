@@ -11,8 +11,8 @@ import (
 
 var scraper_service_host = os.Getenv("SCRAPER_SERVICE_HOST") + ":" + os.Getenv("SCRAPER_SERVICE_PORT")
 
-func NewClient(dialOptions ...grpc.DialOption) (scraper.ScrapeServiceClient, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func NewClient(ctx context.Context, dialOptions ...grpc.DialOption) (scraper.ScrapeServiceClient, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	conn, err := grpc.DialContext(ctx, scraper_service_host, dialOptions...)

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	proto "github.com/NeptuneG/go-back/api/proto/live"
 	"github.com/NeptuneG/go-back/internal/live"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
@@ -12,7 +14,7 @@ const (
 )
 
 func main() {
-	server := live.New()
+	server := live.New(context.Background())
 	defer server.Close()
 
 	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	proto "github.com/NeptuneG/go-back/api/proto/scraper"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
 	"github.com/NeptuneG/go-back/internal/scraper"
@@ -13,12 +15,16 @@ const (
 )
 
 func main() {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	go func() {
-		consumer := consumer.New()
+		consumer := consumer.New(ctx)
 		consumer.Start()
 	}()
 
-	server := scraper.New()
+	server := scraper.New(ctx)
 	defer server.Close()
 
 	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {

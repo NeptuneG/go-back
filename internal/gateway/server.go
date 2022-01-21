@@ -1,4 +1,4 @@
-package server
+package gateway
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	authSvc "github.com/NeptuneG/go-back/internal/auth"
 	liveSvc "github.com/NeptuneG/go-back/internal/live"
 	paymentSvc "github.com/NeptuneG/go-back/internal/payment"
+	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
 	scraperSvc "github.com/NeptuneG/go-back/internal/scraper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -33,7 +34,7 @@ type GatewayServer struct {
 	scraperClient scraper.ScrapeServiceClient
 }
 
-func New() *GatewayServer {
+func New(ctx context.Context) *GatewayServer {
 	authClient := make(chan auth.AuthServiceClient)
 	liveClient := make(chan live.LiveServiceClient)
 	paymentClient := make(chan payment.PaymentServiceClient)
@@ -42,31 +43,32 @@ func New() *GatewayServer {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
+		grpc.WithUnaryInterceptor(interceptors.ContextPropagatingInterceptor),
 	}
 
 	go func() {
-		client, err := authSvc.NewClient(dialOptions...)
+		client, err := authSvc.NewClient(ctx, dialOptions...)
 		if err != nil {
 			panic(err)
 		}
 		authClient <- client
 	}()
 	go func() {
-		client, err := liveSvc.NewClient(dialOptions...)
+		client, err := liveSvc.NewClient(ctx, dialOptions...)
 		if err != nil {
 			panic(err)
 		}
 		liveClient <- client
 	}()
 	go func() {
-		client, err := paymentSvc.NewClient(dialOptions...)
+		client, err := paymentSvc.NewClient(ctx, dialOptions...)
 		if err != nil {
 			panic(err)
 		}
 		paymentClient <- client
 	}()
 	go func() {
-		client, err := scraperSvc.NewClient(dialOptions...)
+		client, err := scraperSvc.NewClient(ctx, dialOptions...)
 		if err != nil {
 			panic(err)
 		}

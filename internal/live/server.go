@@ -27,7 +27,7 @@ type LiveService struct {
 	store *db.Store
 }
 
-func New() *LiveService {
+func New(ctx context.Context) *LiveService {
 	return &LiveService{
 		store: db.NewStore(),
 	}

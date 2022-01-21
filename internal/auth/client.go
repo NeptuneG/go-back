@@ -11,8 +11,8 @@ import (
 
 var auth_service_host = os.Getenv("AUTH_SERVICE_HOST") + ":" + os.Getenv("AUTH_SERVICE_PORT")
 
-func NewClient(dialOptions ...grpc.DialOption) (auth.AuthServiceClient, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func NewClient(ctx context.Context, dialOptions ...grpc.DialOption) (auth.AuthServiceClient, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	conn, err := grpc.DialContext(ctx, auth_service_host, dialOptions...)

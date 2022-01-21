@@ -24,7 +24,7 @@ func main() {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	svc := service.New()
+	svc := service.New(ctx)
 	grpcSrc := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterGatewayServiceServer(srv, svc)
 	}, grpc.UnaryInterceptor(
@@ -35,7 +35,9 @@ func main() {
 		grpcSrc.Start()
 	}()
 
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux(
+		runtime.WithMetadata(service.PropagateTracingHeader),
+	)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if err := proto.RegisterGatewayServiceHandlerFromEndpoint(ctx, mux, grpcPort, opts); err != nil {
 		log.Error("failed to register gateway", log.Field.Error(err))
