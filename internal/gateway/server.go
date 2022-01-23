@@ -14,7 +14,6 @@ import (
 	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
 	scraperSvc "github.com/NeptuneG/go-back/internal/scraper"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -40,7 +39,7 @@ func New(ctx context.Context) *GatewayServer {
 	paymentClient := make(chan payment.PaymentServiceClient)
 	scraperClient := make(chan scraper.ScrapeServiceClient)
 	dialOptions := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithInsecure(),
 		grpc.WithBlock(),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		grpc.WithUnaryInterceptor(interceptors.ContextPropagatingInterceptor),

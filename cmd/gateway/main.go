@@ -14,7 +14,6 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -42,7 +41,7 @@ func main() {
 	mux := runtime.NewServeMux(
 		runtime.WithMetadata(service.PropagateTracingHeader),
 	)
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	opts := []grpc.DialOption{grpc.WithInsecure()}
 	if err := proto.RegisterGatewayServiceHandlerFromEndpoint(ctx, mux, grpcPort, opts); err != nil {
 		log.Error("failed to register gateway", log.Field.Error(err))
 		panic(err)
