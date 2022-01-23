@@ -14,7 +14,7 @@ type ScrapeService struct {
 	proto.UnimplementedScrapeServiceServer
 }
 
-func New() *ScrapeService {
+func New(ctx context.Context) *ScrapeService {
 	return &ScrapeService{}
 }
 

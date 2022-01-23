@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	proto "github.com/NeptuneG/go-back/api/proto/payment"
 	"github.com/NeptuneG/go-back/internal/payment"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
@@ -8,14 +10,21 @@ import (
 )
 
 const (
-	port = ":3377"
+	grpcPort    = ":3377"
+	metricsPort = ":9887"
 )
 
 func main() {
-	server := payment.New()
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() { grpcServer.ListenAndServeMetrics(metricsPort) }()
+
+	server := payment.New(ctx)
 	defer server.Close()
 
-	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {
+	gprcSrv := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterPaymentServiceServer(srv, server)
 	})
 

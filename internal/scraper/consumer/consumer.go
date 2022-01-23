@@ -10,6 +10,7 @@ import (
 	liveSvc "github.com/NeptuneG/go-back/internal/live"
 	"github.com/NeptuneG/go-back/internal/pkg/cache"
 	"github.com/NeptuneG/go-back/internal/pkg/db/types"
+	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
 	"github.com/NeptuneG/go-back/internal/pkg/log"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc"
@@ -42,7 +43,7 @@ var (
 	redisMqHost = os.Getenv("REDIS_MQ_SERVICE_HOST") + ":" + os.Getenv("REDIS_MQ_SERVICE_PORT")
 )
 
-func New() *ScrapedEventsConsumer {
+func New(ctx context.Context) *ScrapedEventsConsumer {
 	redisClient := make(chan *redis.Client)
 	liveClient := make(chan live.LiveServiceClient)
 
@@ -51,9 +52,10 @@ func New() *ScrapedEventsConsumer {
 			grpc.WithInsecure(),
 			grpc.WithBlock(),
 			grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
+			grpc.WithUnaryInterceptor(interceptors.ContextPropagatingInterceptor),
 		}
 
-		client, err := liveSvc.NewClient(opts...)
+		client, err := liveSvc.NewClient(ctx, opts...)
 		if err != nil {
 			log.Error("failed to create live client", log.Field.Error(err))
 			panic(err)

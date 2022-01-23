@@ -14,6 +14,7 @@ import (
 	liveSvc "github.com/NeptuneG/go-back/internal/live"
 	db "github.com/NeptuneG/go-back/internal/payment/db/sqlc"
 	"github.com/NeptuneG/go-back/internal/pkg/db/types"
+	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
 	"github.com/NeptuneG/go-back/internal/pkg/log"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -34,15 +35,16 @@ type PaymentService struct {
 	store      *db.Store
 }
 
-func New() *PaymentService {
+func New(ctx context.Context) *PaymentService {
 	opts := []grpc.DialOption{
 		grpc.WithInsecure(),
 		grpc.WithBlock(),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		grpc.WithDefaultServiceConfig(retryPolicy),
+		grpc.WithUnaryInterceptor(interceptors.ContextPropagatingInterceptor),
 	}
 
-	liveClient, err := liveSvc.NewClient(opts...)
+	liveClient, err := liveSvc.NewClient(ctx, opts...)
 	if err != nil {
 		log.Fatal("failed to connect to live service", log.Field.Error(err))
 		panic(err)

@@ -11,8 +11,8 @@ import (
 
 var payment_service_host = os.Getenv("PAYMENT_SERVICE_HOST") + ":" + os.Getenv("PAYMENT_SERVICE_PORT")
 
-func NewClient(dialOptions ...grpc.DialOption) (payment.PaymentServiceClient, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func NewClient(ctx context.Context, dialOptions ...grpc.DialOption) (payment.PaymentServiceClient, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	conn, err := grpc.DialContext(ctx, payment_service_host, dialOptions...)

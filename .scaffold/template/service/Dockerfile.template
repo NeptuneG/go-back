@@ -10,6 +10,8 @@ RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
+RUN go install github.com/grpc-ecosystem/grpc-health-probe@latest
+
 WORKDIR /go/src/github.com/NeptuneG/go-back
 
 COPY go.mod go.mod
@@ -28,5 +30,6 @@ FROM alpine:3.14
 RUN apk --no-cache add ca-certificates && addgroup -S app && adduser -S app -G app
 USER app
 WORKDIR /app
+COPY --from=builder /go/bin/grpc-health-probe .
 COPY --from=dev /go/src/github.com/NeptuneG/go-back/bin/${SERVICE_UNDERSCORE_NAME} .
 ENTRYPOINT ["./${SERVICE_UNDERSCORE_NAME}"]

@@ -17,7 +17,7 @@ type AuthService struct {
 	store *db.Store
 }
 
-func New() *AuthService {
+func New(ctx context.Context) *AuthService {
 	return &AuthService{store: db.NewStore()}
 }
 

@@ -43,6 +43,7 @@
 - [ ] slug
 - [ ] test
     - [GoConvey - Go testing in the browser](http://goconvey.co/)
+    - [fortio/fortio: Fortio load testing library, command line tool, advanced echo server and web UI in go (golang). Allows to specify a set query-per-second load and record latency histograms and other useful stats.](https://github.com/fortio/fortio)
 - [x] logging
     - [uber-go/zap: Blazing fast, structured, leveled logging in Go.](https://github.com/uber-go/zap)
 - [x] k8s
@@ -50,13 +51,14 @@
 - [ ] pagination
 - [ ] service discovery
 - [ ] config center
-- [ ] health check
+- [X] health check
 - [x] cache
 - [ ] rate limit
 - [ ] hot reload debug
-    - air does not work well due to 2345 is occupied
+    - air does not work well due to 2345 may not be avaiable
 - [x] timeout & retry
 - [ ] grpc responses
+- [ ] TLS
 
 ## Notes
 

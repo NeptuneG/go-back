@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	proto "github.com/NeptuneG/go-back/api/proto/live"
 	"github.com/NeptuneG/go-back/internal/live"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
@@ -8,14 +10,17 @@ import (
 )
 
 const (
-	port = ":3377"
+	grpcPort    = ":3377"
+	metricsPort = ":9887"
 )
 
 func main() {
-	server := live.New()
+	server := live.New(context.Background())
 	defer server.Close()
 
-	gprcSrv := grpcServer.New(port, func(srv *grpc.Server) {
+	go func() { grpcServer.ListenAndServeMetrics(metricsPort) }()
+
+	gprcSrv := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterLiveServiceServer(srv, server)
 	})
 
