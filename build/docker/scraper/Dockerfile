@@ -26,6 +26,8 @@ RUN set -x && \
     apk add --update --no-cache tzdata curl build-base && \
     cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
+RUN go install github.com/grpc-ecosystem/grpc-health-probe@latest
+
 WORKDIR /go/src/github.com/NeptuneG/go-back
 
 COPY go.mod go.mod
@@ -39,5 +41,6 @@ FROM alpine:3.14
 RUN apk --no-cache add ca-certificates && addgroup -S app && adduser -S app -G app
 USER app
 WORKDIR /app
+COPY --from=builder /go/bin/grpc-health-probe .
 COPY --from=builder /go/src/github.com/NeptuneG/go-back/bin/scraper .
 ENTRYPOINT ["./scraper"]

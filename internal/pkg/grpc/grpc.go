@@ -7,6 +7,8 @@ import (
 	"github.com/NeptuneG/go-back/internal/pkg/log"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type Server struct {
@@ -17,6 +19,10 @@ type Server struct {
 func New(port string, register func(server *grpc.Server), opt ...grpc.ServerOption) *Server {
 	srv := grpc.NewServer(opt...)
 	register(srv)
+
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(srv, healthServer)
+
 	return &Server{
 		server: srv,
 		port:   port,
