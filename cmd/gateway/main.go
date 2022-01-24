@@ -11,6 +11,7 @@ import (
 	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
 	"github.com/NeptuneG/go-back/internal/pkg/log"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -30,10 +31,11 @@ func main() {
 	svc := service.New(ctx)
 	grpcSrc := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterGatewayServiceServer(srv, svc)
-	}, grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+	}, grpc_middleware.WithUnaryServerChain(
 		grpc_prometheus.UnaryServerInterceptor,
+		grpc_recovery.UnaryServerInterceptor(),
 		interceptors.UnaryDefaultAuthInterceptor(service.AuthRequiredMethods...),
-	)))
+	))
 
 	go func() { grpcSrc.Start() }()
 	go func() { grpcServer.ListenAndServeMetrics(metricsPort) }()

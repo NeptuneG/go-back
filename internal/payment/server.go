@@ -220,7 +220,7 @@ func (s *PaymentService) consumeUserPoints(ctx context.Context, req *paymentProt
 		userID := uuid.MustParse(req.UserId)
 		_, err := s.store.CreateUserPoints(ctx, db.CreateUserPointsParams{
 			UserID:      userID,
-			Points:      req.UserPoints,
+			Points:      -req.UserPoints,
 			Description: types.NewNullString("order: " + liveEvent.Title),
 			OrderType:   "LiveEventOrder",
 			OrderID:     orderId,

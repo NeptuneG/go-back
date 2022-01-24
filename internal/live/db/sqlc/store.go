@@ -59,6 +59,9 @@ func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID u
 		if err != nil {
 			return nil, err
 		}
+		if liveEvent.AvailableSeats == liveEvent.Seats {
+			return &liveEvent, nil
+		}
 		liveEvent.AvailableSeats++
 		if err = q.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
 			ID:             liveEventID,

@@ -6,6 +6,9 @@ import (
 	proto "github.com/NeptuneG/go-back/api/proto/payment"
 	"github.com/NeptuneG/go-back/internal/payment"
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 )
 
@@ -26,7 +29,10 @@ func main() {
 
 	gprcSrv := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterPaymentServiceServer(srv, server)
-	})
+	}, grpc_middleware.WithUnaryServerChain(
+		grpc_prometheus.UnaryServerInterceptor,
+		grpc_recovery.UnaryServerInterceptor(),
+	))
 
 	gprcSrv.Start()
 }
