@@ -49,6 +49,14 @@
         }
       }
     },
+    "paymentSucceedLiveEventOrderResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

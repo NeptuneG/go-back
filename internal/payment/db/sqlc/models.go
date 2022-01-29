@@ -51,4 +51,5 @@ type UserPoint struct {
 	OrderID     uuid.UUID        `json:"order_id"`
 	CreatedAt   time.Time        `json:"created_at"`
 	UpdatedAt   time.Time        `json:"updated_at"`
+	TxID        types.NullString `json:"tx_id"`
 }

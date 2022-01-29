@@ -45,6 +45,27 @@ func (q *Queries) CreateLiveEventOrder(ctx context.Context, arg CreateLiveEventO
 	return i, err
 }
 
+const getLiveEventOrder = `-- name: GetLiveEventOrder :one
+SELECT id, user_id, live_event_id, price, user_points, created_at, updated_at, state FROM live_event_orders
+WHERE id = $1
+`
+
+func (q *Queries) GetLiveEventOrder(ctx context.Context, id uuid.UUID) (LiveEventOrder, error) {
+	row := q.queryRow(ctx, q.getLiveEventOrderStmt, getLiveEventOrder, id)
+	var i LiveEventOrder
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.LiveEventID,
+		&i.Price,
+		&i.UserPoints,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.State,
+	)
+	return i, err
+}
+
 const updateLiveEventOrderState = `-- name: UpdateLiveEventOrderState :exec
 UPDATE live_event_orders SET state = $1
 WHERE id = $2

@@ -12,7 +12,7 @@ svc-push-image:
 
 .PHONY: svc-generate-migrate
 svc-generate-migrate:
-	docker exec $(svc)-service migrate create -dir migrations/$(svc) -ext sql $(NAME)
+	docker exec $(svc)-service migrate create -dir ../../migrations/$(svc) -ext sql $(NAME)
 
 .PHONY: svc-db-migrate
 svc-db-migrate:

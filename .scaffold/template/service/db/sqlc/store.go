@@ -1,20 +1,20 @@
 package db
 
 import (
-	"database/sql"
+	"sync"
 
 	"github.com/NeptuneG/go-back/internal/pkg/db"
 )
 
-type Store struct {
-	*Queries
-	db *sql.DB
-}
+var (
+	queriesOnce sync.Once
+	queries     *Queries
+	Close       = store().Close
+)
 
-func NewStore() *Store {
-	dbConn := db.ConnectDatabase()
-	return &Store{
-		db:      dbConn,
-		Queries: New(dbConn),
-	}
+func store() *Queries {
+	queriesOnce.Do(func() {
+		queries = New(db.ConnectDatabase())
+	})
+	return queries
 }

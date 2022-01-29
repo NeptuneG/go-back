@@ -49,7 +49,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := http.ListenAndServe(":4000", mux); err != nil {
+	if err := http.ListenAndServe(httpPort, mux); err != nil {
 		log.Error("failed to start server", log.Field.Error(err))
 		panic(err)
 	}

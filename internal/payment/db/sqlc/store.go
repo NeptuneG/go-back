@@ -1,20 +1,26 @@
 package db
 
 import (
-	"database/sql"
+	"sync"
 
 	"github.com/NeptuneG/go-back/internal/pkg/db"
 )
 
-type Store struct {
-	*Queries
-	db *sql.DB
-}
+var (
+	queriesOnce               sync.Once
+	queries                   *Queries
+	Close                     = store().Close
+	CreateUserPoints          = store().CreateUserPoints
+	DeleteUserPointsByTxID    = store().DeleteUserPointsByTxID
+	GetUserPoints             = store().GetUserPoints
+	CreateLiveEventOrder      = store().CreateLiveEventOrder
+	UpdateLiveEventOrderState = store().UpdateLiveEventOrderState
+	GetLiveEventOrder         = store().GetLiveEventOrder
+)
 
-func NewStore() *Store {
-	dbConn := db.ConnectDatabase()
-	return &Store{
-		db:      dbConn,
-		Queries: New(dbConn),
-	}
+func store() *Queries {
+	queriesOnce.Do(func() {
+		queries = New(db.ConnectDatabase())
+	})
+	return queries
 }

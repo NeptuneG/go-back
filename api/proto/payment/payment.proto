@@ -3,12 +3,21 @@ syntax = "proto3";
 option go_package = "github.com/NeptuneG/go-back/api/proto/payment";
 package api.proto.payment;
 
+import "google/protobuf/empty.proto";
+
 service PaymentService {
   rpc CreateLiveEventOrder(CreateLiveEventOrderRequest)
       returns (CreateLiveEventOrderResponse);
 
   rpc CreateUserPoints(CreateUserPointsRequest)
       returns (CreateUserPointsResponse);
+  rpc CreateUserPointsCompensate(CreateUserPointsRequest)
+      returns (google.protobuf.Empty);
+
+  rpc SucceedLiveEventOrder(SucceedLiveEventOrderRequest)
+      returns (SucceedLiveEventOrderResponse);
+  rpc SucceedLiveEventOrderCompensate(SucceedLiveEventOrderRequest)
+      returns (SucceedLiveEventOrderResponse);
 
   rpc GetUserPoints(GetUserPointsRequest) returns (GetUserPointsResponse);
 }
@@ -18,6 +27,7 @@ message CreateLiveEventOrderRequest {
   string live_event_id = 2;
   int32 price = 3;
   int32 user_points = 4;
+  string mode = 5;
 }
 
 message CreateLiveEventOrderResponse { string state = 1; }
@@ -25,6 +35,9 @@ message CreateLiveEventOrderResponse { string state = 1; }
 message CreateUserPointsRequest {
   string user_id = 1;
   int32 user_points = 2;
+  string description = 3;
+  string order_type = 4;
+  string transaction_id = 5;
 }
 
 message CreateUserPointsResponse {
@@ -37,4 +50,12 @@ message GetUserPointsRequest { string user_id = 1; }
 message GetUserPointsResponse {
   string user_id = 1;
   int64 user_points = 2;
+}
+
+message SucceedLiveEventOrderRequest {
+  string live_event_order_id = 1;
+}
+
+message SucceedLiveEventOrderResponse {
+  string state = 1;
 }

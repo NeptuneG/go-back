@@ -19,7 +19,7 @@ service LiveService {
 
   rpc ReserveSeat(ReserveSeatRequest) returns (ReserveSeatResponse);
 
-  rpc RollbackSeatReservation(RollbackSeatReservationRequest)
+  rpc ReserveSeatCompensate(ReserveSeatRequest)
       returns (google.protobuf.Empty);
 }
 
