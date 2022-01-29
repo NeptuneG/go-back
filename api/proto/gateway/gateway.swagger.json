@@ -398,6 +398,9 @@
         "userPoints": {
           "type": "integer",
           "format": "int32"
+        },
+        "mode": {
+          "type": "string"
         }
       }
     },
@@ -418,6 +421,15 @@
         "userPoints": {
           "type": "integer",
           "format": "int32"
+        },
+        "description": {
+          "type": "string"
+        },
+        "orderType": {
+          "type": "string"
+        },
+        "transactionId": {
+          "type": "string"
         }
       }
     },

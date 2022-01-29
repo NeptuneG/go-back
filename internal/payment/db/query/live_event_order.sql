@@ -8,3 +8,7 @@ INSERT INTO live_event_orders (
 -- name: UpdateLiveEventOrderState :exec
 UPDATE live_event_orders SET state = $1
 WHERE id = $2;
+
+-- name: GetLiveEventOrder :one
+SELECT * FROM live_event_orders
+WHERE id = $1;

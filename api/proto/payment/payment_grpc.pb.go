@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,6 +25,9 @@ const _ = grpc.SupportPackageIsVersion7
 type PaymentServiceClient interface {
 	CreateLiveEventOrder(ctx context.Context, in *CreateLiveEventOrderRequest, opts ...grpc.CallOption) (*CreateLiveEventOrderResponse, error)
 	CreateUserPoints(ctx context.Context, in *CreateUserPointsRequest, opts ...grpc.CallOption) (*CreateUserPointsResponse, error)
+	CreateUserPointsCompensate(ctx context.Context, in *CreateUserPointsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SucceedLiveEventOrder(ctx context.Context, in *SucceedLiveEventOrderRequest, opts ...grpc.CallOption) (*SucceedLiveEventOrderResponse, error)
+	SucceedLiveEventOrderCompensate(ctx context.Context, in *SucceedLiveEventOrderRequest, opts ...grpc.CallOption) (*SucceedLiveEventOrderResponse, error)
 	GetUserPoints(ctx context.Context, in *GetUserPointsRequest, opts ...grpc.CallOption) (*GetUserPointsResponse, error)
 }
 
@@ -53,6 +57,33 @@ func (c *paymentServiceClient) CreateUserPoints(ctx context.Context, in *CreateU
 	return out, nil
 }
 
+func (c *paymentServiceClient) CreateUserPointsCompensate(ctx context.Context, in *CreateUserPointsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/CreateUserPointsCompensate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) SucceedLiveEventOrder(ctx context.Context, in *SucceedLiveEventOrderRequest, opts ...grpc.CallOption) (*SucceedLiveEventOrderResponse, error) {
+	out := new(SucceedLiveEventOrderResponse)
+	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/SucceedLiveEventOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) SucceedLiveEventOrderCompensate(ctx context.Context, in *SucceedLiveEventOrderRequest, opts ...grpc.CallOption) (*SucceedLiveEventOrderResponse, error) {
+	out := new(SucceedLiveEventOrderResponse)
+	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/SucceedLiveEventOrderCompensate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *paymentServiceClient) GetUserPoints(ctx context.Context, in *GetUserPointsRequest, opts ...grpc.CallOption) (*GetUserPointsResponse, error) {
 	out := new(GetUserPointsResponse)
 	err := c.cc.Invoke(ctx, "/api.proto.payment.PaymentService/GetUserPoints", in, out, opts...)
@@ -68,6 +99,9 @@ func (c *paymentServiceClient) GetUserPoints(ctx context.Context, in *GetUserPoi
 type PaymentServiceServer interface {
 	CreateLiveEventOrder(context.Context, *CreateLiveEventOrderRequest) (*CreateLiveEventOrderResponse, error)
 	CreateUserPoints(context.Context, *CreateUserPointsRequest) (*CreateUserPointsResponse, error)
+	CreateUserPointsCompensate(context.Context, *CreateUserPointsRequest) (*emptypb.Empty, error)
+	SucceedLiveEventOrder(context.Context, *SucceedLiveEventOrderRequest) (*SucceedLiveEventOrderResponse, error)
+	SucceedLiveEventOrderCompensate(context.Context, *SucceedLiveEventOrderRequest) (*SucceedLiveEventOrderResponse, error)
 	GetUserPoints(context.Context, *GetUserPointsRequest) (*GetUserPointsResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
@@ -81,6 +115,15 @@ func (UnimplementedPaymentServiceServer) CreateLiveEventOrder(context.Context, *
 }
 func (UnimplementedPaymentServiceServer) CreateUserPoints(context.Context, *CreateUserPointsRequest) (*CreateUserPointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUserPoints not implemented")
+}
+func (UnimplementedPaymentServiceServer) CreateUserPointsCompensate(context.Context, *CreateUserPointsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserPointsCompensate not implemented")
+}
+func (UnimplementedPaymentServiceServer) SucceedLiveEventOrder(context.Context, *SucceedLiveEventOrderRequest) (*SucceedLiveEventOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SucceedLiveEventOrder not implemented")
+}
+func (UnimplementedPaymentServiceServer) SucceedLiveEventOrderCompensate(context.Context, *SucceedLiveEventOrderRequest) (*SucceedLiveEventOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SucceedLiveEventOrderCompensate not implemented")
 }
 func (UnimplementedPaymentServiceServer) GetUserPoints(context.Context, *GetUserPointsRequest) (*GetUserPointsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserPoints not implemented")
@@ -134,6 +177,60 @@ func _PaymentService_CreateUserPoints_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PaymentService_CreateUserPointsCompensate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserPointsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).CreateUserPointsCompensate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.proto.payment.PaymentService/CreateUserPointsCompensate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).CreateUserPointsCompensate(ctx, req.(*CreateUserPointsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_SucceedLiveEventOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SucceedLiveEventOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).SucceedLiveEventOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.proto.payment.PaymentService/SucceedLiveEventOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).SucceedLiveEventOrder(ctx, req.(*SucceedLiveEventOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_SucceedLiveEventOrderCompensate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SucceedLiveEventOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).SucceedLiveEventOrderCompensate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.proto.payment.PaymentService/SucceedLiveEventOrderCompensate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).SucceedLiveEventOrderCompensate(ctx, req.(*SucceedLiveEventOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PaymentService_GetUserPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserPointsRequest)
 	if err := dec(in); err != nil {
@@ -166,6 +263,18 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUserPoints",
 			Handler:    _PaymentService_CreateUserPoints_Handler,
+		},
+		{
+			MethodName: "CreateUserPointsCompensate",
+			Handler:    _PaymentService_CreateUserPointsCompensate_Handler,
+		},
+		{
+			MethodName: "SucceedLiveEventOrder",
+			Handler:    _PaymentService_SucceedLiveEventOrder_Handler,
+		},
+		{
+			MethodName: "SucceedLiveEventOrderCompensate",
+			Handler:    _PaymentService_SucceedLiveEventOrderCompensate_Handler,
 		},
 		{
 			MethodName: "GetUserPoints",

@@ -7,6 +7,9 @@ import (
 	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
 	"github.com/NeptuneG/go-back/internal/scraper"
 	"github.com/NeptuneG/go-back/internal/scraper/consumer"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +31,10 @@ func main() {
 
 	gprcSrv := grpcServer.New(grpcPort, func(srv *grpc.Server) {
 		proto.RegisterScrapeServiceServer(srv, server)
-	})
+	}, grpc_middleware.WithUnaryServerChain(
+		grpc_prometheus.UnaryServerInterceptor,
+		grpc_recovery.UnaryServerInterceptor(),
+	))
 
 	gprcSrv.Start()
 }

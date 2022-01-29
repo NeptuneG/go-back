@@ -3,36 +3,43 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"errors"
+	"sync"
+	"time"
 
 	"github.com/NeptuneG/go-back/internal/pkg/cache"
 	"github.com/NeptuneG/go-back/internal/pkg/db"
+	"github.com/NeptuneG/go-back/internal/pkg/db/types"
 	"github.com/NeptuneG/go-back/internal/pkg/log"
 	"github.com/google/uuid"
 )
 
-type Store struct {
-	*Queries
-	db *sql.DB
+var (
+	queriesOnce             sync.Once
+	queries                 *Queries
+	Close                   = store().Close
+	CreateLiveHouse         = store().CreateLiveHouse
+	CreateLiveEvent         = store().CreateLiveEvent
+	GetAllLiveHousesDefault = store().GetAllLiveHousesDefault
+	GetAllLiveEvents        = store().GetAllLiveEvents
+)
+
+func store() *Queries {
+	queriesOnce.Do(func() {
+		queries = New(db.ConnectDatabase())
+	})
+	return queries
 }
 
-func NewStore() *Store {
-	dbConn := db.ConnectDatabase()
-	return &Store{
-		db:      dbConn,
-		Queries: New(dbConn),
-	}
-}
-
-func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
+func DecrementLiveEventAvailableSeats(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
 	if result, err := db.ExecTx(ctx, func(tx *sql.Tx) (interface{}, error) {
-		q := store.Queries.WithTx(tx)
+		q := store().WithTx(tx)
 		liveEvent, err := q.GetLiveEventById(ctx, liveEventID)
 		if err != nil {
 			return nil, err
 		}
 		if liveEvent.AvailableSeats == 0 {
-			return nil, fmt.Errorf("no available seats")
+			return nil, errors.New("no available seats")
 		}
 		liveEvent.AvailableSeats--
 		if err = q.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
@@ -41,8 +48,8 @@ func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*
 		}); err != nil {
 			return nil, err
 		}
-		if err := store.updateLiveEventCache(ctx, liveEvent); err != nil {
-			return nil, err
+		if err := cacheLiveEvent(ctx, liveEvent); err != nil {
+			log.Error("failed to update live event cache", log.Field.Error(err))
 		}
 		return &liveEvent, nil
 	}); err != nil {
@@ -52,12 +59,15 @@ func (store *Store) ReserveSeatTx(ctx context.Context, liveEventID uuid.UUID) (*
 	}
 }
 
-func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
+func IncrementLiveEventAvailableSeats(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
 	if result, err := db.ExecTx(ctx, func(tx *sql.Tx) (interface{}, error) {
-		q := store.Queries.WithTx(tx)
+		q := store().WithTx(tx)
 		liveEvent, err := q.GetLiveEventById(ctx, liveEventID)
 		if err != nil {
 			return nil, err
+		}
+		if liveEvent.AvailableSeats == liveEvent.Seats {
+			return &liveEvent, nil
 		}
 		liveEvent.AvailableSeats++
 		if err = q.UpdateLiveEventAvailableSeatsById(ctx, UpdateLiveEventAvailableSeatsByIdParams{
@@ -66,7 +76,7 @@ func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID u
 		}); err != nil {
 			return nil, err
 		}
-		if err := store.updateLiveEventCache(ctx, liveEvent); err != nil {
+		if err := cacheLiveEvent(ctx, liveEvent); err != nil {
 			log.Error("failed to update live event cache", log.Field.Error(err))
 		}
 		return &liveEvent, err
@@ -77,16 +87,58 @@ func (store *Store) RollbackSeatReservationTx(ctx context.Context, liveEventID u
 	}
 }
 
-func (store *Store) updateLiveEventCache(ctx context.Context, liveEvent GetLiveEventByIdRow) error {
+func GetLiveHouseBySlug(ctx context.Context, liveHouseSlug string) (*LiveHouse, error) {
+	if liveHouseSlug == "" {
+		return nil, errors.New("liveHouseSlug is empty")
+	}
+
+	var liveHouse LiveHouse
+	if err := cache.Once(&cache.Item{
+		Ctx:   ctx,
+		Key:   "live-house:" + liveHouseSlug,
+		Value: &liveHouse,
+		TTL:   5 * time.Minute,
+		Do: func(item *cache.Item) (interface{}, error) {
+			return store().GetLiveHouseBySlug(ctx, types.NewNullString(liveHouseSlug))
+		},
+	}); err != nil {
+		return nil, err
+	}
+	return &liveHouse, nil
+}
+
+func GetLiveEventById(ctx context.Context, liveEventID uuid.UUID) (*GetLiveEventByIdRow, error) {
+	if liveEventID == uuid.Nil {
+		return nil, errors.New("liveEventID is empty")
+	}
+
+	var liveEvent GetLiveEventByIdRow
+	if err := cache.Once(&cache.Item{
+		Ctx:   ctx,
+		Key:   "live-event:" + liveEventID.String(),
+		Value: &liveEvent,
+		TTL:   5 * time.Minute,
+		Do: func(item *cache.Item) (interface{}, error) {
+			liveEvent, err := store().GetLiveEventById(ctx, liveEventID)
+			if err != nil {
+				return nil, err
+			}
+			return liveEvent, nil
+		},
+	}); err != nil {
+		return nil, err
+	}
+	return &liveEvent, nil
+}
+
+func cacheLiveEvent(ctx context.Context, liveEvent GetLiveEventByIdRow) error {
+	key := "live-event:" + liveEvent.ID.String()
 	if err := cache.Set(&cache.Item{
 		Ctx:   ctx,
-		Key:   fmt.Sprintf("live-event:%s", liveEvent.ID.String()),
+		Key:   key,
 		Value: liveEvent,
 	}); err != nil {
-		if err := cache.Delete(ctx, fmt.Sprintf("live-event:%s", liveEvent.ID.String())); err != nil {
-			return err
-		}
-		return err
+		return cache.Delete(ctx, key)
 	}
 	return nil
 }

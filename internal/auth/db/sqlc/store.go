@@ -2,32 +2,46 @@ package db
 
 import (
 	"context"
-	"database/sql"
+	"sync"
 
 	"github.com/NeptuneG/go-back/internal/pkg/db"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Store struct {
-	*Queries
-	db *sql.DB
+var (
+	queriesOnce    sync.Once
+	queries        *Queries
+	Close          = store().Close
+	GetUserByEmail = store().GetUserByEmail
+)
+
+func store() *Queries {
+	queriesOnce.Do(func() {
+		queries = New(db.ConnectDatabase())
+	})
+	return queries
 }
 
-func NewStore() *Store {
-	dbConn := db.ConnectDatabase()
-	return &Store{
-		db:      dbConn,
-		Queries: New(dbConn),
-	}
-}
-
-func (s *Store) AuthenticateUser(ctx context.Context, email string, password string) (*User, error) {
-	user, err := s.GetUserByEmail(ctx, email)
+func CreateUser(ctx context.Context, email string, password string) (*User, error) {
+	encrypted_password, err := encryptPassword(password)
 	if err != nil {
 		return nil, err
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(password)); err != nil {
+
+	if user, err := store().CreateUser(ctx, CreateUserParams{
+		Email:             email,
+		EncryptedPassword: encrypted_password,
+	}); err != nil {
 		return nil, err
+	} else {
+		return &user, nil
 	}
-	return &user, nil
+}
+
+func encryptPassword(password string) (string, error) {
+	encrypt_bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(encrypt_bytes), nil
 }

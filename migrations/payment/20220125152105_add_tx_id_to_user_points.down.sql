@@ -1,0 +1,1 @@
+ALTER TABLE user_points DROP COLUMN IF EXISTS tx_id;

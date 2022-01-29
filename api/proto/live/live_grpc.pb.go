@@ -29,7 +29,7 @@ type LiveServiceClient interface {
 	GetLiveEvent(ctx context.Context, in *GetLiveEventRequest, opts ...grpc.CallOption) (*GetLiveEventResponse, error)
 	ListLiveEvents(ctx context.Context, in *ListLiveEventsRequest, opts ...grpc.CallOption) (*ListLiveEventsResponse, error)
 	ReserveSeat(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*ReserveSeatResponse, error)
-	RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ReserveSeatCompensate(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type liveServiceClient struct {
@@ -94,9 +94,9 @@ func (c *liveServiceClient) ReserveSeat(ctx context.Context, in *ReserveSeatRequ
 	return out, nil
 }
 
-func (c *liveServiceClient) RollbackSeatReservation(ctx context.Context, in *RollbackSeatReservationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *liveServiceClient) ReserveSeatCompensate(ctx context.Context, in *ReserveSeatRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/RollbackSeatReservation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.proto.live.LiveService/ReserveSeatCompensate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ type LiveServiceServer interface {
 	GetLiveEvent(context.Context, *GetLiveEventRequest) (*GetLiveEventResponse, error)
 	ListLiveEvents(context.Context, *ListLiveEventsRequest) (*ListLiveEventsResponse, error)
 	ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error)
-	RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*emptypb.Empty, error)
+	ReserveSeatCompensate(context.Context, *ReserveSeatRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedLiveServiceServer()
 }
 
@@ -139,8 +139,8 @@ func (UnimplementedLiveServiceServer) ListLiveEvents(context.Context, *ListLiveE
 func (UnimplementedLiveServiceServer) ReserveSeat(context.Context, *ReserveSeatRequest) (*ReserveSeatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReserveSeat not implemented")
 }
-func (UnimplementedLiveServiceServer) RollbackSeatReservation(context.Context, *RollbackSeatReservationRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RollbackSeatReservation not implemented")
+func (UnimplementedLiveServiceServer) ReserveSeatCompensate(context.Context, *ReserveSeatRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReserveSeatCompensate not implemented")
 }
 func (UnimplementedLiveServiceServer) mustEmbedUnimplementedLiveServiceServer() {}
 
@@ -263,20 +263,20 @@ func _LiveService_ReserveSeat_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LiveService_RollbackSeatReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RollbackSeatReservationRequest)
+func _LiveService_ReserveSeatCompensate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReserveSeatRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, in)
+		return srv.(LiveServiceServer).ReserveSeatCompensate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.proto.live.LiveService/RollbackSeatReservation",
+		FullMethod: "/api.proto.live.LiveService/ReserveSeatCompensate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LiveServiceServer).RollbackSeatReservation(ctx, req.(*RollbackSeatReservationRequest))
+		return srv.(LiveServiceServer).ReserveSeatCompensate(ctx, req.(*ReserveSeatRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -313,8 +313,8 @@ var LiveService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _LiveService_ReserveSeat_Handler,
 		},
 		{
-			MethodName: "RollbackSeatReservation",
-			Handler:    _LiveService_RollbackSeatReservation_Handler,
+			MethodName: "ReserveSeatCompensate",
+			Handler:    _LiveService_ReserveSeatCompensate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

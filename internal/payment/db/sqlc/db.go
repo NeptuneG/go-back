@@ -28,8 +28,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserPointsStmt, err = db.PrepareContext(ctx, createUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUserPoints: %w", err)
 	}
-	if q.deleteUserPointsByOrderIDStmt, err = db.PrepareContext(ctx, deleteUserPointsByOrderID); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteUserPointsByOrderID: %w", err)
+	if q.deleteUserPointsByTxIDStmt, err = db.PrepareContext(ctx, deleteUserPointsByTxID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteUserPointsByTxID: %w", err)
+	}
+	if q.getLiveEventOrderStmt, err = db.PrepareContext(ctx, getLiveEventOrder); err != nil {
+		return nil, fmt.Errorf("error preparing query GetLiveEventOrder: %w", err)
 	}
 	if q.getUserPointsStmt, err = db.PrepareContext(ctx, getUserPoints); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserPoints: %w", err)
@@ -52,9 +55,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createUserPointsStmt: %w", cerr)
 		}
 	}
-	if q.deleteUserPointsByOrderIDStmt != nil {
-		if cerr := q.deleteUserPointsByOrderIDStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteUserPointsByOrderIDStmt: %w", cerr)
+	if q.deleteUserPointsByTxIDStmt != nil {
+		if cerr := q.deleteUserPointsByTxIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteUserPointsByTxIDStmt: %w", cerr)
+		}
+	}
+	if q.getLiveEventOrderStmt != nil {
+		if cerr := q.getLiveEventOrderStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getLiveEventOrderStmt: %w", cerr)
 		}
 	}
 	if q.getUserPointsStmt != nil {
@@ -108,7 +116,8 @@ type Queries struct {
 	tx                            *sql.Tx
 	createLiveEventOrderStmt      *sql.Stmt
 	createUserPointsStmt          *sql.Stmt
-	deleteUserPointsByOrderIDStmt *sql.Stmt
+	deleteUserPointsByTxIDStmt    *sql.Stmt
+	getLiveEventOrderStmt         *sql.Stmt
 	getUserPointsStmt             *sql.Stmt
 	updateLiveEventOrderStateStmt *sql.Stmt
 }
@@ -119,7 +128,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                            tx,
 		createLiveEventOrderStmt:      q.createLiveEventOrderStmt,
 		createUserPointsStmt:          q.createUserPointsStmt,
-		deleteUserPointsByOrderIDStmt: q.deleteUserPointsByOrderIDStmt,
+		deleteUserPointsByTxIDStmt:    q.deleteUserPointsByTxIDStmt,
+		getLiveEventOrderStmt:         q.getLiveEventOrderStmt,
 		getUserPointsStmt:             q.getUserPointsStmt,
 		updateLiveEventOrderStateStmt: q.updateLiveEventOrderStateStmt,
 	}
