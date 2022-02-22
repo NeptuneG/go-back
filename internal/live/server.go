@@ -221,10 +221,10 @@ func (s *LiveService) ReserveSeat(ctx context.Context, req *proto.ReserveSeatReq
 	log.Info("reserve seat", log.Field.Any("req", req))
 	// force a retry
 	count++
-	log.Debug("mock failure for retry", log.Field.Int("count", count))
-	if count%3 != 0 {
-		return nil, status.Error(codes.Internal, "just failed")
-	}
+	// log.Debug("mock failure for retry", log.Field.Int("count", count))
+	// if count%3 != 0 {
+	// 	return nil, status.Error(codes.Internal, "just failed")
+	// }
 
 	// mock delay
 	if false {
