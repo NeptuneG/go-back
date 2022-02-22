@@ -1,0 +1,32 @@
+name: 'Build And Push Image'
+description: 'Builds and pushes an image with a tag of the commit SHA'
+inputs:
+  dockerfile:
+    description: 'Dockerfile to build'
+    required: true
+  context:
+    description: 'Context to build'
+    required: true
+  tags:
+    description: 'Tags to push'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Check out the repo
+      uses: actions/checkout@v2
+
+    - name: Login to Quay.io
+      uses: docker/login-action@v1
+      with:
+        registry: quay.io
+        username: ${{ secrets.QUAY_ROBOT_NAME }}
+        password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+    - name: Build and push image
+      uses: docker/build-push-action@v2
+      with:
+        file: ${{ inputs.dockerfile }}
+        context: ${{ inputs.context }}
+        push: true
+        tags: ${{ inputs.tags }}
+  

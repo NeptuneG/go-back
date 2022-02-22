@@ -1,0 +1,41 @@
+name: Build and Push All Images
+on:
+  push:
+    branches:
+      - main
+    paths:
+    - 'internal/pkg/**'
+    - 'tools/**'
+    - 'go.mod'
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Quay.io
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+       include:
+         - dockerfile: build/docker/auth/Dockerfile
+           context: .
+           tags: quay.io/goss_beta/auth-service:${{ github.sha }}
+         - dockerfile: build/docker/faktory-workers/Dockerfile
+           context: cmd/faktory-workers
+           tags: quay.io/goss_beta/faktory-workers:${{ github.sha }}
+         - dockerfile: build/docker/gateway/Dockerfile
+           context: .
+           tags: quay.io/goss_beta/gateway-service:${{ github.sha }}
+         - dockerfile: build/docker/live/Dockerfile
+           context: .
+           tags: quay.io/goss_beta/live-service:${{ github.sha }}
+         - dockerfile: build/docker/payment/Dockerfile
+           context: .
+           tags: quay.io/goss_beta/payment-service:${{ github.sha }}
+         - dockerfile: build/docker/scraper/Dockerfile
+           context: .
+           tags: quay.io/goss_beta/scraper-service:${{ github.sha }}
+    steps:
+      - uses: ./.github/actions/build-image
+        with:
+          dockerfile: ${{ matrix.dockerfile }}
+          context: ${{ matrix.context }}
+          tags: ${{ matrix.tags }}
