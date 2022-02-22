@@ -12,20 +12,20 @@ svc-push-image:
 
 .PHONY: svc-generate-migrate
 svc-generate-migrate:
-	docker exec $(svc)-service migrate create -dir ../../migrations/$(svc) -ext sql $(NAME)
+	docker run --rm -v migrations:/migrations migrate/migrate create -dir /migrations/$(svc) -ext sql $(NAME)
 
 .PHONY: svc-db-migrate
 svc-db-migrate:
-	docker exec -it $(svc)-service migrate \
+	docker run --rm -v migrations:/migrations migrate/migrate \
 	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
-	-path ../../migrations/$(svc) \
+	-path /migrations/$(svc) \
 	-verbose up
 
 .PHONY: svc-db-rollback
 svc-db-rollback:
-	docker exec -it $(svc)-service migrate \
+	docker run --rm -v migrations:/migrations migrate/migrate \
 	-database postgresql://dev@db/$(svc)_development?sslmode=disable \
-	-path ../../migrations/$(svc) \
+	-path /migrations/$(svc) \
 	-verbose down $(or $(STEP), 1)
 
 .PHONY: svc-db-seed
