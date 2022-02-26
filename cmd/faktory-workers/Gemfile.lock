@@ -55,7 +55,7 @@ GEM
       nokogiri (~> 1.11)
     multipart-post (2.1.1)
     nesty (1.0.2)
-    nokogiri (1.12.5-x86_64-linux)
+    nokogiri (1.13.3-x86_64-linux)
       racc (~> 1.4)
     parallel (1.21.0)
     prometheus-client (2.1.0)
