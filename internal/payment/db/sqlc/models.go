@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NeptuneG/go-back/internal/pkg/db/types"
+	"github.com/NeptuneG/go-back/pkg/db/types"
 	"github.com/google/uuid"
 )
 

@@ -3,7 +3,7 @@ package db
 import (
 	"sync"
 
-	"github.com/NeptuneG/go-back/internal/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/db"
 )
 
 var (

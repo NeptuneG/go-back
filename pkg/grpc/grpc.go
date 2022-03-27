@@ -4,7 +4,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/log"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"

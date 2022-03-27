@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/NeptuneG/go-back/internal/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/db"
 	"golang.org/x/crypto/bcrypt"
 )
 

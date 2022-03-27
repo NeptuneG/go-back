@@ -6,9 +6,9 @@ import (
 
 	proto "github.com/NeptuneG/go-back/api/proto/live"
 	db "github.com/NeptuneG/go-back/internal/live/db/sqlc"
-	"github.com/NeptuneG/go-back/internal/pkg/cache"
-	"github.com/NeptuneG/go-back/internal/pkg/db/types"
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/cache"
+	"github.com/NeptuneG/go-back/pkg/db/types"
+	"github.com/NeptuneG/go-back/pkg/log"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

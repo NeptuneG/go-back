@@ -5,8 +5,8 @@ import (
 
 	proto "github.com/NeptuneG/go-back/api/proto/auth"
 	db "github.com/NeptuneG/go-back/internal/auth/db/sqlc"
-	"github.com/NeptuneG/go-back/internal/pkg/auth"
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/auth"
+	"github.com/NeptuneG/go-back/pkg/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

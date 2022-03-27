@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/NeptuneG/go-back/internal/pkg/auth"
+	"github.com/NeptuneG/go-back/pkg/auth"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

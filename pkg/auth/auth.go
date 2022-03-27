@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/log"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"

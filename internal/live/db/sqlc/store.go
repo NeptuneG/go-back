@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NeptuneG/go-back/internal/pkg/cache"
-	"github.com/NeptuneG/go-back/internal/pkg/db"
-	"github.com/NeptuneG/go-back/internal/pkg/db/types"
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/cache"
+	"github.com/NeptuneG/go-back/pkg/db"
+	"github.com/NeptuneG/go-back/pkg/db/types"
+	"github.com/NeptuneG/go-back/pkg/log"
 	"github.com/google/uuid"
 )
 

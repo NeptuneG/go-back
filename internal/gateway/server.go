@@ -11,8 +11,8 @@ import (
 	authSvc "github.com/NeptuneG/go-back/internal/auth"
 	liveSvc "github.com/NeptuneG/go-back/internal/live"
 	paymentSvc "github.com/NeptuneG/go-back/internal/payment"
-	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
 	scraperSvc "github.com/NeptuneG/go-back/internal/scraper"
+	"github.com/NeptuneG/go-back/pkg/grpc/interceptors"
 	"google.golang.org/grpc"
 )
 

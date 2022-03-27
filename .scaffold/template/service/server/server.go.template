@@ -2,7 +2,7 @@ package ${SERVICE_UNDERSCORE_NAME}
 
 import (
 	proto "github.com/NeptuneG/go-back/api/proto/${SERVICE_UNDERSCORE_NAME}"
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/log"
 	db "github.com/NeptuneG/go-back/internal/${SERVICE_UNDERSCORE_NAME}/db/sqlc"
 )
 

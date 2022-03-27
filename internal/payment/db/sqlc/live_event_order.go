@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/log"
 )
 
 func (lo *LiveEventOrder) UpdateState(ctx context.Context, state State) error {

@@ -5,7 +5,7 @@ import (
 
 	proto "github.com/NeptuneG/go-back/api/proto/live"
 	"github.com/NeptuneG/go-back/internal/live"
-	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
+	grpcServer "github.com/NeptuneG/go-back/pkg/grpc"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"

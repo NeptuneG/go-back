@@ -6,10 +6,10 @@ import (
 
 	proto "github.com/NeptuneG/go-back/api/proto/gateway"
 	service "github.com/NeptuneG/go-back/internal/gateway"
-	grpcServer "github.com/NeptuneG/go-back/internal/pkg/grpc"
+	grpcServer "github.com/NeptuneG/go-back/pkg/grpc"
 
-	"github.com/NeptuneG/go-back/internal/pkg/grpc/interceptors"
-	"github.com/NeptuneG/go-back/internal/pkg/log"
+	"github.com/NeptuneG/go-back/pkg/grpc/interceptors"
+	"github.com/NeptuneG/go-back/pkg/log"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
