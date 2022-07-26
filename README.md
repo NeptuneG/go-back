@@ -12,7 +12,7 @@
 ### gateway
 - gRPC -> JSON proxy service by [grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
 ### dtm
-- distributed transaction management service by [dtm-labs/dtf](https://github.com/dtm-labs/dtf)
+- distributed transaction management service by [dtm-labs/dtm](https://github.com/dtm-labs/dtm)
 ### auth
 - JWT authentication service
 ### live
